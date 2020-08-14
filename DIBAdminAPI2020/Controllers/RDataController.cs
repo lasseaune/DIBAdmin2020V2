@@ -38,7 +38,6 @@ namespace DIBAdminAPI.Controllers
             };
             if (data.ob == "topicdata")
             {
-                
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
                 if (result == null)
                 {
@@ -51,7 +50,11 @@ namespace DIBAdminAPI.Controllers
                         string query = "dbo.GetTopicDetail";
                         TopicDetail topicresult = await _repo.ExecTopicDetail(query, new { topic_id = topicId }, null);
                         TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
-                        return Ok(tdapi);
+                        TopicPartsAPI tp = new TopicPartsAPI {
+                            objects = tdapi.objects
+                                    .Where(v => v.Value.type == "topicdata")
+                                    .ToDictionary(v => v.Key, v => v.Value) };
+                        return Ok(tp);
                     }
                 }
                 else
@@ -69,7 +72,17 @@ namespace DIBAdminAPI.Controllers
                 }
                 if ((string)result.Attributes("value").FirstOrDefault() == "1")
                 {
-                    return Ok();
+                    if (Guid.TryParse(data.resourceId, out Guid topicId))
+                    {
+                        string query = "dbo.GetTopicDetail";
+                        TopicDetail topicresult = await _repo.ExecTopicDetail(query, new { topic_id = topicId }, null);
+                        TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
+                        return Ok(tdapi);
+                    }
+                }
+                else if ((string)result.Attributes("value").FirstOrDefault() == "0")
+                {
+                    return BadRequest((string)result.Attributes("message").FirstOrDefault());
                 }
                 return BadRequest();
             }
@@ -87,8 +100,21 @@ namespace DIBAdminAPI.Controllers
                         string query = "dbo.GetTopicDetail";
                         TopicDetail topicresult = await _repo.ExecTopicDetail(query, new { topic_id = topicId }, null);
                         TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
-                        return Ok(tdapi);
+                        TopicPartsAPI tp = new TopicPartsAPI
+                        {
+                            root = tdapi.objects
+                                    .Where(v => v.Value.type == "name")
+                                    .Select(v=>v.Key).ToList(),
+                            objects = tdapi.objects
+                                    .Where(v => v.Value.type == "name")
+                                    .ToDictionary(v => v.Key, v => v.Value)
+                        };
+                        return Ok(tp);
                     }
+                }
+                else if((string)result.Attributes("value").FirstOrDefault() == "0")
+                {
+                    return BadRequest((string)result.Attributes("message").FirstOrDefault());
                 }
             }
             return Ok(data);

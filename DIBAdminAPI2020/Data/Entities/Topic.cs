@@ -14,6 +14,7 @@ namespace DIBAdminAPI.Data.Entities
         public int topic_type_id { get; set; }
         public string short_description { get; set; }
         public string description { get; set; }
+        public int deleted { get; set; }
         public IEnumerable<int> Databases { get; set; }
         public IEnumerable<TopicName> TopicNames { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
@@ -157,6 +158,11 @@ namespace DIBAdminAPI.Data.Entities
     {
        public string id { get; set; }   
     }
+    public class TopicPartsAPI
+    {
+        public Dictionary<string, ObjectApi> objects { get; set; }
+        public List<string> root { get; set; }
+    }
     public class TopicDetailAPI
     {
         public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
@@ -192,11 +198,13 @@ namespace DIBAdminAPI.Data.Entities
                     { "supplier_id",topicDetail.supplier_id.ToString() },
                     { "topic_type_id", topicDetail.topic_type_id.ToString() },
                     { "short_description",topicDetail.short_description },
-                    { "description", topicDetail.description }
+                    { "description", topicDetail.description },
+                    { "deleted", topicDetail.deleted.ToString() }
                 }
             };
 
             objects.Add(topicDetail.topic_id.ToString(), topicObject);
+
             databases = topicDetail.Databases;
 
             ObjectsApi objectsApi = new ObjectsApi(topicDetail.TopicNames);

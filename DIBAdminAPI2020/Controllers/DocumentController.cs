@@ -12,6 +12,9 @@ using System.IO;
 using System.Xml.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DIBAdminAPI.Controllers
 {
@@ -171,7 +174,7 @@ namespace DIBAdminAPI.Controllers
             _cache.Set<DocumentContainer>(rid + "_document", dc);
             return Ok(dc);
         }
-
+        
         [HttpGet("s")]
         public async Task<IActionResult> Search(
                 [FromQuery] string search
