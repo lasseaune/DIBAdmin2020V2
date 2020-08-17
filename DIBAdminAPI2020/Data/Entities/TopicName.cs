@@ -11,6 +11,8 @@ namespace DIBAdminAPI.Data.Entities
         public string name { get; set; }
         public bool isdefault { get; set; }
         public int topic_name_type_id { get; set; }
-        
+        public string transactionId { get; set; }
+
+
     }
 }

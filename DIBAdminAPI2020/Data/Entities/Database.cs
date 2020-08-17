@@ -10,5 +10,6 @@ namespace DIBAdminAPI.Data.Entities
     {
         public int database_id { get; set; }
         public string name { get; set; }
+        public string transactionId { get; set; }
     }
 }

@@ -52,6 +52,7 @@ namespace DIBAdminAPI.Data.Entities
         public DateTime updatedate { get; set; }
         public string username { get; set; }
         public string language { get; set; }
+        public string transactionId { get; set; }
     }
 
     public class ResourceType

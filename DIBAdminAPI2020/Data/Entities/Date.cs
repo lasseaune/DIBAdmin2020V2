@@ -16,5 +16,6 @@ namespace DIBAdminAPI.Data.Entities
         public Guid id { get; set; }
         public int date_type_id { get; set; }
         public DateTime date { get; set; }
+        public string transactionId { get; set; }
     }
 }

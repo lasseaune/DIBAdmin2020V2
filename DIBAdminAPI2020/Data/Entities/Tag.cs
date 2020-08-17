@@ -10,6 +10,7 @@ namespace DIBAdminAPI.Data.Entities
         public int tag_id { get; set; }
         public string tag { get; set; }
         public int tag_type_id { get; set; }
+        public string transactionId { get; set; }
 
     }
 }

@@ -223,7 +223,7 @@ namespace DIBAdminAPI.Data
                     {
                         result = multi.Read<TopicDetail>().FirstOrDefault();
                         result.TopicNames = multi.Read<TopicName>().ToList();
-                        result.Databases = multi.Read<int>().ToList();
+                        result.Databases = multi.Read<Database>().ToList();
                         result.Tags = multi.Read<Tag>().ToList();
                         result.description = multi.Read<string>().FirstOrDefault();
                         result.Dates = multi.Read<Dates>().ToList();

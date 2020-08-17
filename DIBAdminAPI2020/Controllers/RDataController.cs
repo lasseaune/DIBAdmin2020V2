@@ -27,97 +27,60 @@ namespace DIBAdminAPI.Controllers
         [HttpPatch("")]
         public async Task<IActionResult> Patch([FromBody]JsonRDataPatch data)
         {
+            string transactionId = Guid.NewGuid().ToString();
+            if (!(Guid.TryParse(data.resourceId, out Guid test)))
+            {
+                return BadRequest();
+            }
+            string topic_id = data.resourceId;
             var p = new
             {
                 data.resourceId,
-                Id= data.Id??"",
+                Id = data.Id ?? "",
                 data.ob,
                 data.op,
+                transactionId,
                 values = new XElement("values", data.values.Select(v => new XAttribute(v.Key, v.Value))),
                 session_id = "apitest" //_usrsvc.CurrentUser.session_id,
             };
-            if (data.ob == "topicdata")
+            
+            if ("topicdata;database;name".Split(';').Contains(data.ob))
             {
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
                 if (result == null)
                 {
-                    return BadRequest();
+                    return BadRequest("No data");
                 }
                 if ((string)result.Attributes("value").FirstOrDefault() == "1")
                 {
-                    if (Guid.TryParse(data.resourceId, out Guid topicId))
+                    var t = new
                     {
-                        string query = "dbo.GetTopicDetail";
-                        TopicDetail topicresult = await _repo.ExecTopicDetail(query, new { topic_id = topicId }, null);
-                        TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
-                        TopicPartsAPI tp = new TopicPartsAPI {
-                            objects = tdapi.objects
-                                    .Where(v => v.Value.type == "topicdata")
-                                    .ToDictionary(v => v.Key, v => v.Value) };
-                        return Ok(tp);
-                    }
+                        topic_id,
+                        data.ob,
+                        transactionId
+                    };
+                    string query = "dbo.GetTopicDetail";
+                    TopicDetail topicresult = await _repo.ExecTopicDetail(query, t , null);
+                    TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
+                    TopicPartsAPI tp = new TopicPartsAPI {
+                        root = tdapi.objects
+                                .Where(v => v.Value.type == data.ob)
+                                .Select(v => v.Key).ToList(),
+                        objects = tdapi.objects
+                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId )
+                                .ToDictionary(v => v.Key, v => v.Value) };
+                    return Ok(tp);
                 }
                 else
                 {
-                    return BadRequest();
+                    string message = (string)result.Attributes("value").FirstOrDefault();
+                    return BadRequest(message);
                 }
             }
-            if (data.ob == "area")
+            else
             {
-
-                XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
-                if (result == null)
-                {
-                    return BadRequest();
-                }
-                if ((string)result.Attributes("value").FirstOrDefault() == "1")
-                {
-                    if (Guid.TryParse(data.resourceId, out Guid topicId))
-                    {
-                        string query = "dbo.GetTopicDetail";
-                        TopicDetail topicresult = await _repo.ExecTopicDetail(query, new { topic_id = topicId }, null);
-                        TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
-                        return Ok(tdapi);
-                    }
-                }
-                else if ((string)result.Attributes("value").FirstOrDefault() == "0")
-                {
-                    return BadRequest((string)result.Attributes("message").FirstOrDefault());
-                }
-                return BadRequest();
+                return BadRequest("No action");
             }
-            if (data.ob == "topicname")
-            {
-                XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
-                if (result == null)
-                {
-                    return BadRequest();
-                }
-                if ((string)result.Attributes("value").FirstOrDefault() == "1")
-                {
-                    if (Guid.TryParse(data.resourceId, out Guid topicId))
-                    {
-                        string query = "dbo.GetTopicDetail";
-                        TopicDetail topicresult = await _repo.ExecTopicDetail(query, new { topic_id = topicId }, null);
-                        TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
-                        TopicPartsAPI tp = new TopicPartsAPI
-                        {
-                            root = tdapi.objects
-                                    .Where(v => v.Value.type == "name")
-                                    .Select(v=>v.Key).ToList(),
-                            objects = tdapi.objects
-                                    .Where(v => v.Value.type == "name")
-                                    .ToDictionary(v => v.Key, v => v.Value)
-                        };
-                        return Ok(tp);
-                    }
-                }
-                else if((string)result.Attributes("value").FirstOrDefault() == "0")
-                {
-                    return BadRequest((string)result.Attributes("message").FirstOrDefault());
-                }
-            }
-            return Ok(data);
         }
     }
 }

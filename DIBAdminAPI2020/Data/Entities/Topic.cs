@@ -15,7 +15,8 @@ namespace DIBAdminAPI.Data.Entities
         public string short_description { get; set; }
         public string description { get; set; }
         public int deleted { get; set; }
-        public IEnumerable<int> Databases { get; set; }
+        public string transactionId { get; set; }
+        public IEnumerable<Database> Databases { get; set; }
         public IEnumerable<TopicName> TopicNames { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
         public IEnumerable<Dates> Dates { get; set; }
@@ -28,6 +29,24 @@ namespace DIBAdminAPI.Data.Entities
         public List<string> objectsList { get; set; }
         public Dictionary<string, ObjectApi> objects { get; set; }
         public ObjectsApi() { }
+        public ObjectsApi(IEnumerable<Database> databases)
+        {
+            objectsList = databases.OrderBy(p => p.name).Select(p => p.database_id.ToString()).ToList();
+            objects = databases
+                 .ToDictionary(
+                     p => p.database_id.ToString(),
+                     p => new ObjectApi
+                     {
+                         type = "database",
+                         id = p.database_id.ToString(),
+                         transactionId = p.transactionId,
+                         data = new Dictionary<string, string> {
+                            { "name", p.name }
+                            
+                         }
+                     }
+                 );
+        }
         public ObjectsApi(IEnumerable<TopicName> topicNames)
         {
             objectsList = topicNames.OrderBy(p => p.name).Select(p => p.topic_name_id.ToString()).ToList();
@@ -38,10 +57,11 @@ namespace DIBAdminAPI.Data.Entities
                      {
                          type = "name",
                          id = p.topic_name_id.ToString(),
+                         transactionId = p.transactionId,
                          data = new Dictionary<string, string> {
                             { "name", p.name },
                             { "name_type_id",p.topic_name_type_id.ToString() },
-                            { "default", p.isdefault ? "1" : "0"  }
+                            { "default", p.isdefault ? "1" : "0"  },
                          }
                      }
                  );
@@ -56,6 +76,7 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         type = "tag",
                         id = p.tag_id.ToString(),
+                        transactionId = p.transactionId,
                         data = new Dictionary<string, string>
                         {
                             {"tag", p.tag },
@@ -74,10 +95,11 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         type = "date",
                         id = p.id.ToString(),
+                        transactionId = p.transactionId,
                         data = new Dictionary<string, string>
                         {
                             { "date", p.date.ToString() },
-                            { "date_type_id" ,p.date_type_id.ToString() }
+                            { "date_type_id" ,p.date_type_id.ToString() },
                         }
                     }
                 );
@@ -92,6 +114,7 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         type = "related",
                         id = p.Key.ToString(),
+                        transactionId = p.Value.transactionId,
                         data = new Dictionary<string, string>
                         {
                             { "resourceId", p.Value.resourceId },
@@ -113,13 +136,14 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         type = "resource",
                         id = p.resource_id.ToString().Trim().ToLower() == topic_id.Trim().ToLower() ? "default;" + p.resource_id.ToString() : p.resource_id.ToString(),
+                        transactionId = p.transactionId,
                         data = new Dictionary<string, string>
                         {
                             { "resourceId" , p.resource_id.ToString() },
                             { "resource_type_id" , p.resource_type_id.ToString()},
                             { "language" , p.language},
                             { "lastupdate" , p.updatedate.ToString()},
-                            { "default" , p.resource_id.ToString().Trim().ToLower() == topic_id.Trim().ToLower() ? "1":"0"}
+                            { "default" , p.resource_id.ToString().Trim().ToLower() == topic_id.Trim().ToLower() ? "1":"0"},
                         }
                     }
             );
@@ -130,6 +154,7 @@ namespace DIBAdminAPI.Data.Entities
     {
         public string type { get; set; }
         public string id { get; set; }
+        public string transactionId { get; set; }
         public Dictionary<string, string> data { get; set; }
     }
     public class TagsAPI
@@ -166,32 +191,26 @@ namespace DIBAdminAPI.Data.Entities
     public class TopicDetailAPI
     {
         public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
-        //public Guid topic_id { get; set; }
-        //public string language { get; set; }
-        //public bool publish { get; set; }
-        //public int supplier_id { get; set; }
-        //public int topic_type_id { get; set; }
-        //public string short_description { get; set; }
-        //public string description { get; set; }
-        public IEnumerable<int> databases { get; set; }
+        public List<string> databases { get; set; }
         public List<string> names { get; set; }
         public List<string> tags { get; set; }
         public List<string> dates { get; set; }
         public List<string> related { get; set; }
         public List<string> resources { get; set; }
-        public TopicRoot root { get; set; }
+        public List<string> root { get; set; }
         public TopicDetailAPI(TopicDetail topicDetail)
         {
 
-            root = new TopicRoot
+            root = new List<string>
             {
-                id = topicDetail.topic_id.ToString()
+                topicDetail.topic_id.ToString()
             };
 
             ObjectApi topicObject = new ObjectApi
             {
                 type = "topicdata",
                 id = topicDetail.topic_id.ToString(),
+                transactionId =  topicDetail.transactionId,
                 data = new Dictionary<string, string>{
                     { "language",topicDetail.language },
                     { "publish", topicDetail.publish.ToString() },
@@ -205,9 +224,13 @@ namespace DIBAdminAPI.Data.Entities
 
             objects.Add(topicDetail.topic_id.ToString(), topicObject);
 
-            databases = topicDetail.Databases;
 
-            ObjectsApi objectsApi = new ObjectsApi(topicDetail.TopicNames);
+
+            ObjectsApi objectsApi = new ObjectsApi(topicDetail.Databases);
+            databases = objectsApi.objectsList;
+            objects.AddRange(objectsApi.objects);
+
+            objectsApi = new ObjectsApi(topicDetail.TopicNames);
             names = objectsApi.objectsList;
             objects.AddRange(objectsApi.objects);
 
@@ -235,6 +258,7 @@ namespace DIBAdminAPI.Data.Entities
         public Dictionary<string, Related> related { get; set; }
         public RelatedResources(IEnumerable<TopicBase> Related, IEnumerable<TopicSubElement> SubLink)
         {
+            if (Related == null || SubLink == null) return;
             related = (
                 from r in Related
                 join s in SubLink
@@ -263,6 +287,7 @@ namespace DIBAdminAPI.Data.Entities
         public string subname { get; set; }
         public string Id { get; set; }
         public int idx { get; set; }
+        public string transactionId { get; set; }
     }
     public class TopicSubElement
     {
