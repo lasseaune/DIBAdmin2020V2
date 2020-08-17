@@ -53,6 +53,14 @@ namespace DIBAdminAPI.Controllers
                 }
                 if ((string)result.Attributes("value").FirstOrDefault() == "1")
                 {
+                    if (data.op=="delete")
+                    {
+                        List<string> root = new List<string>
+                        {
+                            (string)result.Attributes("id").FirstOrDefault()
+                        };
+                        return Ok(root);
+                    }
                     var t = new
                     {
                         topic_id,
@@ -64,11 +72,12 @@ namespace DIBAdminAPI.Controllers
                     TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
                     TopicPartsAPI tp = new TopicPartsAPI {
                         root = tdapi.objects
-                                .Where(v => v.Value.type == data.ob)
+                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
                                 .Select(v => v.Key).ToList(),
                         objects = tdapi.objects
                                 .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId )
                                 .ToDictionary(v => v.Key, v => v.Value) };
+                        
                     return Ok(tp);
                 }
                 else
