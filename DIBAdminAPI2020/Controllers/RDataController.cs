@@ -44,7 +44,7 @@ namespace DIBAdminAPI.Controllers
                 session_id = "apitest" //_usrsvc.CurrentUser.session_id,
             };
             
-            if ("topicdata;database;name".Split(';').Contains(data.ob))
+            if ("topicdata;database;name;tag;date;related".Split(';').Contains(data.ob))
             {
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
                 if (result == null)
@@ -55,11 +55,15 @@ namespace DIBAdminAPI.Controllers
                 {
                     if (data.op=="delete")
                     {
-                        List<string> root = new List<string>
+                        TopicPartsAPI dp = new TopicPartsAPI
                         {
-                            (string)result.Attributes("id").FirstOrDefault()
+                            root = new List<string>
+                            {
+                                (string)result.Attributes("id").FirstOrDefault()
+                            },
+                            objects= null
                         };
-                        return Ok(root);
+                        return Ok(dp);
                     }
                     var t = new
                     {
@@ -82,7 +86,7 @@ namespace DIBAdminAPI.Controllers
                 }
                 else
                 {
-                    string message = (string)result.Attributes("value").FirstOrDefault();
+                    string message = (string)result.Attributes("message").FirstOrDefault();
                     return BadRequest(message);
                 }
             }

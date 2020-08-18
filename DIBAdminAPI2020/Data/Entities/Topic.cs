@@ -68,19 +68,21 @@ namespace DIBAdminAPI.Data.Entities
         }
         public ObjectsApi(IEnumerable<Tag> tags)
         {
-            objectsList = tags.OrderBy(p => p.tag).Select(p => p.tag_id.ToString()).ToList();
+            objectsList = tags.OrderBy(p => p.tag).Select(p => p.tagId.ToString()).ToList();
             objects = tags
                 .ToDictionary(
-                    p => p.tag_id.ToString(),
+                    p => p.tagId.ToString(),
                     p => new ObjectApi
                     {
                         type = "tag",
-                        id = p.tag_id.ToString(),
+                        id = p.tagId.ToString(),
                         transactionId = p.transactionId,
                         data = new Dictionary<string, string>
                         {
-                            {"tag", p.tag },
-                            {"tag_type_id" , p.tag_type_id.ToString() }
+                            { "id", p.tagId.ToString() },
+                            { "tag", p.tag },
+                            { "tag_type_id" , p.tag_type_id.ToString() },
+                            { "language", p.language }
                         }
                     }
                 );
@@ -117,6 +119,7 @@ namespace DIBAdminAPI.Data.Entities
                         transactionId = p.Value.transactionId,
                         data = new Dictionary<string, string>
                         {
+                            { "rId",  p.Key.ToString() },
                             { "resourceId", p.Value.resourceId },
                             { "name" ,p.Value.name },
                             { "topic_type_id" , p.Value.topic_type_id.ToString()},
@@ -273,7 +276,8 @@ namespace DIBAdminAPI.Data.Entities
                 topic_type_id = p.r.topic_type_id,
                 subname = p.s.Name,
                 Id = p.s.relId,
-                idx = p.s.idx
+                idx = p.s.idx,
+                transactionId = p.s.transactionId
             });
 
             
@@ -296,6 +300,7 @@ namespace DIBAdminAPI.Data.Entities
         public string relId { get; set; }
         public string Name { get; set; }
         public int idx { get; set; }
+        public string transactionId { get; set; }
     }
     
     public class TopicBase
