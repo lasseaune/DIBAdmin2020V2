@@ -26,17 +26,17 @@ namespace DIBAdminAPI.Controllers
         }
 
         [HttpPost("create")]
-        public IActionResult Create([FromBody]AccountingJson aj)
+        public IActionResult Create()
         {
-            string resourceId = aj.resourceid;
-            string segmentId = aj.segmentid == null ? "" : aj.segmentid;
-            string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
+            //string resourceId = aj.resourceid;
+            //string segmentId = aj.segmentid == null ? "" : aj.segmentid;
+            //string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
 
-            DocumentContainer result = _cache.Get<DocumentContainer>(rid);
-            if (result == null)
-            {
-                return BadRequest("Document finnes ikke i cache");
-            }
+            //DocumentContainer result = _cache.Get<DocumentContainer>(rid);
+            //if (result == null)
+            //{
+            //    return BadRequest("Document finnes ikke i cache");
+            //}
 
 
 

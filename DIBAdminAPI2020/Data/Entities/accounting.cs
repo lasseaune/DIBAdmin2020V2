@@ -10,100 +10,80 @@ using System.Text.RegularExpressions;
 
 namespace DIBAdminAPI.Data.Entities
 {
-    public static class OtherPropsOperations
+    public static class ElementData
     {
-        public static void SetOtherProps(this KeyValuePair<string, JsonElement> ae, Dictionary<string, JsonElement> elements, string propsName, string refName)
+        public static Dictionary<string, AccountingElementApi> GetElementData(IEnumerable<AccountLine> AccountLines, IEnumerable<TaxLine> TaxLines)
         {
-            if (ae.Value.name == "section")
-            {
-                KeyValuePair<string, JsonElement> target = (
-                    from c in ae.Value.children
-                    join e in elements
-                    on c.id equals e.Key
-                    where Regex.IsMatch(e.Value.name.Trim().ToLower(), @"^h\d")
-                    select e
-                ).FirstOrDefault();
-                if (target.Key != null)
-                {
-                    if (target.Value.otherprops == null)
-                        target.Value.otherprops = new Dictionary<string, string>();
-                    target.Value.otherprops.Add(refName, ae.Key) ;
-                    if (ae.Value.otherprops == null)
-                        ae.Value.otherprops = new Dictionary<string, string>();
-                    ae.Value.otherprops.Add(propsName, "true");
-                }
-                else
-                {
-                    if (ae.Value.otherprops == null)
-                        ae.Value.otherprops = new Dictionary<string, string>();
-                    ae.Value.otherprops.Add(propsName, "true");
-                    ae.Value.otherprops.Add(refName, ae.Key);
+            return AccountLines
+                .Select(p => p.id)
+                .Union(
+                    TaxLines
+                    .Select(p => p.id)
+                )
+                .GroupBy(p => p)
+                .ToDictionary(
+                    p => p.Key,
+                    p => new AccountingElementApi
+                    {
+                        accounting = AccountLines
+                                    .Where(a => a.id == p.Key)
+                                    .OrderBy(a => a.guiorder)
+                                    .ThenBy(a => a.idx)
+                                    .Select(a => a.lineid.ToString())
+                                    .ToList(),
+                        tax = TaxLines
+                                    .Where(a => a.id == p.Key)
+                                    .OrderBy(a => a.idx)
+                                    .Select(a => a.lineid.ToString())
+                                    .ToList()
 
-                }
-            }
-            else
-            {
-                if (ae.Value.otherprops == null)
-                    ae.Value.otherprops = new Dictionary<string, string>();
-                ae.Value.otherprops.Add(propsName, "true");
-                ae.Value.otherprops.Add(refName, ae.Key);
-            }
+                    }
+                ); ;
         }
-    }
-    public static class AccointingOperations
-    {
-        public static void SetAccounting(this KeyValuePair<string, JsonElement> ae, Dictionary<string, JsonElement> elements)
+        public static Dictionary<string, ObjectApi> GetAccountLineObjects(IEnumerable<AccountLine> AccountLines)
         {
-            if (ae.Value.name == "section")
-            {
-                KeyValuePair<string, JsonElement> target = (
-                    from c in ae.Value.children
-                    join e in elements
-                    on c.id equals e.Key
-                    where Regex.IsMatch(e.Value.name.Trim().ToLower(), @"^h\d")
-                    select e
-                ).FirstOrDefault();
-                if (target.Key != null)
+            return AccountLines
+                .ToDictionary(
+                p => p.lineid.ToString(),
+                p => new ObjectApi
                 {
-                    target.Value.otherprops = new Dictionary<string, string>() { { "accref", ae.Key } };
-                    ae.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" } };
-                }
-                else
-                {
-                    ae.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" }, { "accref", ae.Key } };
-                }
-            }
-            else
-                ae.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" }, { "accref", ae.Key } };
+                    type = "accline",
+                    id = p.lineid.ToString(),
+                    data = new Dictionary<string, string>
+                    {
 
-
+                           { "accId" , p.accid.ToString() },
+                           { "name", p.name },
+                           { "code", p.code },
+                           { "debetcredit", p.debetcredit.ToString()},
+                           { "refRecorceId", p.refResourceId.ToString() },
+                           { "refId", p.refId },
+                           { "type", p.type.ToString() }
+                    }
+                }
+                );
         }
-    }
-        
-    public class Taxline
-    {
-        public int taxid { get; set; }
-        public bool value { get; set; }
+        public static Dictionary<string, ObjectApi> GetTaxLineObjects(IEnumerable<TaxLine> TaxLines)
+        {
+            return TaxLines
+                .ToDictionary(
+                p => p.lineid.ToString(),
+                p => new ObjectApi
+                {
+                    type = "taxLine",
+                    id = p.lineid.ToString(),
+                    data = new Dictionary<string, string>
+                    {
 
-    }
-    public class AcclineJson
-    {
-        public int accid { get; set; }
-        public string code { get; set; }
-        public int DebetCredit { get; set; }
-        public List<Taxline> tax { get; set; }
-    }
-    public class AccountingJson
-    {
-        public string resourceid { get; set; }
-        public string segmentid { get; set; }
-        public string id { get; set; }
-        public string action { get; set; }
-        public string item { get; set; }
-        public List<AcclineJson> line { get; set; }
-
-        
-
+                        { "accId" , p.accid.ToString() },
+                        { "taxid" , p.taxid.ToString() },
+                        { "name" , p.name },
+                        { "refResourceId" , p.refResourceId.ToString() },
+                        { "refId", p.id },
+                    }
+                }
+                );
+        }
     }
     public class AccountingType
     {
@@ -130,6 +110,148 @@ namespace DIBAdminAPI.Data.Entities
         public string Id { get; set; }
         public int AccId { get; set; }
     }
+
+    public class TaxLine
+    {
+        public Guid lineid { get; set; }
+        public Guid resorceid { get; set; }
+        public string id { get; set; }
+        public int accid { get; set; }
+        public int taxid { get; set; }
+        public string name { get; set; }
+        public int guiorder { get; set; }
+        public int idx { get; set; }
+        public Guid refResourceId { get; set; }
+        public string refId { get; set; }
+    }
+    public class AccountLine
+    {
+        public Guid lineid { get; set; }
+        public Guid resorceid { get; set; }
+        public string id { get; set; }
+        public int accid { get; set; }
+        public int type { get; set; }
+        public string code { get; set; }
+        public string name { get; set; }
+        public int debetcredit { get; set; }
+        public int guiorder { get; set; }
+        public int idx { get; set; }
+        public Guid refResourceId { get; set; }
+        public string refId { get; set; }
+    }
+
+    public class AccountingElementApi
+    {
+        public List<string> accounting { get; set; }
+        public List<string> tax { get; set; }
+    }
+
+    public class AccountingObjectsAPI
+    {
+
+        //public Dictionary<string, dynamic> accountings { get; set; }
+        public Dictionary<string, ObjectApi> objects { get; set; }
+        public Dictionary<string, AccountingElementApi> objectsList { get; set; }
+        public List<string> aobjects { get; set; }
+
+       
+    }
+
+    public static class OtherPropsOperations
+    {
+        public static void SetOtherProps(this KeyValuePair<string, JsonElement> ae, Dictionary<string, JsonElement> elements, string propsName, string refName)
+        {
+            if (ae.Value.name == "section")
+            {
+                KeyValuePair<string, JsonElement> target = (
+                    from c in ae.Value.children
+                    join e in elements
+                    on c.id equals e.Key
+                    where Regex.IsMatch(e.Value.name.Trim().ToLower(), @"^h\d")
+                    select e
+                ).FirstOrDefault();
+                if (target.Key != null)
+                {
+                    if (target.Value.otherprops == null)
+                        target.Value.otherprops = new Dictionary<string, string>();
+                    target.Value.otherprops.Add(refName, ae.Key);
+                    if (ae.Value.otherprops == null)
+                        ae.Value.otherprops = new Dictionary<string, string>();
+                    ae.Value.otherprops.Add(propsName, "true");
+                }
+                else
+                {
+                    if (ae.Value.otherprops == null)
+                        ae.Value.otherprops = new Dictionary<string, string>();
+                    ae.Value.otherprops.Add(propsName, "true");
+                    ae.Value.otherprops.Add(refName, ae.Key);
+
+                }
+            }
+            else
+            {
+                if (ae.Value.otherprops == null)
+                    ae.Value.otherprops = new Dictionary<string, string>();
+                ae.Value.otherprops.Add(propsName, "true");
+                ae.Value.otherprops.Add(refName, ae.Key);
+            }
+        }
+    }
+    //public static class AccointingOperations
+    //{
+    //    public static void SetAccounting(this KeyValuePair<string, JsonElement> ae, Dictionary<string, JsonElement> elements)
+    //    {
+    //        if (ae.Value.name == "section")
+    //        {
+    //            KeyValuePair<string, JsonElement> target = (
+    //                from c in ae.Value.children
+    //                join e in elements
+    //                on c.id equals e.Key
+    //                where Regex.IsMatch(e.Value.name.Trim().ToLower(), @"^h\d")
+    //                select e
+    //            ).FirstOrDefault();
+    //            if (target.Key != null)
+    //            {
+    //                target.Value.otherprops = new Dictionary<string, string>() { { "accref", ae.Key } };
+    //                ae.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" } };
+    //            }
+    //            else
+    //            {
+    //                ae.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" }, { "accref", ae.Key } };
+    //            }
+    //        }
+    //        else
+    //            ae.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" }, { "accref", ae.Key } };
+
+
+    //    }
+    //}
+
+    //public class Taxline
+    //{
+    //    public int taxid { get; set; }
+    //    public bool value { get; set; }
+
+    //}
+    //public class AcclineJson
+    //{
+    //    public int accid { get; set; }
+    //    public string code { get; set; }
+    //    public int DebetCredit { get; set; }
+    //    public List<Taxline> tax { get; set; }
+    //}
+    //public class AccountingJson
+    //{
+    //    public string resourceid { get; set; }
+    //    public string segmentid { get; set; }
+    //    public string id { get; set; }
+    //    public string action { get; set; }
+    //    public string item { get; set; }
+    //    public List<AcclineJson> line { get; set; }
+
+
+
+    //}
     //public class MvaObjects: Object
     //{
     //    public int AccId { get; set; }
@@ -153,7 +275,7 @@ namespace DIBAdminAPI.Data.Entities
     //        Id = code.Id;
 
     //    }
-        
+
     //}
     //public class TaxObject 
     //{
@@ -201,7 +323,7 @@ namespace DIBAdminAPI.Data.Entities
     //public class AccLineGroup
     //{
     //    public XElement Line { get; set; }
-        
+
 
     //}
     //public class AccountingObject
@@ -295,304 +417,152 @@ namespace DIBAdminAPI.Data.Entities
     //        });
     //    }
     //}
-    public class TaxLine
-    {
-        public Guid lineid { get; set; }
-        public Guid resorceid { get; set; }
-        public string id { get; set; }
-        public int accid { get; set; }
-        public int taxid { get; set; }
-    }
 
-    
-    public class AccountLine
-    {
-        public Guid lineid { get; set; }
-        public string id { get; set; }
-        public int accid { get; set; }
-        public string name { get; set; }
-        public string code { get; set; }
-        public int? debetcredit = null;
-    }
+    //public class AccountingSection
+    //{
+    //    public int accid { get; set; }
+    //    public string name { get; set; }
+    //    public Guid resourceid { get; set; }
+    //    public int type { get; set; }
+    //    public List<string> accountline { get; set; }
+    //    public List<string> taxline { get; set; }
 
-    public class AccountingSection
-    {
-        public int accid { get; set; }
-        public string name { get; set; }
-        public Guid resourceid { get; set; }
-        public int type { get; set; }
-        public List<string> accountline { get; set; }
-        public List<string> taxline { get; set; }
-
-        public AccountingSection(
-            string parentId,
-            AccountingType a,
-            IEnumerable<XElement> lines,
-            IEnumerable<AccountingCode> accountingCodes,
-            IEnumerable<AccountingTax> accountingTax)
-        {
-            accid = a.AccId;
-            name = a.Name;
-            resourceid = a.ResourceId;
-            type = a.Type;
-            
-
-            accountline = (
-                    from l in lines.Where(p => p.Name.LocalName == "accline")
-                    join ac in accountingCodes
-                    on new
-                    {
-                        code = (string)l.Attributes("code").FirstOrDefault(),
-                        type = (string)l.Attributes("type").FirstOrDefault()
-                    } equals new
-                    {
-                        code = ac.Code,
-                        type = ac.Type.ToString()
-                    }
-                    orderby ac.GuiOrder
-                    select (string)l.Attributes("lineid").FirstOrDefault()
-                    ).ToList();
-            taxline = (
-                    from l in lines.Where(p => p.Name.LocalName == "taxline")
-                    join t in accountingTax
-                    on (string)l.Attributes("tax_id").FirstOrDefault() equals t.TaxId.ToString()
-                    orderby t.Id
-                    select (string)l.Attributes("lineid").FirstOrDefault()
-                    ).ToList();
-        }
-    }
-    
-    public class AccountingObjects
-    {
-       
-        //public Dictionary<string, dynamic> accountings { get; set; }
-        public Dictionary<string, Dictionary<string, AccountingSection>> accounts { get; set; }
-        public Dictionary<string, TaxLine> taxelement { get; set; }
-        public Dictionary<string, AccountLine> accountelement { get; set; }
-        public List<string> aobjects { get; set; }
-        public AccountingObjects(
-            XElement AccRoot,
-            IEnumerable<AccountingType> accountingType,
-            IEnumerable<AccountingCode> accountingCodes,
-            IEnumerable<AccountingTax> accountingTax
-        )
-        {
-            if (AccRoot == null ? true: AccRoot.Elements().Count() == 0)
-            {
-                accounts = null;
-                taxelement = null;
-                accountelement = null;
-                return;
-            }
-
-            aobjects = AccRoot
-                .Descendants()
-                .Where(p => "accline;taxline".Split(';').Contains(p.Name.LocalName))
-                .GroupBy(p => (string)p.Attributes("id").FirstOrDefault())
-                .Select(p => p.Key)
-                .ToList();
+    //    public AccountingSection(
+    //        string parentId,
+    //        AccountingType a,
+    //        IEnumerable<XElement> lines,
+    //        IEnumerable<AccountingCode> accountingCodes,
+    //        IEnumerable<AccountingTax> accountingTax)
+    //    {
+    //        accid = a.AccId;
+    //        name = a.Name;
+    //        resourceid = a.ResourceId;
+    //        type = a.Type;
 
 
-            accountelement = (
-                    from a in AccRoot.Descendants("accline")
-                    join at in accountingType
-                    on (string)a.Attributes("accounting_id").FirstOrDefault() equals at.AccId.ToString()
-                    join ac in accountingCodes 
-                    on new {
-                        type = at.Type.ToString(),
-                        code = (string)a.Attributes("code").FirstOrDefault()
-                    } equals new {
-                        type = ac.Type.ToString(),
-                        code = ac.Code
-                    }
-                    select new { a, at,  ac }
-                )
-               .ToDictionary(
-                   p => (string)p.a.Attributes("lineid").FirstOrDefault(),
-                   p => new AccountLine
-                   {
-                       lineid = (Guid)p.a.Attributes("lineid").FirstOrDefault(),
-                       id = p.ac.Id,
-                       accid = p.at.AccId,
-                       name = p.ac.Name,
-                       code = p.ac.Code,
-                       debetcredit = (p.at.AccId == 1).SetValueToNull(Convert.ToInt32((string)p.a.Attributes("debet_credit").FirstOrDefault()??"0"))
-                   }
-               );
+    //        accountline = (
+    //                from l in lines.Where(p => p.Name.LocalName == "accline")
+    //                join ac in accountingCodes
+    //                on new
+    //                {
+    //                    code = (string)l.Attributes("code").FirstOrDefault(),
+    //                    type = (string)l.Attributes("type").FirstOrDefault()
+    //                } equals new
+    //                {
+    //                    code = ac.Code,
+    //                    type = ac.Type.ToString()
+    //                }
+    //                orderby ac.GuiOrder
+    //                select (string)l.Attributes("lineid").FirstOrDefault()
+    //                ).ToList();
+    //        taxline = (
+    //                from l in lines.Where(p => p.Name.LocalName == "taxline")
+    //                join t in accountingTax
+    //                on (string)l.Attributes("tax_id").FirstOrDefault() equals t.TaxId.ToString()
+    //                orderby t.Id
+    //                select (string)l.Attributes("lineid").FirstOrDefault()
+    //                ).ToList();
+    //    }
+    //}
 
-            taxelement = (
-                    from l in AccRoot.Descendants("taxline")
-                    join t in accountingTax
-                    on (string)l.Attributes("tax_id").FirstOrDefault() equals t.TaxId.ToString()
-                    join at in accountingType
-                    on (string)l.Attributes("accounting_id").FirstOrDefault() equals at.AccId.ToString()
-                    select new {l, t, at}
-                )
-                .ToDictionary(
-                    p => (string)p.l.Attributes("lineid").FirstOrDefault(),
-                    p => new TaxLine
-                    {
-                        lineid = (Guid)p.l.Attributes("lineid").FirstOrDefault(),
-                        resorceid = p.t.ResourceId,
-                        id = p.t.Id,
-                        accid = p.at.AccId,
-                        taxid = p.t.TaxId
-                    }
-                );
+    //public class AccountingObjects
+    //{
 
-            accounts = AccRoot
-                .Elements()
-                .GroupBy(p => (string)p.Attributes("id").FirstOrDefault())
-                .Select(p => p)
-                .ToDictionary(p => p.Key.ToString(), p=>
-                                        accountingType
-                                        .Select(b=>b)
-                                        .OrderBy(b=>b.GuiOrder)
-                                        .ToDictionary(b => b.GuiOrder.ToString(), b=> new AccountingSection(
-                                            p.Key, 
-                                            b,
-                                            from l in p
-                                            where ((string)l.Attributes("accounting_id").FirstOrDefault()??"").ToLower() == b.AccId.ToString().ToLower()
-                                            select l
-                                            ,
-                                            accountingCodes, accountingTax))
-                );
+    //    //public Dictionary<string, dynamic> accountings { get; set; }
+    //    public Dictionary<string, Dictionary<string, AccountingSection>> accounts { get; set; }
+    //    public Dictionary<string, TaxLine> taxelement { get; set; }
+    //    public Dictionary<string, AccountLine> accountelement { get; set; }
+    //    public List<string> aobjects { get; set; }
+    //    public AccountingObjects(
+    //        XElement AccRoot,
+    //        IEnumerable<AccountingType> accountingType,
+    //        IEnumerable<AccountingCode> accountingCodes,
+    //        IEnumerable<AccountingTax> accountingTax
+    //    )
+    //    {
+    //        if (AccRoot == null ? true: AccRoot.Elements().Count() == 0)
+    //        {
+    //            accounts = null;
+    //            taxelement = null;
+    //            accountelement = null;
+    //            return;
+    //        }
+
+    //        aobjects = AccRoot
+    //            .Descendants()
+    //            .Where(p => "accline;taxline".Split(';').Contains(p.Name.LocalName))
+    //            .GroupBy(p => (string)p.Attributes("id").FirstOrDefault())
+    //            .Select(p => p.Key)
+    //            .ToList();
 
 
-         
-        }
-    }
-    public class AccountingElementApi
-    {
-        public List<string> accounting { get; set; }
-        public List<string> tax { get; set; }
-    }
-    public class AccountingObjectsAPI
-    {
+    //        accountelement = (
+    //                from a in AccRoot.Descendants("accline")
+    //                join at in accountingType
+    //                on (string)a.Attributes("accounting_id").FirstOrDefault() equals at.AccId.ToString()
+    //                join ac in accountingCodes 
+    //                on new {
+    //                    type = at.Type.ToString(),
+    //                    code = (string)a.Attributes("code").FirstOrDefault()
+    //                } equals new {
+    //                    type = ac.Type.ToString(),
+    //                    code = ac.Code
+    //                }
+    //                select new { a, at,  ac }
+    //            )
+    //           .ToDictionary(
+    //               p => (string)p.a.Attributes("lineid").FirstOrDefault(),
+    //               p => new AccountLine
+    //               {
+    //                   lineid = (Guid)p.a.Attributes("lineid").FirstOrDefault(),
+    //                   id = p.ac.Id,
+    //                   accid = p.at.AccId,
+    //                   name = p.ac.Name,
+    //                   code = p.ac.Code,
+    //                   debetcredit = (p.at.AccId == 1).SetValueToNull(Convert.ToInt32((string)p.a.Attributes("debet_credit").FirstOrDefault()??"0"))
+    //               }
+    //           );
 
-        //public Dictionary<string, dynamic> accountings { get; set; }
-        public Dictionary<string, ObjectApi> objects { get; set; }
-        public Dictionary<string, AccountingElementApi> objectsList { get; set; }
-        public List<string> aobjects { get; set; }
+    //        taxelement = (
+    //                from l in AccRoot.Descendants("taxline")
+    //                join t in accountingTax
+    //                on (string)l.Attributes("tax_id").FirstOrDefault() equals t.TaxId.ToString()
+    //                join at in accountingType
+    //                on (string)l.Attributes("accounting_id").FirstOrDefault() equals at.AccId.ToString()
+    //                select new {l, t, at}
+    //            )
+    //            .ToDictionary(
+    //                p => (string)p.l.Attributes("lineid").FirstOrDefault(),
+    //                p => new TaxLine
+    //                {
+    //                    lineid = (Guid)p.l.Attributes("lineid").FirstOrDefault(),
+    //                    resorceid = p.t.ResourceId,
+    //                    id = p.t.Id,
+    //                    accid = p.at.AccId,
+    //                    taxid = p.t.TaxId
+    //                }
+    //            );
 
-        public AccountingObjectsAPI(
-            XElement AccRoot,
-            IEnumerable<AccountingType> accountingType,
-            IEnumerable<AccountingCode> accountingCodes,
-            IEnumerable<AccountingTax> accountingTax
-        )
-        {
-            if (AccRoot == null ? true : AccRoot.Elements().Count() == 0)
-            {
-                return;
-            }
-
-            aobjects = AccRoot
-                .Descendants()
-                .Where(p => "accline;taxline".Split(';').Contains(p.Name.LocalName))
-                .GroupBy(p => (string)p.Attributes("id").FirstOrDefault())
-                .Select(p => p.Key)
-                .ToList();
-            objects = new Dictionary<string, ObjectApi>();
-            objects.AddRange(
-                (
-                     from a in AccRoot.Descendants("accline")
-                     join at in accountingType
-                     on (string)a.Attributes("accounting_id").FirstOrDefault() equals at.AccId.ToString()
-                     join ac in accountingCodes
-                     on new
-                     {
-                         type = at.Type.ToString(),
-                         code = (string)a.Attributes("code").FirstOrDefault()
-                     } equals new
-                     {
-                         type = ac.Type.ToString(),
-                         code = ac.Code
-                     }
-                     select new { a, at, ac }
-                 )
-                .ToDictionary(
-                    p => (string)p.a.Attributes("lineid").FirstOrDefault(),
-                    p => new ObjectApi
-                    {
-                        type = "accline",
-                        id = (string)p.a.Attributes("lineid").FirstOrDefault(),
-                        data = new Dictionary<string, string>
-                        {
-                           //{ "id", (string)p.a.Attributes("lineid").FirstOrDefault() },
-                           { "refId", p.ac.Id },
-                           { "accId" , p.at.AccId.ToString() },
-                           { "name", p.ac.Name },
-                           { "code", p.ac.Code },
-                           { "debetcredit",(p.at.AccId == 1 ? "" : ((string)p.a.Attributes("debet_credit").FirstOrDefault() ?? "0"))}
-                        }
-                   }
-                )
-            );
-
-            objects.AddRange(
-                (
-                    from l in AccRoot.Descendants("taxline")
-                    join t in accountingTax
-                    on (string)l.Attributes("tax_id").FirstOrDefault() equals t.TaxId.ToString()
-                    join at in accountingType
-                    on (string)l.Attributes("accounting_id").FirstOrDefault() equals at.AccId.ToString()
-                    select new { l, t, at }
-                )
-                .ToDictionary(
-                    p => (string)p.l.Attributes("lineid").FirstOrDefault(),
-                    p => new ObjectApi
-                    {
-                        type = "taxLine",
-                        id = (string)p.l.Attributes("lineid").FirstOrDefault(),
-                        data = new Dictionary<string, string>
-                        {
-                            { "refResourceId" , p.t.ResourceId.ToString() },
-                            { "refId", p.t.Id },
-                            { "accId" , p.at.AccId.ToString() },
-                            { "taxid" , p.t.TaxId.ToString() }
-                        }
-                    }
-                )
-            );
-
-            objectsList = AccRoot
-                .Elements()
-                .GroupBy(p => (string)p.Attributes("id").FirstOrDefault())
-                .Select(p => p)
-                .ToDictionary(p =>
-                    p.Key.ToString(),
-                    p => new AccountingElementApi
-                    {
-                        accounting = (
-                                from at in accountingType
-                                join l in p.Where(a => a.Name.LocalName == "accline")
-                                on at.AccId.ToString() equals (string)l.Attributes("accounting_id").FirstOrDefault()
-                                join ac in accountingCodes
-                                on new
-                                {
-                                    code = (string)l.Attributes("code").FirstOrDefault(),
-                                    type = (string)l.Attributes("type").FirstOrDefault()
-                                } equals new
-                                {
-                                    code = ac.Code,
-                                    type = ac.Type.ToString()
-                                }
-                                orderby at.GuiOrder, ac.GuiOrder
-                                select (string)l.Attributes("lineid").FirstOrDefault()
-                            ).ToList(),
-                        tax = (
-                            from l in p.Where(a => a.Name.LocalName == "taxline")
-                            join t in accountingTax
-                            on (string)l.Attributes("tax_id").FirstOrDefault() equals t.TaxId.ToString()
-                            orderby t.Id
-                            select (string)l.Attributes("lineid").FirstOrDefault()
-                            ).ToList()
-                    }
-                );
+    //        accounts = AccRoot
+    //            .Elements()
+    //            .GroupBy(p => (string)p.Attributes("id").FirstOrDefault())
+    //            .Select(p => p)
+    //            .ToDictionary(p => p.Key.ToString(), p=>
+    //                                    accountingType
+    //                                    .Select(b=>b)
+    //                                    .OrderBy(b=>b.GuiOrder)
+    //                                    .ToDictionary(b => b.GuiOrder.ToString(), b=> new AccountingSection(
+    //                                        p.Key, 
+    //                                        b,
+    //                                        from l in p
+    //                                        where ((string)l.Attributes("accounting_id").FirstOrDefault()??"").ToLower() == b.AccId.ToString().ToLower()
+    //                                        select l
+    //                                        ,
+    //                                        accountingCodes, accountingTax))
+    //            );
 
 
 
-        }
-    }
+    //    }
+    //}
 }

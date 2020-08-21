@@ -90,9 +90,11 @@ namespace DIBAdminAPI.Controllers
             {
                     return Ok(result);
             }
-            
 
-            ResourceDataDocument data = await _repo.ExecDocumentResource("dbo.GetResourceData", p, null);
+            ResourceHTML5 data = await _repo.GetHTML5("[dbo].[GetResourceHTML]", p, null);
+
+
+            //ResourceDataDocument data = await _repo.ExecDocumentResource("dbo.GetResourceData", p, null);
             //XElement data = await _repo.ExecDocument("dbo.Document", p, null);
             //data.Save(@"d:\_dibappapidata\" + resourceId + ".xml");
             if (data==null)
@@ -121,10 +123,11 @@ namespace DIBAdminAPI.Controllers
             //}
             //else
             //{
-            string objectName = "dibobjects";
+            //string objectName = "dibobjects";
 
-                result = new DocumentContainer(data, _cache.Get<DIBObjects>(objectName));
-                if ((Id == null ? "" : Id) == "")
+            //result = new DocumentContainer(data, _cache.Get<DIBObjects>(objectName));
+            result = new DocumentContainer(data);
+            if ((Id == null ? "" : Id) == "")
                 {
                     _cache.Set<DocumentContainer>(rid, result);
                 }

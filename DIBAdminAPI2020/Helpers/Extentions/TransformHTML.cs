@@ -61,29 +61,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                     );
             }
         }
-        private class LinkInfo
-        {
-            public string Id { get; set; }
-            public string dId { get; set; }
-            public string rName { get; set; }
-            public string rText { get; set; }
-            public string rTag1 { get; set; }
-            public string rTag2 { get; set; }
-            public string dName { get; set; }
-            public string dType { get; set; }
-            public LinkInfo(XElement idLink)
-            {
-                if (idLink == null) return;
-                Id = (string)idLink.Attributes("id").FirstOrDefault();
-                dId = (string)idLink.Attributes("rid").FirstOrDefault();
-                rName = (string)idLink.Attributes("rname").FirstOrDefault();
-                rText = (string)idLink.Attributes("text").FirstOrDefault();
-                rTag1 = (string)idLink.Attributes("tag1").FirstOrDefault();
-                rTag2 = (string)idLink.Attributes("tag2").FirstOrDefault();
-                dName = (string)idLink.Attributes("dname").FirstOrDefault();
-                dType = (string)idLink.Attributes("dname").FirstOrDefault();
-            }
-        }
+      
         private class MoreinfoItem
         {
             public bool hasRelations { get; set; }
@@ -109,6 +87,21 @@ namespace DIBAdminAPI.Helpers.Extentions
                 XElement xcs = new XElement("x-cs", vals.Select(p => new XElement("x-c", new XAttribute("type", p))));
                 item.AddAnnotation(new CommentsItem(xcs));
             }
+        }
+        public static XElement ConvertXMLtoHTML5(this XElement document, IEnumerable<LinkData> linkDatas)
+        {
+            document.DescendantsAndSelf().Attributes("idx").Remove();
+            (
+                from e in document.Descendants()
+                join l in linkDatas
+                on ((string)e.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower() equals l.id.Trim().ToLower()
+                select new { e, l }
+            )
+            .ToList()
+            .ForEach(p => p.e.AddAnnotation(new LinkInfo(p.l)));
+
+
+            return new XElement("document", document.Transform());
         }
         public static XElement ConvertXMLtoHTML5(this XElement document, XElement links)
         {

@@ -12,6 +12,8 @@ namespace DIBAdminAPI.Data
         Task<RelatedResources> GetRelated(object p, int? timeOut = null);
         Task<IEnumerable<Tag>> GetTags(object p, int? timeOut = null);
         Task<XElement> ExecDocument(string QueryName, object p, int? timeOut = null);
+        Task<ResourceHTML5> GetHTML5(string QueryName, object p, int? timeOut = null);
+        Task<ResourceHTML5Element> GetRecourceElementdata(string QueryName, object p, int? timeOut = null);
         Task<ResourceDataDocument> ExecDocumentResource(string QueryName, object p, int? timeOut = null);
         Task<IEnumerable<XElement>> ExecQuery(string QueryName, object p, int? timeOut = null);
         Task<Home> ExecHome(string QueryName, object p, int? timeOut = null);

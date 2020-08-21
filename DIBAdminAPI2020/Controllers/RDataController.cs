@@ -43,7 +43,7 @@ namespace DIBAdminAPI.Controllers
                 values = new XElement("values", data.values.Select(v => new XAttribute(v.Key, v.Value))),
                 session_id = "apitest" //_usrsvc.CurrentUser.session_id,
             };
-            
+
             if ("topicdata;database;name;tag;date;related".Split(';').Contains(data.ob))
             {
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
@@ -53,7 +53,7 @@ namespace DIBAdminAPI.Controllers
                 }
                 if ((string)result.Attributes("value").FirstOrDefault() == "1")
                 {
-                    if (data.op=="delete")
+                    if (data.op == "delete")
                     {
                         TopicPartsAPI dp = new TopicPartsAPI
                         {
@@ -61,7 +61,7 @@ namespace DIBAdminAPI.Controllers
                             {
                                 (string)result.Attributes("id").FirstOrDefault()
                             },
-                            objects= null
+                            objects = null
                         };
                         return Ok(dp);
                     }
@@ -72,17 +72,70 @@ namespace DIBAdminAPI.Controllers
                         transactionId
                     };
                     string query = "dbo.GetTopicDetail";
-                    TopicDetail topicresult = await _repo.ExecTopicDetail(query, t , null);
+                    TopicDetail topicresult = await _repo.ExecTopicDetail(query, t, null);
                     TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
-                    TopicPartsAPI tp = new TopicPartsAPI {
+                    TopicPartsAPI tp = new TopicPartsAPI
+                    {
                         root = tdapi.objects
                                 .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
                                 .Select(v => v.Key).ToList(),
                         objects = tdapi.objects
-                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId )
-                                .ToDictionary(v => v.Key, v => v.Value) };
-                        
+                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
+                                .ToDictionary(v => v.Key, v => v.Value)
+                    };
+
                     return Ok(tp);
+                }
+                else
+                {
+                    string message = (string)result.Attributes("message").FirstOrDefault();
+                    return BadRequest(message);
+                }
+            }
+            else if ("accline".Split(';').Contains(data.ob) && (data.Id ?? "") != "")
+            {
+                XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
+                if (result == null)
+                {
+                    return BadRequest("No data");
+                }
+                if ((string)result.Attributes("value").FirstOrDefault() == "1")
+                {
+                    if (data.op == "delete")
+                    {
+                        TopicPartsAPI dp = new TopicPartsAPI
+                        {
+                            root = new List<string>
+                            {
+                                (string)result.Attributes("id").FirstOrDefault()
+                            },
+                            objects = null
+                        };
+                        return Ok(dp);
+                    }
+                    var t = new
+                    {
+                        resource_id = topic_id,
+                        id = data.Id,
+                        data.ob,
+                        session_id = "apitest"
+                    };
+                    string query = "[dbo].[GetResourceHTMLElement]";
+                    ResourceHTML5Element resel = await _repo.GetRecourceElementdata(query, t, null);
+                    if (resel == null)
+                    {
+                        return BadRequest();
+                    }
+                    DocumentContainer c = new DocumentContainer(resel);
+                    DocumentElementdata ded = new DocumentElementdata
+                    {
+                        elementdata = c.elementdata,
+                        objects = c.objects
+                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
+                                .ToDictionary(v => v.Key, v => v.Value)
+                    };
+                    return Ok(ded);
+
                 }
                 else
                 {

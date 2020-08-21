@@ -8,180 +8,63 @@ using static DIBAdminAPI.Models.Result;
 using DIBAdminAPI.Helpers.Extentions;
 
 namespace DIBAdminAPI.Data.Entities
+
 {
-    public class DocumentPartJson
+    public class DocumentElementdata
     {
-        public DocumentPartsContainer container { get; set; }
-
-        public DocumentPartJson(XElement data, string topicId, string segmentId, string Id, IEnumerable<AccountingType> accountingType,
-            IEnumerable<AccountingCode> accountingCodes,
-            IEnumerable<AccountingTax> accountingTax)
-        {
-            container = new DocumentPartsContainer(data, topicId, segmentId, Id, accountingType, accountingCodes, accountingTax);
-        }
-    }
-    public class DocumentPartsContainer
-    {
-
-        public string document { get; set; }
-        public ResultSetContainer relations { get; set; }
-        public ResultSet link { get; set; }
-        //public IEnumerable<DocumentPartContainer> parts { get; set; }
-        public List<JsonPart> parts { get; set; }
-        public DocumentPartsContainer(
-            XElement result, 
-            string topicId,
-            string segmentId,
-            string Id,
-            IEnumerable<AccountingType> accountingType,
-            IEnumerable<AccountingCode> accountingCodes,
-            IEnumerable<AccountingTax> accountingTax
-            )
-        {
-            //if (result == null) return;
-            //if (result.Name.LocalName == "x-relations" && result.Elements("result").Count() != 0)
-            //{
-            //    relations = result.GetResultSet();
-            //}
-            //else if (result.DescendantsAndSelf("package").Count() == 1 && (string)result.DescendantsAndSelf("package").Attributes("type").FirstOrDefault() == "link" && result.DescendantsAndSelf("package").Elements("topics").Elements("topic").Count() == 1)
-            //{
-            //    link = new ResultSet(result.DescendantsAndSelf("package").Elements("topics").Elements("topic").FirstOrDefault());
-            //}
-            //else
-            if (result.DescendantsAndSelf("package").Count() != 0)
-            {
-                //parts = result.DescendantsAndSelf("package").Select(p => new DocumentPartContainer(p));
-                parts = result.DescendantsAndSelf("package")
-                    .Select(p => new DocumentPartContainer(p, accountingType, accountingCodes, accountingTax))
-                    .Select(p => new JsonPart
-                    {
-                        resourceid = p.resourceId,
-                        segmentid = p.segmentId,
-                        root = p.root,
-                        elements = p.elements
-                    }
-                    ).ToList();
-            }
-            else
-            {
-                document = (new XElement("p", "Ikke noe å vise frem for " + topicId + (Id == "" ? "" : @"/" + Id))).ToString();
-            }
-
-
-        }
-    }
-    public class DocumentPartContainer
-    {
-        public bool access { get; set; }
-        public IEnumerable<DocumentTOC> toc { get; set; }
-        public string name { get; set; }
-        //public string document { get; set; }
-        public List<JsonChild> root { get; set; }
-        public Dictionary<string, JsonElement> elements { get; set; }
-        public ResultSet metadata { get; set; }
-        public IEnumerable<ParentsItem> parents { get; set; }
-        public string resourceId  { get; set; }
-        public string segmentId { get; set; }
-
         public Dictionary<string, AccountingElementApi> elementdata { get; set; }
-        public Dictionary<string, ObjectApi> objects { get; set; }
-
-
-
-        public DocumentPartContainer(
-            XElement result,
-            IEnumerable<AccountingType> accountingType,
-            IEnumerable<AccountingCode> accountingCodes,
-            IEnumerable<AccountingTax> accountingTax
-        )
+        public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+    }
+    public class LinkData
+    {
+        public string id { get; set; }
+        public Guid destResourceid { get; set; }
+        public string regexName { get; set; }
+        public string title { get; set; }
+        public string tag1 { get; set; }
+        public string tag2 { get; set; }
+        public string destName { get; set; }
+        public string desttype { get; set; }
+        public LinkData() { }
+        
+    }
+    public class LinkInfo
+    {
+        public string Id { get; set; }
+        public string dId { get; set; }
+        public string rName { get; set; }
+        public string rText { get; set; }
+        public string rTag1 { get; set; }
+        public string rTag2 { get; set; }
+        public string dName { get; set; }
+        public string dType { get; set; }
+        public LinkInfo(LinkData idLink)
         {
-            if (result.HasElements)
-            {
-                resourceId = Regex.Replace(((string)result.Attributes("topic_id").FirstOrDefault()??""),@"[\{\}]", "");
-                segmentId = (string)result.Attributes("segment_id").FirstOrDefault()??"";
-                access = ((string)result.Attributes("cred").FirstOrDefault() ?? "0") == "1" ? true : false;
-                XElement Parents = result.Elements("parents").FirstOrDefault();
-                XElement settings = result.Elements("settings").FirstOrDefault();
-                XElement map = result.Elements("index").FirstOrDefault();
-                XElement docpart = result.Elements("docpart").FirstOrDefault();
-                XElement relation = result.Elements("x-relations").FirstOrDefault();
-
-                AccountingObjectsAPI ao = new AccountingObjectsAPI(result.Elements("accroot").FirstOrDefault(), accountingType, accountingCodes, accountingTax);
-                elementdata = ao.objectsList;
-                objects = ao.objects;
-                
-                
-                XElement desc = result.Elements("topic").Elements("description").FirstOrDefault();
-                XElement xmoreinfo = result.Elements("x-more-info").FirstOrDefault();
-                name = (string)result.Elements("topic").Attributes("name").FirstOrDefault();
-                XElement topic = result.Descendants("topic").FirstOrDefault();
-                XElement topics = result.Descendants("topics").FirstOrDefault();
-
-                string select_id = (string)result.Attributes("select_id").FirstOrDefault();
-                if (select_id != null && topic != null)
-                    topic.Add(new XAttribute("select_id", select_id));
-                string segment_id = (string)result.Attributes("segment_id").FirstOrDefault();
-
-                metadata = new ResultSet(topic);
-                
-
-                XElement xlinkgroup = result.Elements("x-link-group").FirstOrDefault();
-
-                
-                string viewstyle = (result.Elements("settings").Elements("viewstyle").Elements("main").Select(p => p.Value).FirstOrDefault() ?? "").ToLower();
-                if (docpart != null && viewstyle != null)
-                {
-                    switch (viewstyle)
-                    {
-                        case "11":
-
-
-                            XElement docparthtml = docpart.ConvertXMLtoHTML(ao.aobjects, xmoreinfo, topics, xlinkgroup);
-
-                            docparthtml
-                                .Descendants()
-                                .Select(p=>p)
-                                .ToList()
-                                .ForEach(p => p.SetAttributeValueEx("id", Guid.NewGuid().ToString()));
-                            
-                            string document_id = "document;" + resourceId + ";" + segmentId;
-                            //JsonObject htmlJson = new JsonObject(docpart.Descendants("document").Elements());
-                            root = new List<JsonChild>();
-                            root.Add(new JsonChild { id = document_id });
-                            elements = new Dictionary<string, JsonElement>();
-                            elements.Add(document_id,
-                                new JsonElement
-                                {
-                                    name="div",
-                                    attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
-                                    children = docparthtml.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
-                                }
-                            );
-                            elements.AddRange(
-                                docparthtml
-                                .Descendants()
-                                .Select(p => p)
-                                .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
-                            );
-                            if (ao.aobjects != null)
-                            {
-                                (
-                                    from e in elements
-                                    join a in ao.aobjects
-                                    on e.Key.ToLower() equals a.ToLower()
-                                    select e
-                                ).ToList()
-                                .ForEach(p => p.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" } });
-                            }
-                            break;
-                    }
-                }
-            }
+            if (idLink == null) return;
+            Id = idLink.id;
+            dId = idLink.destResourceid.ToString();
+            rName = idLink.regexName;
+            rText = idLink.title;
+            rTag1 = idLink.tag1;
+            rTag2 = idLink.tag2;
+            dName = idLink.destName;
+            dType = idLink.desttype.ToString();
+        }
+        public LinkInfo(XElement idLink)
+        {
+            if (idLink == null) return;
+            Id = (string)idLink.Attributes("id").FirstOrDefault();
+            dId = (string)idLink.Attributes("rid").FirstOrDefault();
+            rName = (string)idLink.Attributes("rname").FirstOrDefault();
+            rText = (string)idLink.Attributes("text").FirstOrDefault();
+            rTag1 = (string)idLink.Attributes("tag1").FirstOrDefault();
+            rTag2 = (string)idLink.Attributes("tag2").FirstOrDefault();
+            dName = (string)idLink.Attributes("dname").FirstOrDefault();
+            dType = (string)idLink.Attributes("dname").FirstOrDefault();
         }
     }
     public class DocumentContainer
     {
-       
         public bool access { get; set; }
         public bool companylookup { get; set; }
         public string name { get; set; }
@@ -190,8 +73,8 @@ namespace DIBAdminAPI.Data.Entities
         public List<JsonChild> tocroot { get; set; }
         public Dictionary<string, JsonToc> toc { get; set; }
         public Dictionary<string, AccountingElementApi> elementdata { get; set; }
-        public Dictionary<string, ObjectApi> objects { get; set; }
-        
+        public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+
         public IEnumerable<XVariable> variables { get; set; }
         public IEnumerable<XObj> xobjects { get; set; }
         
@@ -225,170 +108,72 @@ namespace DIBAdminAPI.Data.Entities
             );
 
         }
-        public DocumentContainer(ResourceDataDocument data, DIBObjects dIBObjects)
+
+        public DocumentContainer(ResourceHTML5Element r)
         {
+            elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);
+            objects.AddRange(ElementData.GetAccountLineObjects(r.AccountLines));
+            objects.AddRange(ElementData.GetTaxLineObjects(r.TaxLines));
+        }
+        public DocumentContainer(ResourceHTML5 r)
+        {
+            access = r.Accsess == 1 ? true : false;
+            XElement map = r.ResourceMap;
+            elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);
 
-            access = data.Accsess == 1 ? true : false;
-            XElement vars = null;
-            if (data.DGVariables != null)
+            objects.AddRange(ElementData.GetAccountLineObjects(r.AccountLines));
+            objects.AddRange(ElementData.GetTaxLineObjects(r.TaxLines));
+
+            if (r.Document != null)
             {
-                vars = data.DGVariables.Elements("variables").FirstOrDefault();
-                XElement userdatas = data.DGVariables.Elements("userdatas").FirstOrDefault();
-                XElement triggerdata = data.DGVariables.Elements("triggerdata").FirstOrDefault();
+                r.Document.Descendants().Where(p => (string)p.Attributes("id").FirstOrDefault() == null && p.Nodes().Count() == 0).ToList().ForEach(p => p.Remove());
+                r.Document.Descendants().Where(p => (string)p.Attributes("id").FirstOrDefault() == null && p.Nodes().Count() != 0).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
 
-                if (vars != null && userdatas != null)
-                {
-                    (
-                        from v in vars.Elements("variable")
-                        join ud in userdatas.Elements("userdata")
-                        on (v.Elements("id").Select(s => s.Value).FirstOrDefault() ?? "-0").ToLower() equals ((string)ud.Attributes("id").FirstOrDefault() ?? "-1").ToLower()
-                        select new { var = v, userdata = ud }
-                    ).ToList()
-                    .ForEach(p =>
-                    {
-                        if (p.var.Attributes("changedate").FirstOrDefault() == null)
-                            p.var.Add(new XAttribute("changedate", p.userdata.Attribute("changedate").Value));
-                        else
-                            p.var.Attributes("changedate").FirstOrDefault().Value = p.userdata.Attribute("changedate").Value;
-
-                        if (p.var.Elements("value").FirstOrDefault() == null)
-                            p.var.Add(new XElement("value", p.userdata.Value));
-                        else
-                            p.var.Elements("value").FirstOrDefault().Value = p.userdata.Value;
-
-                    });
-
-                    var c = from v in vars.Elements("variable")
-                                .Where(p => Regex.IsMatch(p.Elements("id").Select(s => s.Value).FirstOrDefault(), @"\*N\*", RegexOptions.IgnoreCase))
-                            select new
-                            {
-                                e = v,
-                                r = new Regex(Regex.Replace(v.Elements("id").Select(s => s.Value).FirstOrDefault(), @"\*N\*", @"\d+", RegexOptions.IgnoreCase))
-                            };
-
-                    foreach (var e in c)
-                    {
-                        var v = userdatas.Elements("userdata").Where(p => e.r.IsMatch((string)p.Attributes("id").FirstOrDefault()));
-                        foreach (XElement ud in v)
-                        {
-                            e.e.Add(new XElement("variable",
-                                new XAttribute("changedate", (string)ud.Attributes("changedate").FirstOrDefault()),
-                                new XElement("id", (string)ud.Attributes("id").FirstOrDefault()),
-                                new XElement("value", ud.Value)
-                                )
-                            );
-                        }
-                    }
-
-                }
-                if (vars != null && triggerdata != null)
-                {
-                    vars = vars.InsertProffData(triggerdata);
-                }
-            }
-            else
-            {
-                vars = data.DGVariables;
-            }
-
-            if (vars != null)
-            {
-                List<XElement> nvar = vars
-                    .Elements("variable").Where(p => Regex.IsMatch(p.Elements("id").Select(v => v.Value).FirstOrDefault(), @"\*N\*"))
-                    .ToList();
-                nvar.ForEach(p => p.EvalNVariable());
-
-                variables = vars.Elements("variable").Select(p => new XVariable(p));
-            }
-
-
-            XElement xtriggers = data.TriggerData;
-            XElement xobjs = data.XObjects;
-            if (xobjs != null)
-            {
-                (
-                    from o in xobjs.Descendants("x-var")
-                    join v in vars.Elements("variable").Where(p => (string)p.Attributes("counter").FirstOrDefault() == "true")
-                    on (string)o.Attributes("id").FirstOrDefault() equals v.Elements("id").Select(p => p.Value).FirstOrDefault()
-                    select o
-                )
-                .ToList().ForEach(p => p.SetAttributeValueEx("counter", "true"));
-                (
-                    from o in xobjs.Descendants("x-var")
-                    join v in xtriggers.Elements("x-trigger")
-                    on ((string)o.Attributes("id").FirstOrDefault() ?? "-1").Trim().ToLower() equals ((string)v.Attributes("id").FirstOrDefault() ?? "-0").Trim().ToLower()
-                    select o
-                )
-                .ToList()
-                .ForEach(p => p.SetAttributeValueEx("trigger", "true"));
-
-                xobjects = xobjs.Elements().Select(p => new XObj(p, vars));
-            }
-
-            XElement map = data.ResourceMap;
-
-            AccountingObjectsAPI ao = new AccountingObjectsAPI(data.Accounting, dIBObjects.accountingTypes, dIBObjects.accountingCodes, dIBObjects.accountingTaxes);
-
-            //accounts = ao.accounts;
-            if (ao.objectsList != null)
-            {
-                elementdata = ao.objectsList;
-                objects = ao.objects;
-            }
-
-            
-
-            //XElement xlinkgroup = result.Elements("x-link-group").FirstOrDefault();
-            //XElement xComments = result.Elements("x-cs").FirstOrDefault();
-            //XElement xMirrors = result.Elements("x-mirrors").FirstOrDefault();
-
-
-            if (data.Document != null)
-            {
-                data.Document.Descendants().Where(p => (string)p.Attributes("id").FirstOrDefault() == null && p.Nodes().Count()==0).ToList().ForEach(p => p.Remove());
-                data.Document.Descendants().Where(p => (string)p.Attributes("id").FirstOrDefault() == null && p.Nodes().Count() != 0).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
-
-                string lookup = data.Document.Descendants("x-settings").Elements("companylookup").Select(p => p.Value).FirstOrDefault();
+                string lookup = r.Document.Descendants("x-settings").Elements("companylookup").Select(p => p.Value).FirstOrDefault();
                 companylookup = false;
-                if (vars != null)
-                {
-                    if (lookup == "off")
-                        companylookup = false;
-                    else
-                        companylookup = true;
-                }
+                
+                if (lookup == "off")
+                    companylookup = false;
+                else
+                    companylookup = true;
+                
 
-                if (data.Document.Attributes("id").FirstOrDefault() == null)
+                if (r.Document.Attributes("id").FirstOrDefault() == null)
                 {
-                    data.Document.Add(new XAttribute("id", data.resourceId));
+                    r.Document.Add(new XAttribute("id", r.resourceId));
                 }
                 else
                 {
-                    data.Document.Attributes("id").FirstOrDefault().SetValue(data.resourceId);
+                    r.Document.Attributes("id").FirstOrDefault().SetValue(r.resourceId);
                 }
 
-                XElement docparthtml = data.Document.ConvertXMLtoHTML5(data.LinkData);
+                XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links);
 
-                TocJson tocJson = new TocJson(map, docparthtml, data.resourceId, data.segmentId);
+                TocJson tocJson = new TocJson(map, docparthtml, r.resourceId, r.segmentId);
                 tocroot = tocJson.tocroot;
                 toc = tocJson.toc;
 
-                string document_id = "document;" + data.resourceId + ";" + data.segmentId;
-                root = new List<JsonChild>();
-                root.Add(new JsonChild { id = document_id });
-                elements = new Dictionary<string, JsonElement>();
-                elements.Add(document_id,
-                    new JsonElement
+                string document_id = "document;" + r.resourceId + ";" + r.segmentId;
+                root = new List<JsonChild>
+                {
+                    new JsonChild { id = document_id }
+                };
+                elements = new Dictionary<string, JsonElement>
+                {
                     {
-                        name = "div",
-                        attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
-                        children = docparthtml.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
+                        document_id,
+                        new JsonElement
+                        {
+                            name = "div",
+                            attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
+                            children = docparthtml.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
+                        }
                     }
-                );
+                };
 
-                List<string> like = docparthtml.Descendants().GroupBy(p => (string)p.Attributes("id").FirstOrDefault()).Where(p => p.Count() > 1).Select(p => p.Key).ToList();
+                //List<string> like = docparthtml.Descendants().GroupBy(p => (string)p.Attributes("id").FirstOrDefault()).Where(p => p.Count() > 1).Select(p => p.Key).ToList();
 
-                List<XElement> elike = docparthtml.Descendants().Where(p => (string)p.Attributes("id").FirstOrDefault() == null).ToList();
+                //List<XElement> elike = docparthtml.Descendants().Where(p => (string)p.Attributes("id").FirstOrDefault() == null).ToList();
 
                 elements.AddRange(
                     docparthtml
@@ -397,34 +182,34 @@ namespace DIBAdminAPI.Data.Entities
                     .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
                 );
 
-                if (ao.aobjects != null)
+                if (elementdata.Count()>0)
                 {
                     (
                         from e in elements
-                        join a in ao.aobjects
-                        on e.Key.ToLower() equals a.ToLower()
+                        join a in elementdata
+                        on e.Key.ToLower() equals a.Key.ToLower()
                         select e
                     ).ToList()
                     .ForEach(p => p.SetOtherProps(elements, "accounting", "accref"));
                 }
 
 
-                if (data.Tags!=null)
+                if (r.Tags.Count()>0)
                 {
                     (
                         from e in elements
-                        join t in data.Tags.Elements("tag")
-                        on e.Key.ToLower() equals ((string)t.Attributes("id").FirstOrDefault()??"").ToLower()
+                        join t in r.Tags
+                        on e.Key.ToLower() equals t.ToLower()
                         select e
                     ).ToList()
                     .ForEach(p => p.SetOtherProps(elements, "tags", "tagsRef"));
                 }
-                if (data.Related != null)
+                if (r.Related.Count()>0)
                 {
                     (
                         from e in elements
-                        join t in data.Related.Elements("rel")
-                        on e.Key.ToLower() equals ((string)t.Attributes("id").FirstOrDefault() ?? "").ToLower()
+                        join t in r.Related
+                        on e.Key.ToLower() equals t.ToLower()
                         select e
                     ).ToList()
                     .ForEach(p => p.SetOtherProps(elements, "related", "relatedRef"));
@@ -493,258 +278,258 @@ namespace DIBAdminAPI.Data.Entities
             );
 
         }
-        public xDocumentContainer(
-            XElement result,
-            IEnumerable<AccountingType> accountingType,
-            IEnumerable<AccountingCode> accountingCodes,
-            IEnumerable<AccountingTax> accountingTax
-        )
-        {
-            if (result == null) return;
-            if (result.Name.LocalName == "package")
-            {
+        //public xDocumentContainer(
+        //    XElement result,
+        //    IEnumerable<AccountingType> accountingType,
+        //    IEnumerable<AccountingCode> accountingCodes,
+        //    IEnumerable<AccountingTax> accountingTax
+        //)
+        //{
+        //    if (result == null) return;
+        //    if (result.Name.LocalName == "package")
+        //    {
                 
 
-                string topic_id = (string)result.Attributes("topic_id").FirstOrDefault();
+        //        string topic_id = (string)result.Attributes("topic_id").FirstOrDefault();
 
-                resourceId = topic_id;
-                topicId = topic_id;
-                segmentId = (string)result.Attributes("segment_id").FirstOrDefault();
+        //        resourceId = topic_id;
+        //        topicId = topic_id;
+        //        segmentId = (string)result.Attributes("segment_id").FirstOrDefault();
 
-                access = ((string)result.Attributes("cred").FirstOrDefault() ?? "0") == "1" ? true : false;
-                XElement topic = result.Elements("topic").FirstOrDefault();
-                if (topic == null)
-                {
-                    //document = new XElement("p", "Ingenting å vise").ToString();
-                    return;
-                }
-                metadata = new ResultSet(topic);
+        //        access = ((string)result.Attributes("cred").FirstOrDefault() ?? "0") == "1" ? true : false;
+        //        XElement topic = result.Elements("topic").FirstOrDefault();
+        //        if (topic == null)
+        //        {
+        //            //document = new XElement("p", "Ingenting å vise").ToString();
+        //            return;
+        //        }
+        //        metadata = new ResultSet(topic);
 
-                XElement dgvariables = result.Elements("dgvariables").FirstOrDefault();
-                XElement vars = null;
-                if (dgvariables != null)
-                {
-                    vars = dgvariables.Elements("variables").FirstOrDefault();
-                    XElement userdatas = dgvariables.Elements("userdatas").FirstOrDefault();
-                    XElement triggerdata = dgvariables.Elements("triggerdata").FirstOrDefault();
+        //        XElement dgvariables = result.Elements("dgvariables").FirstOrDefault();
+        //        XElement vars = null;
+        //        if (dgvariables != null)
+        //        {
+        //            vars = dgvariables.Elements("variables").FirstOrDefault();
+        //            XElement userdatas = dgvariables.Elements("userdatas").FirstOrDefault();
+        //            XElement triggerdata = dgvariables.Elements("triggerdata").FirstOrDefault();
 
-                    if (vars != null && userdatas != null)
-                    {
-                        (
-                            from v in vars.Elements("variable")
-                            join ud in userdatas.Elements("userdata")
-                            on (v.Elements("id").Select(s => s.Value).FirstOrDefault() ?? "-0").ToLower() equals ((string)ud.Attributes("id").FirstOrDefault() ?? "-1").ToLower()
-                            select new { var = v, userdata = ud }
-                        ).ToList()
-                        .ForEach(p => {
-                            if (p.var.Attributes("changedate").FirstOrDefault() == null)
-                                p.var.Add(new XAttribute("changedate", p.userdata.Attribute("changedate").Value));
-                            else
-                                p.var.Attributes("changedate").FirstOrDefault().Value = p.userdata.Attribute("changedate").Value;
+        //            if (vars != null && userdatas != null)
+        //            {
+        //                (
+        //                    from v in vars.Elements("variable")
+        //                    join ud in userdatas.Elements("userdata")
+        //                    on (v.Elements("id").Select(s => s.Value).FirstOrDefault() ?? "-0").ToLower() equals ((string)ud.Attributes("id").FirstOrDefault() ?? "-1").ToLower()
+        //                    select new { var = v, userdata = ud }
+        //                ).ToList()
+        //                .ForEach(p => {
+        //                    if (p.var.Attributes("changedate").FirstOrDefault() == null)
+        //                        p.var.Add(new XAttribute("changedate", p.userdata.Attribute("changedate").Value));
+        //                    else
+        //                        p.var.Attributes("changedate").FirstOrDefault().Value = p.userdata.Attribute("changedate").Value;
 
-                            if (p.var.Elements("value").FirstOrDefault() == null)
-                                p.var.Add(new XElement("value", p.userdata.Value));
-                            else
-                                p.var.Elements("value").FirstOrDefault().Value = p.userdata.Value;
+        //                    if (p.var.Elements("value").FirstOrDefault() == null)
+        //                        p.var.Add(new XElement("value", p.userdata.Value));
+        //                    else
+        //                        p.var.Elements("value").FirstOrDefault().Value = p.userdata.Value;
 
-                        });
+        //                });
 
-                        var c = from v in vars.Elements("variable")
-                                    .Where(p => Regex.IsMatch(p.Elements("id").Select(s => s.Value).FirstOrDefault(), @"\*N\*", RegexOptions.IgnoreCase))
-                                select new
-                                {
-                                    e = v,
-                                    r = new Regex(Regex.Replace(v.Elements("id").Select(s => s.Value).FirstOrDefault(), @"\*N\*", @"\d+", RegexOptions.IgnoreCase))
-                                };
+        //                var c = from v in vars.Elements("variable")
+        //                            .Where(p => Regex.IsMatch(p.Elements("id").Select(s => s.Value).FirstOrDefault(), @"\*N\*", RegexOptions.IgnoreCase))
+        //                        select new
+        //                        {
+        //                            e = v,
+        //                            r = new Regex(Regex.Replace(v.Elements("id").Select(s => s.Value).FirstOrDefault(), @"\*N\*", @"\d+", RegexOptions.IgnoreCase))
+        //                        };
 
-                        foreach (var e in c)
-                        {
-                            var v = userdatas.Elements("userdata").Where(p => e.r.IsMatch((string)p.Attributes("id").FirstOrDefault()));
-                            foreach (XElement ud in v)
-                            {
-                                e.e.Add(new XElement("variable",
-                                    new XAttribute("changedate", (string)ud.Attributes("changedate").FirstOrDefault()),
-                                    new XElement("id", (string)ud.Attributes("id").FirstOrDefault()),
-                                    new XElement("value", ud.Value)
-                                    )
-                                );
-                            }
-                        }
+        //                foreach (var e in c)
+        //                {
+        //                    var v = userdatas.Elements("userdata").Where(p => e.r.IsMatch((string)p.Attributes("id").FirstOrDefault()));
+        //                    foreach (XElement ud in v)
+        //                    {
+        //                        e.e.Add(new XElement("variable",
+        //                            new XAttribute("changedate", (string)ud.Attributes("changedate").FirstOrDefault()),
+        //                            new XElement("id", (string)ud.Attributes("id").FirstOrDefault()),
+        //                            new XElement("value", ud.Value)
+        //                            )
+        //                        );
+        //                    }
+        //                }
 
-                    }
-                    if (vars != null && triggerdata != null)
-                    {
-                        vars = vars.InsertProffData(triggerdata);
-                    }
-                }
-                else
-                {
-                    vars = result.Elements("variables").FirstOrDefault();
-                }
+        //            }
+        //            if (vars != null && triggerdata != null)
+        //            {
+        //                vars = vars.InsertProffData(triggerdata);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            vars = result.Elements("variables").FirstOrDefault();
+        //        }
 
-                if (vars != null)
-                {
-                    List<XElement> nvar = vars
-                        .Elements("variable").Where(p => Regex.IsMatch(p.Elements("id").Select(v => v.Value).FirstOrDefault(), @"\*N\*"))
-                        .ToList();
-                    nvar.ForEach(p => p.EvalNVariable());
+        //        if (vars != null)
+        //        {
+        //            List<XElement> nvar = vars
+        //                .Elements("variable").Where(p => Regex.IsMatch(p.Elements("id").Select(v => v.Value).FirstOrDefault(), @"\*N\*"))
+        //                .ToList();
+        //            nvar.ForEach(p => p.EvalNVariable());
 
-                    variables = vars.Elements("variable").Select(p => new XVariable(p));
-                }
+        //            variables = vars.Elements("variable").Select(p => new XVariable(p));
+        //        }
 
 
-                XElement xtriggers = result.Elements("x-triggers").FirstOrDefault();
-                XElement xobjs = result.Elements("xobjects").FirstOrDefault();
-                if (xobjs != null)
-                {
-                    (
-                        from o in xobjs.Descendants("x-var")
-                        join v in vars.Elements("variable").Where(p => (string)p.Attributes("counter").FirstOrDefault() == "true")
-                        on (string)o.Attributes("id").FirstOrDefault() equals v.Elements("id").Select(p => p.Value).FirstOrDefault()
-                        select o
-                    )
-                    .ToList().ForEach(p => p.SetAttributeValueEx("counter", "true"));
-                    (
-                        from o in xobjs.Descendants("x-var")
-                        join v in xtriggers.Elements("x-trigger")
-                        on ((string)o.Attributes("id").FirstOrDefault() ?? "-1").Trim().ToLower() equals ((string)v.Attributes("id").FirstOrDefault() ?? "-0").Trim().ToLower()
-                        select o
-                    )
-                    .ToList()
-                    .ForEach(p => p.SetAttributeValueEx("trigger", "true"));
+        //        XElement xtriggers = result.Elements("x-triggers").FirstOrDefault();
+        //        XElement xobjs = result.Elements("xobjects").FirstOrDefault();
+        //        if (xobjs != null)
+        //        {
+        //            (
+        //                from o in xobjs.Descendants("x-var")
+        //                join v in vars.Elements("variable").Where(p => (string)p.Attributes("counter").FirstOrDefault() == "true")
+        //                on (string)o.Attributes("id").FirstOrDefault() equals v.Elements("id").Select(p => p.Value).FirstOrDefault()
+        //                select o
+        //            )
+        //            .ToList().ForEach(p => p.SetAttributeValueEx("counter", "true"));
+        //            (
+        //                from o in xobjs.Descendants("x-var")
+        //                join v in xtriggers.Elements("x-trigger")
+        //                on ((string)o.Attributes("id").FirstOrDefault() ?? "-1").Trim().ToLower() equals ((string)v.Attributes("id").FirstOrDefault() ?? "-0").Trim().ToLower()
+        //                select o
+        //            )
+        //            .ToList()
+        //            .ForEach(p => p.SetAttributeValueEx("trigger", "true"));
 
-                    xobjects = xobjs.Elements().Select(p => new XObj(p, vars));
-                }
-                XElement varvalues = result.Elements("varvalues").FirstOrDefault();
-                XElement settings = result.Elements("settings").FirstOrDefault();
-                XElement map = result.Elements("index").FirstOrDefault();
-                XElement docpart = result.Elements("docpart").FirstOrDefault();
-                XElement relation = result.Elements("x-relations").FirstOrDefault();
+        //            xobjects = xobjs.Elements().Select(p => new XObj(p, vars));
+        //        }
+        //        XElement varvalues = result.Elements("varvalues").FirstOrDefault();
+        //        XElement settings = result.Elements("settings").FirstOrDefault();
+        //        XElement map = result.Elements("index").FirstOrDefault();
+        //        XElement docpart = result.Elements("docpart").FirstOrDefault();
+        //        XElement relation = result.Elements("x-relations").FirstOrDefault();
 
-                AccountingObjectsAPI ao = new AccountingObjectsAPI(result.Elements("accroot").FirstOrDefault(), accountingType, accountingCodes, accountingTax);
-                elementdata = ao.objectsList;
-                objects = ao.objects;
+        //        //AccountingObjectsAPI ao = new AccountingObjectsAPI(result.Elements("accroot").FirstOrDefault(), accountingType, accountingCodes, accountingTax);
+        //        //elementdata = ao.objectsList;
+        //        //objects = ao.objects;
 
-                //AccRoot = new AccountingObjects(result.Elements("accroot").FirstOrDefault(), accountingType, accountingCodes, accountingTax).AccRoot;
-                //XElement accounting = result.Elements("accroot").FirstOrDefault();
+        //        //AccRoot = new AccountingObjects(result.Elements("accroot").FirstOrDefault(), accountingType, accountingCodes, accountingTax).AccRoot;
+        //        //XElement accounting = result.Elements("accroot").FirstOrDefault();
 
-                XElement desc = result.Elements("topic").Elements("description").FirstOrDefault();
-                XElement xmoreinfo = result.Elements("x-more-info").FirstOrDefault();
-                name = (string)result.Elements("topic").Attributes("name").FirstOrDefault();
-                //string topic_id = (string)result.Elements("topic").Attributes("topic_id").FirstOrDefault();
+        //        XElement desc = result.Elements("topic").Elements("description").FirstOrDefault();
+        //        XElement xmoreinfo = result.Elements("x-more-info").FirstOrDefault();
+        //        name = (string)result.Elements("topic").Attributes("name").FirstOrDefault();
+        //        //string topic_id = (string)result.Elements("topic").Attributes("topic_id").FirstOrDefault();
 
-                XElement topics = result.Elements("topics").FirstOrDefault();
-                XElement searchresult = result.Elements("searchresult").FirstOrDefault();
+        //        XElement topics = result.Elements("topics").FirstOrDefault();
+        //        XElement searchresult = result.Elements("searchresult").FirstOrDefault();
 
-                XElement xlinkgroup = result.Elements("x-link-group").FirstOrDefault();
-                XElement xComments = result.Elements("x-cs").FirstOrDefault();
-                XElement xMirrors = result.Elements("x-mirrors").FirstOrDefault();
-                if (map != null)
-                {
-                    if ((searchresult == null ? 0 : searchresult.Elements("item").Count()) != 0)
-                    {
+        //        XElement xlinkgroup = result.Elements("x-link-group").FirstOrDefault();
+        //        XElement xComments = result.Elements("x-cs").FirstOrDefault();
+        //        XElement xMirrors = result.Elements("x-mirrors").FirstOrDefault();
+        //        if (map != null)
+        //        {
+        //            if ((searchresult == null ? 0 : searchresult.Elements("item").Count()) != 0)
+        //            {
 
-                        mark = searchresult.Elements("sw")
-                            .Elements("w")
-                            .Select(p => new SearchWords(p))
-                            .ToList();
+        //                mark = searchresult.Elements("sw")
+        //                    .Elements("w")
+        //                    .Select(p => new SearchWords(p))
+        //                    .ToList();
 
-                        (
-                            from m in map.Descendants("item")
-                            join s in searchresult.Elements("item")
-                            on (string)m.Attributes("id").FirstOrDefault() equals (string)s.Attributes("id").FirstOrDefault()
-                            select new { me = m, se = s }
-                        )
-                        .ToList()
-                        .ForEach(p => p.me.AddAnnotation(new DocumentIntemScore(p.se)));
+        //                (
+        //                    from m in map.Descendants("item")
+        //                    join s in searchresult.Elements("item")
+        //                    on (string)m.Attributes("id").FirstOrDefault() equals (string)s.Attributes("id").FirstOrDefault()
+        //                    select new { me = m, se = s }
+        //                )
+        //                .ToList()
+        //                .ForEach(p => p.me.AddAnnotation(new DocumentIntemScore(p.se)));
                        
-                    }
+        //            }
 
-                }
+        //        }
 
-                string viewstyle = (result.Elements("settings").Elements("viewstyle").Elements("main").Select(p => p.Value).FirstOrDefault() ?? "").ToLower();
+        //        string viewstyle = (result.Elements("settings").Elements("viewstyle").Elements("main").Select(p => p.Value).FirstOrDefault() ?? "").ToLower();
 
-                if (docpart != null && viewstyle != null)
-                {
-                    string lookup = docpart.Descendants("x-settings").Elements("companylookup").Select(p => p.Value).FirstOrDefault();
-                    companylookup = false;
-                    if (vars != null)
-                    {
-                        if (lookup == "off")
-                            companylookup = false;
-                        else
-                            companylookup = true;
-                    }
+        //        if (docpart != null && viewstyle != null)
+        //        {
+        //            string lookup = docpart.Descendants("x-settings").Elements("companylookup").Select(p => p.Value).FirstOrDefault();
+        //            companylookup = false;
+        //            if (vars != null)
+        //            {
+        //                if (lookup == "off")
+        //                    companylookup = false;
+        //                else
+        //                    companylookup = true;
+        //            }
 
-                    if (docpart.Attributes("id").FirstOrDefault() == null)
-                    {
-                        docpart.Add(new XAttribute("id", topic_id));
-                    }
-                    else
-                    {
-                        docpart.Attributes("id").FirstOrDefault().SetValue(topic_id);
-                    }
+        //            if (docpart.Attributes("id").FirstOrDefault() == null)
+        //            {
+        //                docpart.Add(new XAttribute("id", topic_id));
+        //            }
+        //            else
+        //            {
+        //                docpart.Attributes("id").FirstOrDefault().SetValue(topic_id);
+        //            }
 
-                    switch (viewstyle)
-                    {
-                        case "11":
-                            {
-                                XElement docparthtml = docpart.ConvertXMLtoHTML(ao.aobjects, xmoreinfo, topics, xlinkgroup);
-                                //TocJson tocJson = new TocJson(map);
-                                TocJson tocJson = new TocJson(map, docparthtml, topic_id, segmentId);
-                                tocroot = tocJson.tocroot;
-                                toc = tocJson.toc;
+        //            switch (viewstyle)
+        //            {
+        //                case "11":
+        //                    {
+        //                        XElement docparthtml = docpart.ConvertXMLtoHTML(ao.aobjects, xmoreinfo, topics, xlinkgroup);
+        //                        //TocJson tocJson = new TocJson(map);
+        //                        TocJson tocJson = new TocJson(map, docparthtml, topic_id, segmentId);
+        //                        tocroot = tocJson.tocroot;
+        //                        toc = tocJson.toc;
 
-                                string document_id = "document;" + topic_id + ";" + segmentId;
-                                //JsonObject htmlJson = new JsonObject(docpart.Descendants("document").Elements());
-                                root = new List<JsonChild>();
-                                root.Add(new JsonChild { id = document_id });
-                                elements = new Dictionary<string, JsonElement>();
-                                elements.Add(document_id,
-                                    new JsonElement
-                                    {
-                                        name = "div",
-                                        attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
-                                        children = docparthtml.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
-                                    }
-                                );
+        //                        string document_id = "document;" + topic_id + ";" + segmentId;
+        //                        //JsonObject htmlJson = new JsonObject(docpart.Descendants("document").Elements());
+        //                        root = new List<JsonChild>();
+        //                        root.Add(new JsonChild { id = document_id });
+        //                        elements = new Dictionary<string, JsonElement>();
+        //                        elements.Add(document_id,
+        //                            new JsonElement
+        //                            {
+        //                                name = "div",
+        //                                attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
+        //                                children = docparthtml.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
+        //                            }
+        //                        );
 
-                                elements.AddRange(
-                                    docparthtml
-                                    .Descendants()
-                                    .Select(p => p)
-                                    .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
-                                );
+        //                        elements.AddRange(
+        //                            docparthtml
+        //                            .Descendants()
+        //                            .Select(p => p)
+        //                            .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
+        //                        );
 
-                                if (ao.aobjects != null)
-                                {
-                                    (
-                                        from e in elements
-                                        join a in ao.aobjects
-                                        on e.Key.ToLower() equals a.ToLower()
-                                        select e
-                                    ).ToList()
-                                    .ForEach(p => p.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" } } );
-                                }
-                            }
-                            break;
-                            //document = docpart.ConvertHTML(accounting, xmoreinfo, topics, xlinkgroup, xComments, xMirrors); break;
-                    }
-                }
+        //                        if (ao.aobjects != null)
+        //                        {
+        //                            (
+        //                                from e in elements
+        //                                join a in ao.aobjects
+        //                                on e.Key.ToLower() equals a.ToLower()
+        //                                select e
+        //                            ).ToList()
+        //                            .ForEach(p => p.Value.otherprops = new Dictionary<string, string>() { { "accounting", "true" } } );
+        //                        }
+        //                    }
+        //                    break;
+        //                    //document = docpart.ConvertHTML(accounting, xmoreinfo, topics, xlinkgroup, xComments, xMirrors); break;
+        //            }
+        //        }
 
-                if (desc != null)
-                {
-                    if ((viewstyle == null ? "" : viewstyle) == "lovdata.xsl")
-                    {
-                        desc.Descendants().Where(p => "diblink;dibparameter".Split(';').Contains(p.Name.LocalName)).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
-                    }
-                    description = desc.ConvertHTML(null, null, null, xlinkgroup);
-                }
+        //        if (desc != null)
+        //        {
+        //            if ((viewstyle == null ? "" : viewstyle) == "lovdata.xsl")
+        //            {
+        //                desc.Descendants().Where(p => "diblink;dibparameter".Split(';').Contains(p.Name.LocalName)).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+        //            }
+        //            description = desc.ConvertHTML(null, null, null, xlinkgroup);
+        //        }
 
-                if (relation != null) relations = relation.GetResultSet();
+        //        if (relation != null) relations = relation.GetResultSet();
 
-            }
-        }
+        //    }
+        //}
 
 
     }

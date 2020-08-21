@@ -83,6 +83,62 @@ namespace DIBAdminAPI.Data
             }
             return null;
         }
+        public async Task<ResourceHTML5> GetHTML5(string QueryName, object p, int? timeOut = null)
+        {
+            ResourceHTML5 result;
+            if (!timeOut.HasValue)
+                timeOut = 60;
+            try
+            {
+                using (IDbConnection conn = dbConnection)
+                {
+                    using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, null, CommandType.StoredProcedure))
+                    {
+                        result = multi.Read<ResourceHTML5>().FirstOrDefault();
+                        result.ResourceMap = multi.Read<XElement>().FirstOrDefault();
+                        result.Document = multi.Read<XElement>().FirstOrDefault();
+                        result.Links = multi.Read<LinkData>();
+                        result.Related = multi.Read<string>();
+                        result.Tags = multi.Read<string>();
+                        result.AccountLines = multi.Read<AccountLine>();
+                        result.TaxLines = multi.Read<TaxLine>();
+                        result.TriggerData = multi.Read<XElement>().FirstOrDefault();
+                        result.Collections = multi.Read<XElement>().FirstOrDefault();
+                        result.XObjects = multi.Read<XElement>().FirstOrDefault();
+                        result.DgVariables = multi.Read<XElement>().FirstOrDefault();
+                        return result;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+            }
+            return null;
+        }
+        public async Task<ResourceHTML5Element> GetRecourceElementdata(string QueryName, object p, int? timeOut = null)
+        {
+            ResourceHTML5Element result = new ResourceHTML5Element();
+            if (!timeOut.HasValue)
+                timeOut = 60;
+            try
+            {
+                using (IDbConnection conn = dbConnection)
+                {
+                    using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, null, CommandType.StoredProcedure))
+                    {
+                        result.AccountLines = multi.Read<AccountLine>();
+                        result.TaxLines = multi.Read<TaxLine>();
+                        return result;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+            }
+            return null;
+        }
         public async Task<ResourceDataDocument> ExecDocumentResource(string QueryName, object p, int? timeOut = null)
         {
             IEnumerable<ResourceDataDocument> result;
