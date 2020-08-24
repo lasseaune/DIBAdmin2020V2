@@ -49,6 +49,7 @@ namespace DIBAdminAPI.Data.Entities
                 {
                     type = "accline",
                     id = p.lineid.ToString(),
+                    transactionId = p.transactionId,
                     data = new Dictionary<string, string>
                     {
 
@@ -70,8 +71,9 @@ namespace DIBAdminAPI.Data.Entities
                 p => p.lineid.ToString(),
                 p => new ObjectApi
                 {
-                    type = "taxLine",
+                    type = "taxline",
                     id = p.lineid.ToString(),
+                    transactionId = p.transactionId,
                     data = new Dictionary<string, string>
                     {
 
@@ -123,6 +125,7 @@ namespace DIBAdminAPI.Data.Entities
         public int idx { get; set; }
         public Guid refResourceId { get; set; }
         public string refId { get; set; }
+        public string transactionId { get; set; }
     }
     public class AccountLine
     {
@@ -138,6 +141,7 @@ namespace DIBAdminAPI.Data.Entities
         public int idx { get; set; }
         public Guid refResourceId { get; set; }
         public string refId { get; set; }
+        public string transactionId { get; set; }
     }
 
     public class AccountingElementApi

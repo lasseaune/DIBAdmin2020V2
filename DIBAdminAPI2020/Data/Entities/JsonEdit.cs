@@ -2392,7 +2392,7 @@ namespace DIBAdminAPI.Data.Entities
                     }
                     else if ("a".Split(';').Contains(name))
                     {
-                        element.ReplaceWith(element.Nodes());
+                        //element.ReplaceWith(element.Nodes());
                     }
                     else if ("span".Split(';').Contains(name) && element.Nodes().OfType<XText>().Select(p=>p.Value).StringConcatenate().Trim() == "")
                     {
@@ -2670,7 +2670,13 @@ namespace DIBAdminAPI.Data.Entities
                             {
                                 name = jce.name,
                                 attributes = newAttributes,
-                                children = jce.children == null ? new List<JsonChild>() { new JsonChild { text = "" } } : (jce.children.Count()== 0 ? new List<JsonChild>() { new JsonChild { text = "" } }:jce.children)
+                                children = jce.children == null 
+                                    ? new List<JsonChild>() { new JsonChild { text = "" } } 
+                                    : (
+                                        jce.children.Count()== 0 
+                                        ? new List<JsonChild>() { new JsonChild { text = "" } }
+                                        :jce.children
+                                       )
                             }
                             );
                             break;

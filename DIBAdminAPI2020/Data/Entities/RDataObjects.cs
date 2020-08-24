@@ -8,6 +8,7 @@ namespace DIBAdminAPI.Data.Entities
     public class JsonRDataPatch
     {
         public string resourceId { get; set; }
+        public string segmentId { get; set; }
         public string Id { get; set; }
         public string ob { get; set; }
         public string op { get; set; }

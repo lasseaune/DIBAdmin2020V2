@@ -33,6 +33,7 @@ namespace DIBAdminAPI.Controllers
                 return BadRequest();
             }
             string topic_id = data.resourceId;
+            string segment_id = data.segmentId ?? "";
             var p = new
             {
                 data.resourceId,
@@ -92,8 +93,11 @@ namespace DIBAdminAPI.Controllers
                     return BadRequest(message);
                 }
             }
-            else if ("accline".Split(';').Contains(data.ob) && (data.Id ?? "") != "")
+            else if ("accline;taxline".Split(';').Contains(data.ob) && (data.Id ?? "") != "")
             {
+                string rid = "rid=" + topic_id + ";sid=" + segment_id + ";_document";
+                DocumentContainer dc = null;
+                dc = _cache.Get<DocumentContainer>(rid);
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
                 if (result == null)
                 {
@@ -103,14 +107,33 @@ namespace DIBAdminAPI.Controllers
                 {
                     if (data.op == "delete")
                     {
+                        string deleteId = (string)result.Attributes("id").FirstOrDefault();
                         TopicPartsAPI dp = new TopicPartsAPI
                         {
                             root = new List<string>
                             {
-                                (string)result.Attributes("id").FirstOrDefault()
+                                deleteId
                             },
                             objects = null
                         };
+
+                        if (data.ob == "accline")
+                        {
+                            List<string> s = dc.elementdata.Values.Where(d => d.accounting.Contains(deleteId)).Select(d => d.accounting).FirstOrDefault();
+                            if (s!=null)
+                                s.Remove(deleteId);
+                        }
+                        if (data.ob == "taxline")
+                        {
+                            List<string> s = dc.elementdata
+                                .Values
+                                .Where(d => d.tax.Contains(deleteId))
+                                .Select(d => d.tax).FirstOrDefault();
+                            if (s!=null)
+                                s.Remove(deleteId);
+                        }
+
+                        _cache.Set<DocumentContainer>(rid, dc);
                         return Ok(dp);
                     }
                     var t = new
@@ -134,7 +157,49 @@ namespace DIBAdminAPI.Controllers
                                 .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
                                 .ToDictionary(v => v.Key, v => v.Value)
                     };
-                    return Ok(ded);
+                    if (dc!=null)
+                    {
+                        (
+                          from e in dc.elementdata
+                          join n in ded.elementdata
+                          on e.Key equals n.Key
+                          select e
+                        ).ToList()
+                        .ForEach(d => dc.elementdata.Remove(d.Key));
+
+                        dc.elementdata.AddRange(ded.elementdata);
+
+                        (
+                            from o in dc.objects
+                            join n in ded.objects
+                            on o.Key equals n.Key
+                            select o
+                         ).ToList()
+                         .ForEach(d => dc.objects.Remove(d.Key));
+                        dc.objects.AddRange(ded.objects);
+
+                        KeyValuePair<string, JsonElement> oa = dc.elements.Where(d => d.Key == ded.elementdata.FirstOrDefault().Key).Select(d => d).FirstOrDefault();
+                        if (oa.Key != null)
+                        {
+                            KeyValuePair<string, string> accref = new KeyValuePair<string, string>("accref", ded.elementdata.FirstOrDefault().Key);
+                            oa.Value.otherprops.Remove("accref");
+                            oa.Value.otherprops.Add("accref", ded.elementdata.FirstOrDefault().Key);
+                        }
+                        _cache.Set<DocumentContainer>(rid, dc);
+
+                    }
+                    
+
+                    TopicPartsAPI tp = new TopicPartsAPI
+                    {
+                        root = c.objects
+                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
+                                .Select(v => v.Key).ToList(),
+                        objects = c.objects
+                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
+                                .ToDictionary(v => v.Key, v => v.Value)
+                    };
+                    return Ok(tp);
 
                 }
                 else
