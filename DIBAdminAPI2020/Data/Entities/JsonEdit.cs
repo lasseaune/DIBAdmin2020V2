@@ -3108,8 +3108,6 @@ namespace DIBAdminAPI.Data.Entities
 
             if ((other.attributes == null ? "" : other.attributes.Select(p => p.Key + ":" + p.Value).StringConcatenate(";")) != (attributes == null ? "" : attributes.Select(p => p.Key + ":" + p.Value).StringConcatenate(";"))) return false;
             if ((other.children == null ? "" : other.children.Select(p => p.id).StringConcatenate()) != (children == null ? "" : children.Select(p => p.id).StringConcatenate())) return false;
-
-
             return true;
         }
 
@@ -3139,7 +3137,6 @@ namespace DIBAdminAPI.Data.Entities
         }
         
     }
-
     public class JsonChild
     {
         public string element { get; set; }
@@ -3147,23 +3144,6 @@ namespace DIBAdminAPI.Data.Entities
         public string id { get; set; }
         public JsonElementHierarcy build { set; get; }
     }
-    
-    //public class JsonRoot
-    //{
-    //    public string item { get; set; }
-    //    public List<string> children { get; set; }
-    //    public string id { get; set; }
-    //    public List<JsonChild> pasteroot { get; set; }
-    //    public JsonRoot() { }
-    //}
-    //public class ElementChildren
-    //{
-    //    public string element { get; set; }
-    //    public string id { get; set; }
-    //    public string text { get; set; }
-    //    public ElementChildren() { }
-    //}
-
     public class TocJson
     {
         public List<JsonChild> tocroot { get; set; }
@@ -3224,27 +3204,6 @@ namespace DIBAdminAPI.Data.Entities
                 .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonToc(p))
             );
         }
-        //public TocJson(XElement map)
-        //{
-        //    XElement d = new XElement(map);
-        //    d.Descendants().Reverse().ToList()
-        //        .ForEach(p => p.ReplaceWith(
-        //            new XElement("item",
-        //                new XAttribute("id", (string)p.Attributes().Where(a=>"id;key".Split(';').Contains(a.Name.LocalName)).FirstOrDefault()),
-        //                new XAttribute("seg","1;true".Split(';').Contains((string)p.Attributes().Where(a => "segment;s".Split(';').Contains(a.Name.LocalName)).FirstOrDefault()??"") ? "1": "0"),
-        //                new XAttribute("title",(string)p.Attributes().Where(a => "title;text".Split(';').Contains(a.Name.LocalName)).FirstOrDefault()),
-        //                p.Nodes()
-                        
-        //            )
-        //        )
-        //    );
-        //    tocroot = d.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList();
-
-        //    toc = d
-        //        .Descendants()
-        //        .Select(p => p)
-        //        .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonToc(p));
-        //}
 
     }
  

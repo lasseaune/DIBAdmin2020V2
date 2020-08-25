@@ -7,7 +7,7 @@ namespace DIBAdminAPI.Data.Entities
 {
     public class Tagtype
     {
-        public int tag_type_id { get; set; }
+        public int tagtypeId { get; set; }
         public string name { get; set; }
     }
 }

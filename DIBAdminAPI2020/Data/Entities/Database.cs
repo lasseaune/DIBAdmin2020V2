@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace DIBAdminAPI.Data.Entities
 {
+    public class DatabaseAPI
+    {
+        public int databaseId { get; set; }
+        public string name { get; set; }
+    }
     public class Database
     {
-        public int database_id { get; set; }
+        public int databaseId { get; set; }
         public string name { get; set; }
         public string transactionId { get; set; }
     }

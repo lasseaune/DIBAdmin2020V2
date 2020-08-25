@@ -304,13 +304,10 @@ namespace DIBAdminAPI.Data
             DIBObjects result = new DIBObjects();
             if (!timeOut.HasValue)
                 timeOut = 60;
-
             try
             {
                 using (IDbConnection conn = dbConnection)
                 {
-                    //var r = await conn.QueryAsync<Home>(QueryName, null, null, null, CommandType.StoredProcedure);
-                    //result = r.FirstOrDefault();
                     using (var multi = await conn.QueryMultipleAsync(QueryName, p))
                     {
                         result.Suppliers = multi.Read<Supplier>().ToList();
@@ -321,18 +318,15 @@ namespace DIBAdminAPI.Data
                         result.TopicNameTypes = multi.Read<TopicNameType>().ToList();
                         result.DateTypes = multi.Read<DateType>().ToList();
                         result.ResourceTypes = multi.Read<ResourceType>().ToList();
-                        result.topics = multi.Read<Topic>();
-                        result.topicNames = multi.Read<TopicNames>();
+                        //result.topics = multi.Read<Topic>();
+                        //result.topicNames = multi.Read<TopicNames>();
                         result.topicDatabases = multi.Read<TopicDatabase>();
-                        result.topicResources = multi.Read<Resources>();
+                        //result.topicResources = multi.Read<Resources>();
                         result.accountingTypes = multi.Read<AccountingType>();
                         result.accountingCodes = multi.Read<AccountingCode>();
                         result.accountingTaxes = multi.Read<AccountingTax>();
                     }
                 }
-
-
-
                 return result;
             }
             catch (Exception e)

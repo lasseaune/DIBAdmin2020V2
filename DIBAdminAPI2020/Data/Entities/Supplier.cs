@@ -7,7 +7,7 @@ namespace DIBAdminAPI.Data.Entities
 {
     public class Supplier
     {
-        public int supplier_id { get; set; }
+        public int supplierId { get; set; }
         public string name { get; set; }
         public string logoname { get; set; }
     }

@@ -7,11 +7,11 @@ namespace DIBAdminAPI.Data.Entities
 {
     public class Topictype
     {
-        public int topic_type_id { get; set; }
+        public int topictypeId { get; set; }
         public string name { get; set; }
-        public int assosiation_sort { get; set; }
-        public int sortorder { get; set; }
-        public int category_id { get; set; }
+        public int assosSort { get; set; }
+        public int sortOrder { get; set; }
+        public int categoryId { get; set; }
 
     }
 }

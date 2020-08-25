@@ -83,10 +83,10 @@ namespace DIBAdminAPI.Data.Entities
 
     public class ResourceType
     {
-        public int resource_type_id { get; set; }
+        public int resourcetypeId { get; set; }
         public string name { get; set; }
-        public string data_type { get; set; }
-        public int storage_id { get; set; }
+        public string dataType { get; set; }
+        public int storageId { get; set; }
 
     }
     //public class ResourceData

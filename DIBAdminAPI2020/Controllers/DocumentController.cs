@@ -48,7 +48,7 @@ namespace DIBAdminAPI.Controllers
             else if (objectname == "related")
             {
                 RelatedResources related = await _repo.GetRelated(new { resourceId, Id });
-                RelatedAPI relatedAPI = new RelatedAPI(related);
+                RelatedsAPI relatedAPI = new RelatedsAPI(related);
                 return Ok(relatedAPI);
             }
             return BadRequest();

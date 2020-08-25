@@ -39,11 +39,6 @@ namespace DIBAdminAPI.Controllers
                 }
                 _cache.Set<DIBObjects>(objectName, dibobjects);
             }
-            //Home home = await _repo.ExecHome("dbo.Home", null);
-            //if (home == null)
-            //{
-            //    return BadRequest("Document missing!");
-            //}
 
             Dictionary<int, AccountingType> accountingTypes = new Dictionary<int, AccountingType>();
             accountingTypes = dibobjects.accountingTypes
@@ -69,11 +64,8 @@ namespace DIBAdminAPI.Controllers
                 dibobjects.TopicNameTypes,
                 dibobjects.DateTypes,
                 dibobjects.ResourceTypes,
-                //dibobjects.accountingTypes,
                 accountingTypes,
-                //dibobjects.accountingCodes,
                 accountingCode,
-                //dibobjects.accountingTaxes
                 accountingTaxes
             };
             return Ok(result);
