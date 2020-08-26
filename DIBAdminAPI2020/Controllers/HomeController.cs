@@ -32,7 +32,7 @@ namespace DIBAdminAPI.Controllers
                 {
                     sesssion_id = "apitest",//_usrsvc.CurrentUser.session_id,
                 };
-                dibobjects = await _repo.ExecDIBObjects("dbo.DibObjects", p);
+                dibobjects = await _repo.ExecDIBObjects("[dbo].[GetDibObjects]", p);
                 if (dibobjects==null)
                 {
                     return BadRequest("Objects missing!");
@@ -40,33 +40,33 @@ namespace DIBAdminAPI.Controllers
                 _cache.Set<DIBObjects>(objectName, dibobjects);
             }
 
-            Dictionary<int, AccountingType> accountingTypes = new Dictionary<int, AccountingType>();
-            accountingTypes = dibobjects.accountingTypes
-                .OrderBy(p=>p.GuiOrder)
-                .ToDictionary(p => p.AccId, p => p);
+            //Dictionary<int, AccountingType> accountingTypes = new Dictionary<int, AccountingType>();
+            //accountingTypes = dibobjects.accountingTypes
+            //    .OrderBy(p=>p.guiOrder)
+            //    .ToDictionary(p => p.accId, p => p);
 
-            Dictionary<int, IEnumerable<AccountingCode>> accountingCode = new Dictionary<int, IEnumerable<AccountingCode>>();
-            accountingCode = dibobjects.accountingCodes
-                .GroupBy(p => p.Type)
-                .ToDictionary(p => p.Key, p => p.OrderBy(l => l.GuiOrder).Select(l => l));
+            //Dictionary<int, IEnumerable<AccountingCode>> accountingCodes = new Dictionary<int, IEnumerable<AccountingCode>>();
+            //accountingCodes = dibobjects.accountingCodes
+            //    .GroupBy(p => p.type)
+            //    .ToDictionary(p => p.Key, p => p.OrderBy(l => l.guiOrder).Select(l => l));
 
-            Dictionary<int, AccountingTax> accountingTaxes = new Dictionary<int, AccountingTax>();
-            accountingTaxes = dibobjects.accountingTaxes
-                .OrderBy(p => p.TaxId)
-                .ToDictionary(p => p.TaxId, p => p);
+            //Dictionary<int, AccountingTax> accountingTaxes = new Dictionary<int, AccountingTax>();
+            //accountingTaxes = dibobjects.accountingTaxes
+            //    .OrderBy(p => p.taxId)
+            //    .ToDictionary(p => p.taxId, p => p);
             var result = new
             {
                 dibobjects.Suppliers,
-                dibobjects.Topictypes,
+                dibobjects.TopicTypes,
                 dibobjects.Categories,
                 dibobjects.Databases,
-                dibobjects.Tagtypes,
+                dibobjects.TagTypes,
                 dibobjects.TopicNameTypes,
                 dibobjects.DateTypes,
                 dibobjects.ResourceTypes,
-                accountingTypes,
-                accountingCode,
-                accountingTaxes
+                dibobjects.accountingTypes,
+                dibobjects.accountingCodes,
+                dibobjects.accountingTaxes
             };
             return Ok(result);
         }

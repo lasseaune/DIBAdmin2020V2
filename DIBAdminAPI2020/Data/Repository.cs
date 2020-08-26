@@ -310,21 +310,20 @@ namespace DIBAdminAPI.Data
                 {
                     using (var multi = await conn.QueryMultipleAsync(QueryName, p))
                     {
-                        result.Suppliers = multi.Read<Supplier>().ToList();
-                        result.Topictypes = multi.Read<Topictype>().ToList();
-                        result.Categories = multi.Read<Category>().ToList();
-                        result.Databases = multi.Read<Database>().ToList();
-                        result.Tagtypes = multi.Read<Tagtype>().ToList();
-                        result.TopicNameTypes = multi.Read<TopicNameType>().ToList();
-                        result.DateTypes = multi.Read<DateType>().ToList();
-                        result.ResourceTypes = multi.Read<ResourceType>().ToList();
-                        //result.topics = multi.Read<Topic>();
-                        //result.topicNames = multi.Read<TopicNames>();
-                        result.topicDatabases = multi.Read<TopicDatabase>();
-                        //result.topicResources = multi.Read<Resources>();
-                        result.accountingTypes = multi.Read<AccountingType>();
-                        result.accountingCodes = multi.Read<AccountingCode>();
-                        result.accountingTaxes = multi.Read<AccountingTax>();
+                        result.Suppliers = multi.Read<Supplier>().ToList();             //1
+                        result.TopicTypes = multi.Read<Topictype>().ToList();           //2
+                        result.Categories = multi.Read<Category>().ToList();            //3
+                        result.Databases = multi.Read<Database>().ToList();             //4
+                        result.TagTypes = multi.Read<Tagtype>().ToList();               //5
+                        result.TopicNameTypes = multi.Read<TopicNameType>().ToList();   //6
+                        result.DateTypes = multi.Read<DateType>().ToList();             //7
+                        result.ResourceTypes = multi.Read<ResourceType>().ToList();     //8
+                        result.topicDatabases = multi.Read<TopicDatabase>();            //9    
+                        result.accountingTypes = multi.Read<AccountingType>();          //10
+                        result.accountingCodes = multi.Read<AccountingCode>();          //11
+                        result.accountingTaxes = multi.Read<AccountingTax>();           //12
+                        result.topics = multi.Read<Topic>();                            //13
+                        result.topicNames = multi.Read<TopicNames>();                   //14
                     }
                 }
                 return result;

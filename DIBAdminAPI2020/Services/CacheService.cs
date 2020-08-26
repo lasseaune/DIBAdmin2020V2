@@ -20,7 +20,7 @@ namespace DIBAdminAPI.Services
 
             var p = new { session_id = "apitest" };
             string objectName = "dibobjects";
-            Task<DIBObjects> topicDetails = _repo.ExecDIBObjects("dbo.DIBObjects", p);
+            Task<DIBObjects> topicDetails = _repo.ExecDIBObjects("dbo.GetDibObjects", p);
             if (topicDetails.Result != null)
             {
                 _cache.Set<DIBObjects>(objectName, topicDetails.Result);

@@ -73,7 +73,7 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class Resource
     {
-        public Guid resource_id { get; set; }
+        public string resource_id { get; set; }
         public int resource_type_id { get; set; }
         public DateTime updatedate { get; set; }
         public string username { get; set; }

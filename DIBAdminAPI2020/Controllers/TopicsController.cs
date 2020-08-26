@@ -24,7 +24,7 @@ namespace DIBAdminAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var result = await _repo.ExecTopics("dbo.GetTopics", null, null);
+            var result = await _repo.ExecTopics("[dbo].[GetTopicsSearch]", null, null);
             return Ok(result);
         }
         // GET: api/Topics/5
@@ -35,7 +35,7 @@ namespace DIBAdminAPI.Controllers
             string query = (string)filter.Attributes("query").FirstOrDefault();
             XElement items = new XElement("items", filter.Elements("item"));
 
-            var result = await _repo.ExecTopics("dbo.GetTopics", new {q=query, filter=items },null);
+            var result = await _repo.ExecTopics("[dbo].[GetTopicsSearch]", new {q=query, filter=items },null);
 
             return Ok(result);
         }
@@ -43,7 +43,8 @@ namespace DIBAdminAPI.Controllers
         [HttpGet("{id}", Name = "Get")]
         public async Task<IActionResult> Get(Guid id)
         {
-            string query = "dbo.GetTopicDetail";
+            string query = "dbo.GetTopic";
+
             TopicDetail result = await _repo.ExecTopicDetail(query, new {topic_id = id}, null);
             TopicDetailAPI tdapi = new TopicDetailAPI(result);
             return Ok(tdapi);

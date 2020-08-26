@@ -7,7 +7,7 @@ namespace DIBAdminAPI.Data.Entities
 {
     public class Category
     {
-        public int categoryId { get; set; }
+        public string id { get; set; }
         public string name { get; set; }
     }
 }

@@ -196,22 +196,22 @@ namespace DIBAdminAPI.Controllers
             {
                 topics =
                 from n in dibobjects.topicNames//.Where(p => p.name.ToLower().IndexOf(search.ToLower()) > 0)
-                where n.name.ToLower().Contains(search.ToLower()) || n.topic_id.ToString().ToLower() == search || n.name.ToLower().SearchText(rx, searchlist.Count())
-                group n by n.topic_id into q
+                where n.name.ToLower().Contains(search.ToLower()) || n.topicId.ToString().ToLower() == search || n.name.ToLower().SearchText(rx, searchlist.Count())
+                group n by n.topicId into q
                 join t in dibobjects.topics
-                on q.Key equals t.topic_id
+                on q.Key equals t.topicId
                 join nn in dibobjects.topicNames.Where(p => p.isdefault)
-                on q.Key equals nn.topic_id
+                on q.Key equals nn.topicId
                 orderby q.Min(p=>p.name.Length) 
                 select new TopicBase
                 {
-                    topic_id = t.topic_id,
-                    topic_type_id = t.topic_type_id,
+                    topicId = t.topicId,
+                    topictypeId = t.topictypeId,
                     name = nn.name,
                     language = t.language,
                     publish = t.publish,
-                    short_description = t.short_description,
-                    supplier_id = t.supplier_id
+                    shortDescription = t.shortDescription,
+                    supplierId = t.supplierId
 
                 };
                 

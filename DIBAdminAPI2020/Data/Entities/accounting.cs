@@ -15,10 +15,10 @@ namespace DIBAdminAPI.Data.Entities
         public static Dictionary<string, AccountingElementApi> GetElementData(IEnumerable<AccountLine> AccountLines, IEnumerable<TaxLine> TaxLines)
         {
             return AccountLines
-                .Select(p => p.Id)
+                .Select(p => p.id)
                 .Union(
                     TaxLines
-                    .Select(p => p.Id)
+                    .Select(p => p.id)
                 )
                 .GroupBy(p => p)
                 .ToDictionary(
@@ -26,15 +26,15 @@ namespace DIBAdminAPI.Data.Entities
                     p => new AccountingElementApi
                     {
                         accounting = AccountLines
-                                    .Where(a => a.Id == p.Key)
+                                    .Where(a => a.id == p.Key)
                                     .OrderBy(a => a.guiorder)
                                     .ThenBy(a => a.idx)
                                     .Select(a => a.lineId.ToString())
                                     .ToList(),
                         tax = TaxLines
-                                    .Where(a => a.Id == p.Key)
+                                    .Where(a => a.id == p.Key)
                                     .OrderBy(a => a.idx)
-                                    .Select(a => a.lineid.ToString())
+                                    .Select(a => a.lineId.ToString())
                                     .ToList()
 
                     }
@@ -53,14 +53,15 @@ namespace DIBAdminAPI.Data.Entities
                     //data = new Dictionary<string, string>
                     data = new AccountLineAPI
                     {
-
-                        accId = p.accId,
+                        id = p.lineId,
+                        codeId = p.codeId,
                         name = p.name,
-                        code = p.code,
                         debetcredit = p.debetcredit,
-                        refResourceId = p.refResourceId.ToString(),
-                        refId = p.refId,
-                        type = p.type
+                        accId = p.accId,
+                        typeId = p.typeId,
+                        dataResourceId = p.dataResourceId,
+                        dataId = p.dataId,
+                        
                     }
                 }
                 );
@@ -69,19 +70,20 @@ namespace DIBAdminAPI.Data.Entities
         {
             return TaxLines
                 .ToDictionary(
-                p => p.lineid.ToString(),
+                p => p.lineId.ToString(),
                 p => new ObjectApi
                 {
                     type = "taxline",
-                    id = p.lineid.ToString(),
+                    id = p.lineId.ToString(),
                     transactionId = p.transactionId,
                     data = new TaxLineAPI
                     {
-                        accId =  p.accId,
+                        id = p.id,
                         taxId = p.taxId,
                         name =p.name,
-                        refResourceId= p.refResourceId.ToString(),
-                        refId = p.Id,
+                        accId = p.accId,
+                        dataResourceId = p.dataResorceId,
+                        dataId = p.dataId,
                     }
                 }
             );
@@ -89,76 +91,71 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class AccountingType
     {
-        public int accId { get; set; }
+        public string id { get; set; }
         public string name { get; set; }
-        public int type { get; set; }
-        public Guid resourceId { get; set; }
-        public int guiOrder { get; set; }
+        public string typeId { get; set; }
     }
     public class AccountingCode
     {
-        public int type { get; set; }
-        public string code { get; set; }
-        public string segmentId { get; set; }
         public string id { get; set; }
         public string name { get; set; }
-        public int guiOrder { get; set; }
+        public string typeId { get; set; }
+        
     }
     public class AccountingTax
     {
-        public int taxId { get; set; }
-        public string name { get; set; }
-        public Guid resourceId { get; set; }
         public string id { get; set; }
-        public int accId { get; set; }
+        public string name { get; set; }
+        public string accId { get; set; }
     }
     public class TaxLineAPI
     {
-        public int accId { get; set; }
-        public int taxId { get; set; }
+        public string id { get; set; }
+        public string taxId { get; set; }
         public string name { get; set; }
-        public string refResourceId { get; set; }
-        public string refId { get; set; }
+        public string accId { get; set; }
+        public string dataResourceId { get; set; }
+        public string dataId { get; set; }
     }
     public class TaxLine
     {
-        public Guid lineid { get; set; }
-        public Guid resorceId { get; set; }
-        public string Id { get; set; }
-        public int accId { get; set; }
-        public int taxId { get; set; }
+        public string id { get; set; }
+        public string lineId { get; set; }
+        public string taxId { get; set; }
         public string name { get; set; }
+        public string accId { get; set; }
         public int guiorder { get; set; }
         public int idx { get; set; }
-        public Guid refResourceId { get; set; }
-        public string refId { get; set; }
+        public string dataResorceId { get; set; }
+        public string dataId { get; set; }
         public string transactionId { get; set; }
     }
     public class AccountLineAPI
     {
-        public int accId { get; set; } 
+        public string id { get; set; }
+        public string codeId { get; set; }
         public string name { get; set; }
-        public string code { get; set; }
         public bool debetcredit { get; set; }
-        public string refResourceId { get; set; }
-        public string refId { get; set; }
-        public int type { get; set; }
+        public string accId { get; set; }
+        public string typeId { get; set; }
+        public string dataResourceId { get; set; }
+        public string dataId { get; set; }
+        
     }
         
     public class AccountLine
     {
-        public Guid lineId { get; set; }
-        public Guid resourceId { get; set; }
-        public string Id { get; set; }
-        public int accId { get; set; }
-        public int type { get; set; }
-        public string code { get; set; }
+        public string id { get; set; }
+        public string lineId { get; set; }
+        public string codeId { get; set; }
         public string name { get; set; }
         public bool debetcredit { get; set; }
+        public string accId { get; set; }
+        public string typeId { get; set; }
         public int guiorder { get; set; }
         public int idx { get; set; }
-        public Guid refResourceId { get; set; }
-        public string refId { get; set; }
+        public string dataResourceId { get; set; }
+        public string dataId { get; set; }
         public string transactionId { get; set; }
     }
 

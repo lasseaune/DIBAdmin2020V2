@@ -7,7 +7,7 @@ namespace DIBAdminAPI.Data.Entities
 {
     public class TopicNameType
     {
-        public int nametypeId { get; set; }
+        public string id { get; set; }
         public string name { get; set; }
     }
 }
