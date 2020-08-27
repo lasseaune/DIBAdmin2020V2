@@ -41,6 +41,7 @@ namespace DIBAdminAPI.Data.Entities
         public ObjectsApi() { }
         public ObjectsApi(IEnumerable<Database> databases)
         {
+            if (databases.Select(p=>p.id).FirstOrDefault() == null) return;
             objectsList = databases
                         .OrderBy(p => p.name)
                         .Select(p => p.id.ToLower()).ToList();
@@ -61,6 +62,7 @@ namespace DIBAdminAPI.Data.Entities
         }
         public ObjectsApi(IEnumerable<TopicName> topicNames)
         {
+            if (topicNames.Select(p => p.id).FirstOrDefault() == null) return;
             objectsList = topicNames
                         .OrderBy(p => p.name)
                         .Select(p => p.id.ToLower()).ToList();
@@ -83,6 +85,7 @@ namespace DIBAdminAPI.Data.Entities
         }
         public ObjectsApi(IEnumerable<Tag> tags)
         {
+            if (tags.Select(p => p.id).FirstOrDefault() == null) return;
             objectsList = tags
                     .OrderBy(p => p.name)
                     .Select(p => p.id.ToLower())
@@ -107,6 +110,7 @@ namespace DIBAdminAPI.Data.Entities
         }
         public ObjectsApi(IEnumerable<Dates> dates)
         {
+            if (dates.Select(p => p.id).FirstOrDefault() == null) return;
             objectsList = dates
                         .OrderByDescending(p => p.date)
                         .Select(p => p.id.ToString().ToLower())
@@ -130,6 +134,8 @@ namespace DIBAdminAPI.Data.Entities
         }
         public ObjectsApi(Dictionary<string, Related> related)
         {
+            if (related == null) return;
+            if (related.Select(p => p.Key).FirstOrDefault() == null) return;
             objectsList = related
                 .OrderBy(p => p.Value.topictypeId).ThenBy(p => p.Value.idx)
                 .Select(p => p.Key.ToString().ToLower())
@@ -157,6 +163,7 @@ namespace DIBAdminAPI.Data.Entities
         }
         public ObjectsApi(IEnumerable<Resource> resources, string topic_id)
         {
+            if (resources.Select(p => p.resource_id).FirstOrDefault() == null) return;
             objectsList = resources
                         .Select(p => 
                             p.resource_id.ToString().Trim().ToLower()== topic_id.Trim().ToLower() 
@@ -233,33 +240,32 @@ namespace DIBAdminAPI.Data.Entities
         public List<string> dates { get; set; }
         public List<string> related { get; set; }
         public List<string> resources { get; set; }
-        public List<string> root { get; set; }
+        public string id { get; set; }
         public TopicDetailAPI(TopicDetail topicDetail)
         {
-
-            root = new List<string>
+            ObjectApi topicObject;
+            if (topicDetail.topicId != null)
             {
-                topicDetail.topicId.ToString()
-            };
+                id = topicDetail.topicId.ToString().ToLower();
 
-            ObjectApi topicObject = new ObjectApi
-            {
-                type = "topicdata",
-                id = topicDetail.topicId,
-                transactionId = topicDetail.transactionId,
-                data = new TopicDataAPI
+                topicObject = new ObjectApi
                 {
-                    id = topicDetail.topicId,
-                    language = topicDetail.language,
-                    publish = topicDetail.publish,
-                    supplierId = topicDetail.supplierId,
-                    topictypeId = topicDetail.topictypeId,
-                    shortDescription = topicDetail.shortDescription,
-                    deleted = topicDetail.deleted
-                }
-            };
-
-            objects.Add(topicDetail.topicId.ToString(), topicObject);
+                    type = "topicdata",
+                    id = topicDetail.topicId.ToString().ToLower(),
+                    transactionId = topicDetail.transactionId,
+                    data = new TopicDataAPI
+                    {
+                        id = topicDetail.topicId.ToString().ToLower(),
+                        language = topicDetail.language,
+                        publish = topicDetail.publish,
+                        supplierId = topicDetail.supplierId,
+                        topictypeId = topicDetail.topictypeId,
+                        shortDescription = topicDetail.shortDescription,
+                        deleted = topicDetail.deleted
+                    }
+                };
+                objects.Add(topicDetail.topicId.ToString().ToLower(), topicObject);
+            }
 
 
 
@@ -284,7 +290,7 @@ namespace DIBAdminAPI.Data.Entities
             related = objectsApi.objectsList;
             objects.AddRange(objectsApi.objects);
 
-            objectsApi = new ObjectsApi(topicDetail.Resources, topicDetail.topicId.ToString());
+            objectsApi = new ObjectsApi(topicDetail.Resources, id);
             resources = objectsApi.objectsList;
             objects.AddRange(objectsApi.objects);
 
@@ -295,24 +301,24 @@ namespace DIBAdminAPI.Data.Entities
         public Dictionary<string, Related> related { get; set; }
         public RelatedResources(IEnumerable<TopicBase> Related, IEnumerable<TopicSubElement> SubLink)
         {
-            if (Related == null || SubLink == null) return;
+            if (Related.Select(p=>p.resourceId).FirstOrDefault()==null || SubLink.Select(p=>p.dataResourceId).FirstOrDefault()==null) return;
             related = (
                 from r in Related
                 join s in SubLink
-                on r.resourceId.ToLower() equals s.resourceId.ToLower()
+                on r.resourceId.ToLower() equals s.dataResourceId.ToLower()
                 orderby r.topictypeId, r.name, s.idx
                 select new { r, s }
             )
             .ToDictionary(
-                p => p.s.Id.ToLower(),
+                p => p.s.id.ToLower(),
                 p => new Related
                 {
-                    id = p.s.Id.ToLower(),
+                    id = p.s.id.ToLower(),
                     name = p.r.name,
-                    subname = p.s.Name,
+                    subname = p.s.name,
                     topictypeId = p.r.topictypeId.ToLower(),
                     dataResourceId = p.r.resourceId.ToLower(),
-                    dataId = p.s.relId.ToLower(),
+                    dataId = p.s.dataId.ToLower(),
                     idx = p.s.idx,
                     transactionId = p.s.transactionId
                 }
@@ -339,15 +345,15 @@ namespace DIBAdminAPI.Data.Entities
         public string topictypeId { get; set; }
         public string dataResourceId { get; set; }
         public string dataId { get; set; }
-        public int idx { get; set; }
+        public int? idx { get; set; }
         public string transactionId { get; set; }
     }
     public class TopicSubElement
     {
-        public string resourceId { get; set; }
-        public string Id { get; set; }
-        public string relId { get; set; }
-        public string Name { get; set; }
+        public string id { get; set; }
+        public string name { get; set; }
+        public string dataResourceId { get; set; }
+        public string dataId { get; set; }
         public int idx { get; set; }
         public string transactionId { get; set; }
     }
@@ -365,7 +371,7 @@ namespace DIBAdminAPI.Data.Entities
         public bool deleted { get; set; }
         public int? aSort { get; set; }
         public int? tSort { get; set; }
-        public IEnumerable<TopicSubElement> rel { get; set; }
+        //public IEnumerable<TopicSubElement> rel { get; set; }
     }
     public class TopicDetails
     {

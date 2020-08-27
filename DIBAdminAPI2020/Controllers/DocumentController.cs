@@ -93,10 +93,6 @@ namespace DIBAdminAPI.Controllers
 
             ResourceHTML5 data = await _repo.GetHTML5("[dbo].[GetResourceHTML]", p, null);
 
-
-            //ResourceDataDocument data = await _repo.ExecDocumentResource("dbo.GetResourceData", p, null);
-            //XElement data = await _repo.ExecDocument("dbo.Document", p, null);
-            //data.Save(@"d:\_dibappapidata\" + resourceId + ".xml");
             if (data==null)
             { 
                     return BadRequest("Document missing!");

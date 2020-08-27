@@ -28,8 +28,6 @@ namespace DIBAdminAPI.Data
             _logger = logger;
         }
 
-
-
         private IDbConnection dbConnection
         {
             get
@@ -41,7 +39,7 @@ namespace DIBAdminAPI.Data
         public async Task<RelatedResources> GetRelated(object p, int? timeOut = null)
         {
             
-            string QueryName = "GetRelated";
+            string QueryName = "[dbo].[GetResourceRelated]";
             if (!timeOut.HasValue)
                 timeOut = 60;
             try
@@ -66,7 +64,7 @@ namespace DIBAdminAPI.Data
         public async Task<IEnumerable<Tag>> GetTags(object p, int? timeOut = null)
         {
             IEnumerable<Tag> result;
-            string QueryName = "GetTags";
+            string QueryName = "[dbo].[GetResourceTags]";
             if (!timeOut.HasValue)
                 timeOut = 60;
             try
@@ -139,60 +137,6 @@ namespace DIBAdminAPI.Data
             }
             return null;
         }
-        public async Task<ResourceDataDocument> ExecDocumentResource(string QueryName, object p, int? timeOut = null)
-        {
-            IEnumerable<ResourceDataDocument> result;
-            if (!timeOut.HasValue)
-                timeOut = 60;
-            try
-            {
-                using (IDbConnection conn = dbConnection)
-                {
-                    result = await conn.QueryAsync<ResourceDataDocument>(QueryName, p, null, null, CommandType.StoredProcedure);
-                    return result.FirstOrDefault();
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
-            }
-            return null;
-        }
-        public async Task<XElement> ExecDocument(string QueryName, object p, int? timeOut = null)
-        {
-            IEnumerable<XElement> result;
-            if (!timeOut.HasValue)
-                timeOut = 60;
-
-
-
-            try
-            {
-                using (IDbConnection conn = dbConnection)
-                {
-                    try
-                    {
-                        result = await conn.QueryAsync<XElement>(QueryName, p, null, null, CommandType.StoredProcedure);
-                        return result.FirstOrDefault();
-                    }
-                    catch(Exception e)
-                    {
-
-                    }
-                    
-                    
-                }
-
-
-
-                
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
-            }
-            return null;
-        }
         public async Task<IEnumerable<TopicBase>> ExecTopics(string QueryName, object p, int? timeOut = null)
         {
             IEnumerable<TopicBase> result;
@@ -212,53 +156,6 @@ namespace DIBAdminAPI.Data
 
 
                 return result;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
-            }
-            return null;
-        }
-        public async Task<TopicDetails> ExecTopicDetails(string QueryName, object p, int? timeOut = null)
-        {
-            TopicDetails result = new TopicDetails();
-            if (!timeOut.HasValue)
-                timeOut = 60;
-            try
-            {
-                using (IDbConnection conn = dbConnection)
-                {
-                    using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, null, CommandType.StoredProcedure))
-                    {
-                        result.topics = multi.Read<Topic>();
-                        result.topicNames = multi.Read<TopicNames>();
-                        result.topicDatabases = multi.Read<TopicDatabase>();
-                        result.topicResources = multi.Read<Resources>();
-                    }
-                }
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', Message = '{err}'", QueryName, e.Message);
-            }
-            return null;
-        }
-        public async Task<ResourceNavigation> GetResourceByResourceIdAndId(object p, int? timeOut = null)
-        {
-            string QueryName = "GetResourceByResourceIdAndId";
-            IEnumerable<ResourceNavigation> result;
-            if (!timeOut.HasValue)
-                timeOut = 60;
-            try
-            {
-                using (IDbConnection conn = dbConnection)
-                {
-
-                    result = await conn.QueryAsync<ResourceNavigation>(QueryName, p, null, null, CommandType.StoredProcedure);
-                }
-                return result.FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -286,7 +183,6 @@ namespace DIBAdminAPI.Data
                         IEnumerable<TopicBase> topicBases = multi.Read<TopicBase>();
                         IEnumerable<TopicSubElement> topicSubElements = multi.Read<TopicSubElement>();
                         result.related = new RelatedResources(topicBases, topicSubElements).related;
-                        //result.nrelated = new RelatedResources(topicBases, topicSubElements).nrelated;
                         result.Resources = multi.Read<Resource>().ToList();
                     }
                 }
@@ -334,60 +230,7 @@ namespace DIBAdminAPI.Data
             }
             return null;
         }
-        public async Task<Home> ExecHome(string QueryName, object p, int? timeOut = null)
-        {
-            Home result = new Home();
-            if (!timeOut.HasValue)
-                timeOut = 60;
 
-            try
-            {
-                using (IDbConnection conn = dbConnection)
-                {
-                    //var r = await conn.QueryAsync<Home>(QueryName, null, null, null, CommandType.StoredProcedure);
-                    //result = r.FirstOrDefault();
-                    using (var multi = await conn.QueryMultipleAsync(QueryName, p))
-                    {
-                        result.Suppliers = multi.Read<Supplier>().ToList();
-                        result.Topictypes = multi.Read<Topictype>().ToList();
-                        result.Categories = multi.Read<Category>().ToList();
-                        result.Databases = multi.Read<Database>().ToList();
-                        result.Tagtypes = multi.Read<Tagtype>().ToList();
-                        result.TopicNameTypes = multi.Read<TopicNameType>().ToList();
-                        result.DateTypes = multi.Read<DateType>().ToList();
-                        result.ResourceTypes = multi.Read<ResourceType>().ToList();
-                    }
-                }
-
-
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', Message = '{err}'", QueryName,  e.Message);
-            }
-            return null;
-        }
-        public async Task<IEnumerable<XElement>> ExecQuery(string QueryName, object p, int? timeOut = null)
-        {
-            IEnumerable<XElement> result;
-            if (!timeOut.HasValue)
-                timeOut = 60;
-            try
-            {
-                using (IDbConnection conn = dbConnection)
-                {
-                    result = await conn.QueryAsync<XElement>(QueryName,p,null,null,CommandType.StoredProcedure);
-                }
-                return result;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
-            }
-            return null;
-        }
         public async Task<XElement> ExecRData(string QueryName, object p, int? timeOut = null)
         {
             IEnumerable<XElement> result;
@@ -407,5 +250,164 @@ namespace DIBAdminAPI.Data
             }
             return null;
         }
+        //============================================================================================================
+        //UTKOMMENTERT
+        //============================================================================================================
+        //public async Task<ResourceDataDocument> ExecDocumentResource(string QueryName, object p, int? timeOut = null)
+        //{
+        //    IEnumerable<ResourceDataDocument> result;
+        //    if (!timeOut.HasValue)
+        //        timeOut = 60;
+        //    try
+        //    {
+        //        using (IDbConnection conn = dbConnection)
+        //        {
+        //            result = await conn.QueryAsync<ResourceDataDocument>(QueryName, p, null, null, CommandType.StoredProcedure);
+        //            return result.FirstOrDefault();
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+        //    }
+        //    return null;
+        //}
+        //public async Task<XElement> ExecDocument(string QueryName, object p, int? timeOut = null)
+        //{
+        //    IEnumerable<XElement> result;
+        //    if (!timeOut.HasValue)
+        //        timeOut = 60;
+
+
+
+        //    try
+        //    {
+        //        using (IDbConnection conn = dbConnection)
+        //        {
+        //            try
+        //            {
+        //                result = await conn.QueryAsync<XElement>(QueryName, p, null, null, CommandType.StoredProcedure);
+        //                return result.FirstOrDefault();
+        //            }
+        //            catch(Exception e)
+        //            {
+
+        //            }
+
+
+        //        }
+
+
+
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+        //    }
+        //    return null;
+        //}
+
+        //public async Task<TopicDetails> ExecTopicDetails(string QueryName, object p, int? timeOut = null)
+        //{
+        //    TopicDetails result = new TopicDetails();
+        //    if (!timeOut.HasValue)
+        //        timeOut = 60;
+        //    try
+        //    {
+        //        using (IDbConnection conn = dbConnection)
+        //        {
+        //            using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, null, CommandType.StoredProcedure))
+        //            {
+        //                result.topics = multi.Read<Topic>();
+        //                result.topicNames = multi.Read<TopicNames>();
+        //                result.topicDatabases = multi.Read<TopicDatabase>();
+        //                result.topicResources = multi.Read<Resources>();
+        //            }
+        //        }
+
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', Message = '{err}'", QueryName, e.Message);
+        //    }
+        //    return null;
+        //}
+        //public async Task<ResourceNavigation> GetResourceByResourceIdAndId(object p, int? timeOut = null)
+        //{
+        //    string QueryName = "GetResourceByResourceIdAndId";
+        //    IEnumerable<ResourceNavigation> result;
+        //    if (!timeOut.HasValue)
+        //        timeOut = 60;
+        //    try
+        //    {
+        //        using (IDbConnection conn = dbConnection)
+        //        {
+
+        //            result = await conn.QueryAsync<ResourceNavigation>(QueryName, p, null, null, CommandType.StoredProcedure);
+        //        }
+        //        return result.FirstOrDefault();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+        //    }
+        //    return null;
+        //}
+        //public async Task<Home> ExecHome(string QueryName, object p, int? timeOut = null)
+        //{
+        //    Home result = new Home();
+        //    if (!timeOut.HasValue)
+        //        timeOut = 60;
+
+        //    try
+        //    {
+        //        using (IDbConnection conn = dbConnection)
+        //        {
+        //            //var r = await conn.QueryAsync<Home>(QueryName, null, null, null, CommandType.StoredProcedure);
+        //            //result = r.FirstOrDefault();
+        //            using (var multi = await conn.QueryMultipleAsync(QueryName, p))
+        //            {
+        //                result.Suppliers = multi.Read<Supplier>().ToList();
+        //                result.Topictypes = multi.Read<Topictype>().ToList();
+        //                result.Categories = multi.Read<Category>().ToList();
+        //                result.Databases = multi.Read<Database>().ToList();
+        //                result.Tagtypes = multi.Read<Tagtype>().ToList();
+        //                result.TopicNameTypes = multi.Read<TopicNameType>().ToList();
+        //                result.DateTypes = multi.Read<DateType>().ToList();
+        //                result.ResourceTypes = multi.Read<ResourceType>().ToList();
+        //            }
+        //        }
+
+
+
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', Message = '{err}'", QueryName,  e.Message);
+        //    }
+        //    return null;
+        //}
+        //public async Task<IEnumerable<XElement>> ExecQuery(string QueryName, object p, int? timeOut = null)
+        //{
+        //    IEnumerable<XElement> result;
+        //    if (!timeOut.HasValue)
+        //        timeOut = 60;
+        //    try
+        //    {
+        //        using (IDbConnection conn = dbConnection)
+        //        {
+        //            result = await conn.QueryAsync<XElement>(QueryName,p,null,null,CommandType.StoredProcedure);
+        //        }
+        //        return result;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+        //    }
+        //    return null;
+        //}
     }
 }

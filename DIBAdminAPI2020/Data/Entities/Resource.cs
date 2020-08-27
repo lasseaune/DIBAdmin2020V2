@@ -41,26 +41,26 @@ namespace DIBAdminAPI.Data.Entities
         public XElement DgVariables { get; set; }
 
     }
-    public class ResourceDataDocument
-    {
-        public string topicId { get; set; }
-        public string resourceId { get; set; }
-        public string segmentId { get; set; }
-        public string Name { get; set; }
-        public int Accsess { get; set; }
-        public int ResourceTypeId { get; set; }
-        public XElement ResourceMap { get; set; }
-        public XElement Document { get; set; }
-        public XElement Variables { get; set; }
-        public XElement XObjects { get; set; }
-        public XElement LinkData { get; set; }
-        public XElement DGVariables { get; set; }
-        public XElement TriggerData { get; set; }
-        public XElement Collections { get; set; }
-        public XElement Accounting { get; set; }
-        public XElement Related { get; set; }
-        public XElement Tags { get; set; }
-    }
+    //public class ResourceDataDocument
+    //{
+    //    public string topicId { get; set; }
+    //    public string resourceId { get; set; }
+    //    public string segmentId { get; set; }
+    //    public string Name { get; set; }
+    //    public int Accsess { get; set; }
+    //    public int ResourceTypeId { get; set; }
+    //    public XElement ResourceMap { get; set; }
+    //    public XElement Document { get; set; }
+    //    public XElement Variables { get; set; }
+    //    public XElement XObjects { get; set; }
+    //    public XElement LinkData { get; set; }
+    //    public XElement DGVariables { get; set; }
+    //    public XElement TriggerData { get; set; }
+    //    public XElement Collections { get; set; }
+    //    public XElement Accounting { get; set; }
+    //    public XElement Related { get; set; }
+    //    public XElement Tags { get; set; }
+    //}
 
     public class Resources
     {

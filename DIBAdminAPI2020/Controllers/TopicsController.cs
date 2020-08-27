@@ -44,7 +44,6 @@ namespace DIBAdminAPI.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
             string query = "dbo.GetTopic";
-
             TopicDetail result = await _repo.ExecTopicDetail(query, new {topic_id = id}, null);
             TopicDetailAPI tdapi = new TopicDetailAPI(result);
             return Ok(tdapi);
@@ -75,7 +74,7 @@ namespace DIBAdminAPI.Controllers
                 string id = (string)result.Attributes("id").FirstOrDefault();
                 if (Guid.TryParse(id, out Guid topicId))
                 {
-                    string query = "dbo.GetTopicDetail";
+                    string query = "dbo.GetTopic";
                     TopicDetail topicresult = await _repo.ExecTopicDetail(query, new { topic_id = topicId }, null);
                     TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
                     return Ok(tdapi);

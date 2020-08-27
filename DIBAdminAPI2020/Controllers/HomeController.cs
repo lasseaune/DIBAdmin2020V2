@@ -26,7 +26,7 @@ namespace DIBAdminAPI.Controllers
         {
             string objectName = "dibobjects";
             DIBObjects dibobjects = _cache.Get<DIBObjects>(objectName);
-            if (dibobjects == null)
+            if (dibobjects == null ? true : (DateTime.Now - dibobjects.date).Minutes>10)
             {
                 var p = new
                 {
@@ -40,20 +40,6 @@ namespace DIBAdminAPI.Controllers
                 _cache.Set<DIBObjects>(objectName, dibobjects);
             }
 
-            //Dictionary<int, AccountingType> accountingTypes = new Dictionary<int, AccountingType>();
-            //accountingTypes = dibobjects.accountingTypes
-            //    .OrderBy(p=>p.guiOrder)
-            //    .ToDictionary(p => p.accId, p => p);
-
-            //Dictionary<int, IEnumerable<AccountingCode>> accountingCodes = new Dictionary<int, IEnumerable<AccountingCode>>();
-            //accountingCodes = dibobjects.accountingCodes
-            //    .GroupBy(p => p.type)
-            //    .ToDictionary(p => p.Key, p => p.OrderBy(l => l.guiOrder).Select(l => l));
-
-            //Dictionary<int, AccountingTax> accountingTaxes = new Dictionary<int, AccountingTax>();
-            //accountingTaxes = dibobjects.accountingTaxes
-            //    .OrderBy(p => p.taxId)
-            //    .ToDictionary(p => p.taxId, p => p);
             var result = new
             {
                 dibobjects.Suppliers,

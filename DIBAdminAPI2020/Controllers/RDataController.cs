@@ -72,7 +72,7 @@ namespace DIBAdminAPI.Controllers
                         data.ob,
                         transactionId
                     };
-                    string query = "dbo.GetTopicDetail";
+                    string query = "dbo.GetTopic";
                     TopicDetail topicresult = await _repo.ExecTopicDetail(query, t, null);
                     TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
                     TopicPartsAPI tp = new TopicPartsAPI

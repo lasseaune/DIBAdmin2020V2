@@ -2012,7 +2012,8 @@ namespace DIBAdminAPI.Data.Entities
         {
             if (collection == null)
             {
-                throw new ArgumentNullException("Collection is null");
+                return;
+                //throw new ArgumentNullException("Collection is null");
             }
 
             foreach (var item in collection)

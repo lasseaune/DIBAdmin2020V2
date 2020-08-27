@@ -53,13 +53,13 @@ namespace DIBAdminAPI.Data.Entities
                     //data = new Dictionary<string, string>
                     data = new AccountLineAPI
                     {
-                        id = p.lineId,
+                        id = p.lineId.ToString(),
                         codeId = p.codeId,
                         name = p.name,
                         debetcredit = p.debetcredit,
                         accId = p.accId,
                         typeId = p.typeId,
-                        dataResourceId = p.dataResourceId,
+                        dataResourceId = p.dataResourceId.ToString(),
                         dataId = p.dataId,
                         
                     }
@@ -82,7 +82,7 @@ namespace DIBAdminAPI.Data.Entities
                         taxId = p.taxId,
                         name =p.name,
                         accId = p.accId,
-                        dataResourceId = p.dataResorceId,
+                        dataResourceId = p.dataResorceId.ToString(),
                         dataId = p.dataId,
                     }
                 }
@@ -120,13 +120,13 @@ namespace DIBAdminAPI.Data.Entities
     public class TaxLine
     {
         public string id { get; set; }
-        public string lineId { get; set; }
+        public Guid lineId { get; set; }
         public string taxId { get; set; }
         public string name { get; set; }
         public string accId { get; set; }
         public int guiorder { get; set; }
         public int idx { get; set; }
-        public string dataResorceId { get; set; }
+        public Guid dataResorceId { get; set; }
         public string dataId { get; set; }
         public string transactionId { get; set; }
     }
@@ -146,7 +146,7 @@ namespace DIBAdminAPI.Data.Entities
     public class AccountLine
     {
         public string id { get; set; }
-        public string lineId { get; set; }
+        public Guid lineId { get; set; }
         public string codeId { get; set; }
         public string name { get; set; }
         public bool debetcredit { get; set; }
@@ -154,7 +154,7 @@ namespace DIBAdminAPI.Data.Entities
         public string typeId { get; set; }
         public int guiorder { get; set; }
         public int idx { get; set; }
-        public string dataResourceId { get; set; }
+        public Guid dataResourceId { get; set; }
         public string dataId { get; set; }
         public string transactionId { get; set; }
     }
