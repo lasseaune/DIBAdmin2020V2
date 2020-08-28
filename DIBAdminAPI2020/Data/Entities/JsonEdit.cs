@@ -1895,7 +1895,7 @@ namespace DIBAdminAPI.Data.Entities
         public static EditDocumentContainerResult UpdateJsonElements(this DocumentContainer documentContainer, JsonUpdate jsonUpdate, string resourceId, string segmentId)
         {
             string document_id = "document;" + resourceId + ";" + segmentId;
-            if (jsonUpdate.root.action != "update") return null;
+            if (jsonUpdate.action != "update") return null;
             bool updateToc = false;
             foreach (KeyValuePair<string, JsonElement> pair in jsonUpdate.elements)
             {
@@ -1909,7 +1909,7 @@ namespace DIBAdminAPI.Data.Entities
             if (updateToc)
             {
                 XElement document = documentContainer.GetDocumentContainerXML(document_id);
-                //XElement document = documentContainer.GetDocumentXML(document_id);
+
                 TocJson tocJson = new TocJson(document, resourceId, segmentId);
 
                 tocUpdates = (
@@ -2961,7 +2961,9 @@ namespace DIBAdminAPI.Data.Entities
     {
         public string resourceid { get; set; }
         public string segmentid { get; set; }
-        public JsonUpdateRoot root { get; set; }
+        //public string item { get; set; }
+        public string action { get; set; }
+        //public JsonUpdateRoot root { get; set; }
         public Dictionary<string, JsonElement> elements { get; set; }
     }
 
@@ -2979,6 +2981,7 @@ namespace DIBAdminAPI.Data.Entities
     {
         public string action { get; set; }
         public string name { get; set; }
+        public int resourcetypeId { get; set; }
 
     }
     public class JsonPaste
@@ -3150,10 +3153,10 @@ namespace DIBAdminAPI.Data.Entities
         public List<JsonChild> tocroot { get; set; }
 
         public Dictionary<string, JsonToc> toc { get; set; }
-
+        public XElement items { get; set; }
         public TocJson(XElement container)
         {
-            XElement items = new XElement("items");
+            items = new XElement("items");
             items.Add(container.Elements().Where(p => p.Descendants().Where(d => d.IsHeaderName()).Count() > 0).HeaderToToc());
             toc = new Dictionary<string, JsonToc>();
             toc.AddRange(items
@@ -3164,8 +3167,12 @@ namespace DIBAdminAPI.Data.Entities
         }
         public TocJson(XElement document, string resourceId, string segmentId)
         {
-            XElement items = new XElement("items");
-            items.Add(document.Elements().Where(p => p.Descendants().Where(d => d.IsHeaderName()).Count() > 0).HeaderToToc());
+            items = new XElement("items");
+            items.Add(
+                document
+                .Elements()
+                .Where(p => p.Descendants().Where(d => d.IsHeaderName()).Count() > 0)
+                .HeaderToToc());
             toc = new Dictionary<string, JsonToc>();
             if (segmentId =="")
             {
@@ -3182,7 +3189,7 @@ namespace DIBAdminAPI.Data.Entities
 
         public TocJson(XElement map, XElement document, string resourc_id, string segment_id)
         {
-            XElement items = new XElement("items"); 
+            items = new XElement("items"); 
             segment_id = segment_id == null ? "" : segment_id;
 
             if (segment_id == "")

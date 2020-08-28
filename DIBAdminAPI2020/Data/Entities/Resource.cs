@@ -23,6 +23,7 @@ namespace DIBAdminAPI.Data.Entities
     public class ResourceHTML5
     {
         public string topicId { get; set; }
+        public string id { get; set; }
         public string resourceId { get; set; }
         public string segmentId { get; set; }
         public string Name { get; set; }
@@ -62,6 +63,20 @@ namespace DIBAdminAPI.Data.Entities
     //    public XElement Tags { get; set; }
     //}
 
+    public class ResourceDocuments
+    {
+        public Guid id { get;set; }
+        public Guid topicId { get; set; }
+        public Guid docId { get; set; }
+        public int resourcetypeId { get; set; }
+        public string name { get; set; }
+        public DateTime lastUpdate { get; set; }
+        public string userName { get; set; }
+        public string version { get; set; }
+        public string dataType { get; set; }
+        public string dataName { get; set; }
+        public string transactionId { get; set; }
+    }
     public class Resources
     {
         public Guid topic_id { get; set; }

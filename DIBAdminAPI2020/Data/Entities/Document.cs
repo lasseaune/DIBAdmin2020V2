@@ -65,6 +65,7 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class DocumentContainer
     {
+        public string id { get; set; }
         public bool access { get; set; }
         public bool companylookup { get; set; }
         public string name { get; set; }
@@ -80,7 +81,7 @@ namespace DIBAdminAPI.Data.Entities
         
         public DocumentContainer(string Name, XElement Document, string resourceId)
         {
-            resourceId = resourceId.ToLower();
+            id = resourceId.ToLower();
             name = Name;
         
             TocJson tocJson = new TocJson(null, Document, resourceId, "");
@@ -117,6 +118,7 @@ namespace DIBAdminAPI.Data.Entities
         }
         public DocumentContainer(ResourceHTML5 r)
         {
+            id = r.id.ToLower();
             access = r.Accsess == 1 ? true : false;
             XElement map = r.ResourceMap;
             elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);

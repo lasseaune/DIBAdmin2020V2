@@ -183,7 +183,7 @@ namespace DIBAdminAPI.Data
                         IEnumerable<TopicBase> topicBases = multi.Read<TopicBase>();
                         IEnumerable<TopicSubElement> topicSubElements = multi.Read<TopicSubElement>();
                         result.related = new RelatedResources(topicBases, topicSubElements).related;
-                        result.Resources = multi.Read<Resource>().ToList();
+                        result.Resources = multi.Read<ResourceDocuments>().ToList();
                     }
                 }
 

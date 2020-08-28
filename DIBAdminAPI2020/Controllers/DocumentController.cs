@@ -72,8 +72,7 @@ namespace DIBAdminAPI.Controllers
             var p = new
             {
                 session_id = "apitest",//_usrsvc.CurrentUser.session_id,
-                topic_id = resourceId,
-                resource_id = resourceId,
+                id = resourceId,
                 segment_id = segmentId ?? "",
                 collection_id = collectionId ?? "",
                 version = Version
@@ -102,34 +101,12 @@ namespace DIBAdminAPI.Controllers
             {
                 
             }
-
-            //if (data.Name.LocalName == "package" && (string)data.Attributes("type").FirstOrDefault() == "8")
-            //{
-            //    //ChecklistJson result = new ChecklistJson(data);
-            //    return BadRequest("Document missing!");
-            //}
-            //else if (data.Name.LocalName == "packages")
-            //{
-            //    string objectName = "dibobjects";
-            //    IEnumerable<AccountingType> accountingType = _cache.Get<DIBObjects>(objectName).accountingTypes;
-            //    IEnumerable<AccountingCode> accountingCodes = _cache.Get<DIBObjects>(objectName).accountingCodes;
-            //    IEnumerable<AccountingTax> accountingTax = _cache.Get<DIBObjects>(objectName).accountingTaxes;
-            //    DocumentPartsContainer dpc = new DocumentPartsContainer(data, resourceId, segmentId, Id, accountingType, accountingCodes, accountingTax);
-            //    return Ok(dpc);
-            //}
-            //else
-            //{
-            //string objectName = "dibobjects";
-
-            //result = new DocumentContainer(data, _cache.Get<DIBObjects>(objectName));
             result = new DocumentContainer(data);
             if ((Id == null ? "" : Id) == "")
-                {
-                    _cache.Set<DocumentContainer>(rid, result);
-                }
-                return Ok(result);
-            //}
-            
+            {
+                _cache.Set<DocumentContainer>(rid, result);
+            }
+            return Ok(result);
         }
         [HttpPost("create")]
         public IActionResult Create([FromBody]JsonDocumentCreate jdc)
