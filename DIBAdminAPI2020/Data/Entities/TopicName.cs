@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace DIBAdminAPI.Data.Entities
 {
+    public class TopicNameType
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+    }
     public class TopicNameAPI
     {
         public string id { get; set; }

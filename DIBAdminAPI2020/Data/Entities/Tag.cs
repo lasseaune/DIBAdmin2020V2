@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 
 namespace DIBAdminAPI.Data.Entities
 {
+    public class Tagtype
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+    }
     public class TagAPI
     {
         public string id { get; set; }
