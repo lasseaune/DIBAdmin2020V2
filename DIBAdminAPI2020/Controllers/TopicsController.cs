@@ -11,7 +11,7 @@ using System.Xml.Linq;
 namespace DIBAdminAPI.Controllers
 {
     
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
     public class TopicsController : ControllerBase
     {
@@ -81,14 +81,6 @@ namespace DIBAdminAPI.Controllers
                 }
             }
             return BadRequest();
-
-        }
-
-        // PUT: api/Topics/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-            
         }
 
         // DELETE: api/ApiWithActions/5

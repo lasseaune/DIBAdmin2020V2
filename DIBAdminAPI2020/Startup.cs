@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using DIBAdminAPI.Data;
 using DIBAdminAPI.Services;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace DIBAdminAPI
 {
@@ -31,19 +31,23 @@ namespace DIBAdminAPI
             services.AddDistributedMemoryCache();
             //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvc()
-                .AddJsonOptions(o => {
-                    o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
-
+                .AddNewtonsoftJson();
+            
+            services.AddControllers()
+                .AddNewtonsoftJson();
+            services.AddMvc()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ContractResolver =
+                    new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver());
             services.AddTransient<IRepository, Repository>();
             services.AddTransient<ITempStorage, TempStorage>();
             services.AddSingleton<ICacheService, CacheService>();
             //services.AddTransient<ICacheService, CacheService>();
-           
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -54,14 +58,20 @@ namespace DIBAdminAPI
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseEndpoints(endpoints =>
+                endpoints.MapControllerRoute("default", "{controller=Home}")
+            );
             app.UseCors(builder =>
                 builder.AllowAnyHeader()
                        .AllowAnyOrigin()
                        .AllowAnyMethod());
-            app.UseHttpsRedirection();
-            app.UseMvc();
             
-            
+
+
+
         }
     }
 }

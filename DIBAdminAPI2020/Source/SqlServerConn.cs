@@ -18,7 +18,7 @@ namespace DIBAdminAPI.Source
             try
             {
                 //"Provider=SQLOLEDB;Server=DIBDB03; Database=diba0706;User ID=dibapp;Password=lau610523;";
-                using (SqlConnection cn = new SqlConnection(string.Format("Server={0}; Database={1};User ID={2};Password={3};",
+                using (var cn = new SqlConnection(string.Format("Server={0}; Database={1};User ID={2};Password={3};",
                                                                     Config.Instance.getDibConfig().sqlserver,
                                                                     Config.Instance.getDibConfig().database,
                                                                     Config.Instance.getDibConfig().dbuser,

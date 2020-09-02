@@ -21,7 +21,7 @@ namespace DIBAdminAPI.Controllers
             _repo = repository;
             _cache = cacheService;
         }
-        [HttpGet("api/")]
+        [HttpGet("")]
         public async Task<IActionResult> Get()
         {
             string objectName = "dibobjects";

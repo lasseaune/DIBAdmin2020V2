@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 namespace DIBAdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     public class AcclineController : Controller
     {
         private readonly IRepository _repo;

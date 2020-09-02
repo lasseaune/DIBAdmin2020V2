@@ -19,7 +19,7 @@ using System.Text.Encodings;
 
 namespace DIBAdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
     public class DocumentController : ControllerBase
     {
@@ -309,39 +309,37 @@ namespace DIBAdminAPI.Controllers
             return Ok(topics);
         }
         [HttpPost("upload")]
-        public Task<IActionResult> Upload(IFormFile file)
+        public async Task<IActionResult> Upload(string topicId, IFormFile file)
         {
+            try
+            {
+                
+                if (file == null)
+                    return BadRequest("Fil må angis!");
+                string base64File;
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    base64File = Convert.ToBase64String(memoryStream.ToArray());
+                }
 
-            //try
-            //{
-            //    string topicId = "";
-            //    string folder_id = string.IsNullOrEmpty(topicId) ? string.Empty : topicId;
-            //    if (file == null)
-            //        return BadRequest("Fil må angis!");
-            //    string base64File;
-            //    using (var memoryStream = new MemoryStream())
-            //    {
-            //        await file.CopyToAsync(memoryStream);
-            //        base64File =Convert.ToBase64String(memoryStream.ToArray());
-            //    }
-            //    //var newDocument = new Document
-            //    //{
-            //    //    folder_id = folder_id,
-            //    //    navn = file.FileName,
-            //    //    b64file = base64File
-            //    //};
-            //    //var response = await _client.PostAsync("/api/Document/AddMyDocument", newDocument);
-            //    //var data = JsonConvert.DeserializeObject<MyFolder>(response);
-            //    //return Ok(data);
-            //    return Ok();
-            //}
-            //catch (Exception e)
-            //{
-            //    //_logger.LogError("<DocumentsController/AddDocument/(folder_id: {folder_id}, navn: {navn})> Message: {message}", folder_id, file.FileName, e.Message);
-            //    //return BadRequest(e.Message);
-            //    return BadRequest();
-            //}
-            return null;
+                //var newDocument = new Document
+                //{
+                //    folder_id = folder_id,
+                //    navn = file.FileName,
+                //    b64file = base64File
+                //};
+                //var response = await _client.PostAsync("/api/Document/AddMyDocument", newDocument);
+                //var data = JsonConvert.DeserializeObject<MyFolder>(response);
+                return Ok(topicId);
+            }
+            catch (Exception e)
+            {
+                //_logger.LogError("<DocumentsController/AddDocument/(folder_id: {folder_id}, navn: {navn})> Message: {message}", folder_id, file.FileName, e.Message);
+                //return BadRequest(e.Message);
+                return BadRequest();
+            }
+            
         }
     }
 }

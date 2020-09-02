@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace DIBAdminAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/[controller]")]
     [ApiController]
     public class RDataController : ControllerBase
     {
