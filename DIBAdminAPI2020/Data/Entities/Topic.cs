@@ -182,7 +182,7 @@ namespace DIBAdminAPI.Data.Entities
                     }
                 );
         }
-        public ObjectsApi(IEnumerable<ResourceDocuments> resources, string topic_id)
+        public ObjectsApi(IEnumerable<ResourceDocuments> resources)
         {
             if (resources.Select(p => p.id).FirstOrDefault() == null)
             {
@@ -296,6 +296,7 @@ namespace DIBAdminAPI.Data.Entities
             tags = objectsApi.objectsList;
             objects.AddRange(objectsApi.objects);
 
+
             objectsApi = new ObjectsApi(topicDetail.Dates);
             dates = objectsApi.objectsList;
             objects.AddRange(objectsApi.objects);
@@ -304,7 +305,7 @@ namespace DIBAdminAPI.Data.Entities
             related = objectsApi.objectsList;
             objects.AddRange(objectsApi.objects);
 
-            objectsApi = new ObjectsApi(topicDetail.Resources, id);
+            objectsApi = new ObjectsApi(topicDetail.Resources);
             resources = objectsApi.objectsList;
             objects.AddRange(objectsApi.objects);
 

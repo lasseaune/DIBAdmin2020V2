@@ -50,6 +50,7 @@ namespace DIBAdminAPI.Controllers
                 return BadRequest("Kunne ikke legge til");
             }
             result = editResult.documentContainer;
+            result.Edited = true;
             _cache.Set< DocumentContainer>(rid, result);
            
             return Ok(json);
@@ -70,13 +71,8 @@ namespace DIBAdminAPI.Controllers
             {
                 return BadRequest("Kunne ikke oppdatere");
             }
-            //bool success = result.elements.UpdateJsonElements(ju);
-            //if (!success)
-            //{
-            //    return BadRequest("Kunne ikke oppdatere");
-            //}
+            ecr.documentContainer.Edited = true;
             _cache.Set<DocumentContainer>(rid, ecr.documentContainer);
-            //return Ok(true);
 
             return Ok(ecr.json);
         }
@@ -98,13 +94,8 @@ namespace DIBAdminAPI.Controllers
             {
                 return BadRequest("Kunne ikke oppdatere");
             }
+            ecr.documentContainer.Edited = true;
             _cache.Set<DocumentContainer>(rid, ecr.documentContainer);
-            //bool success = result.elements.DeleteJsonElement(jd);
-            //if (!success)
-            //{
-            //    return BadRequest("Kunne ikke slette");
-            //}
-            //_cache.Set<DocumentContainer>(rid, result);
 
             return Ok(ecr.json);
         }

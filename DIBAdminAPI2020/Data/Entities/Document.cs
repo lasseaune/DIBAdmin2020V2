@@ -65,7 +65,9 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class DocumentContainer
     {
+        public bool Edited = false; 
         public string id { get; set; }
+        public int ResourceTypeId { get; set; }
         public bool access { get; set; }
         public bool companylookup { get; set; }
         public string name { get; set; }
@@ -79,36 +81,36 @@ namespace DIBAdminAPI.Data.Entities
         public IEnumerable<XVariable> variables { get; set; }
         public IEnumerable<XObj> xobjects { get; set; }
         
-        public DocumentContainer(string Name, XElement Document, string resourceId)
-        {
-            id = resourceId.ToLower();
-            name = Name;
+        //public DocumentContainer(string Name, XElement Document, string resourceId)
+        //{
+        //    id = resourceId.ToLower();
+        //    name = Name;
         
-            TocJson tocJson = new TocJson(null, Document, resourceId, "");
-            tocroot = tocJson.tocroot;
-            toc = tocJson.toc;
+        //    TocJson tocJson = new TocJson(null, Document, resourceId, "");
+        //    tocroot = tocJson.tocroot;
+        //    toc = tocJson.toc;
 
-            string document_id = "document;" + resourceId + ";" + "";
-            root = new List<JsonChild>();
-            root.Add(new JsonChild { id = document_id });
-            elements = new Dictionary<string, JsonElement>();
-            elements = new Dictionary<string, JsonElement>();
-            elements.Add(document_id,
-                new JsonElement
-                {
-                    name = "div",
-                    attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
-                    children = Document.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
-                }
-            );
-            elements.AddRange(
-                Document
-                .Descendants()
-                .Select(p => p)
-                .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
-            );
+        //    string document_id = "document;" + resourceId + ";" + "";
+        //    root = new List<JsonChild>();
+        //    root.Add(new JsonChild { id = document_id });
+        //    elements = new Dictionary<string, JsonElement>();
+        //    elements = new Dictionary<string, JsonElement>();
+        //    elements.Add(document_id,
+        //        new JsonElement
+        //        {
+        //            name = "div",
+        //            attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
+        //            children = Document.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
+        //        }
+        //    );
+        //    elements.AddRange(
+        //        Document
+        //        .Descendants()
+        //        .Select(p => p)
+        //        .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
+        //    );
 
-        }
+        //}
 
         public DocumentContainer(ResourceHTML5Element r)
         {
@@ -119,6 +121,7 @@ namespace DIBAdminAPI.Data.Entities
         public DocumentContainer(ResourceHTML5 r)
         {
             id = r.id.ToLower();
+            ResourceTypeId = r.ResourceTypeId;
             access = r.Accsess == 1 ? true : false;
             XElement map = r.ResourceMap;
             elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);

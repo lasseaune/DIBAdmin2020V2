@@ -1641,7 +1641,7 @@ namespace DIBAdminAPI.Data.Entities
             });
             return g.Key.children;
         }
-        public static XElement GetDocumentContainerXML(this DocumentContainer documentContainer, string documentId)
+        public static XElement GetDocumentContainerXML(this DocumentContainer documentContainer)
         {
             JsonElement root = documentContainer
                 .elements
@@ -1677,102 +1677,13 @@ namespace DIBAdminAPI.Data.Entities
             );
             return result1;
 
-            //List<JsonXMLBuildElement> resultE = (
-            //   from c in root.children
-            //   join e in documentContainer.elements
-            //   on c.id equals e.Key
-            //   from cc in e.Value.children
-            //   join ee in documentContainer.elements
-            //   on cc.id equals ee.Key
-            //   group new {e, ee} by e into g
-            //   select new JsonXMLBuildElement{
-            //       id = g.Key.Key,
-            //       element = g.Key.Value,
-            //       elements = g.Select(p => new JsonXMLBuildElement { id = p.ee.Key, element = p.ee.Value }).ToList()
-            //       }
-            // ).ToList();
-
-            //resultE.SelectMany(p => p.elements).FillBuild(documentContainer.elements);
-
-            //XElement result = new XElement("document",
-            //     from be in resultE
-
-            //     select be.GetXML()
-            // );
-
-            //return result;
 
         }
-        public static XElement GetDocumentXML(this DocumentContainer documentContainer, string documentId)
-        {
-            XElement ee = documentContainer.GetDocumentContainerXML(documentId);
-            return ee;
-
-            List<BuildJson> x = (from e in documentContainer.elements
-                                 from c in e.Value.children
-                                 join s in documentContainer.elements
-                                 on c.id equals s.Key
-                                 group new { id = e.Key, el = e, subel = s } by e.Key into g
-                                 select new BuildJson
-                                 {
-                                     element = new SubJsonElement { id = g.Key, element = g.Select(p => p.el.Value).FirstOrDefault() },
-                                     children = g.Select(p => new SubJsonElement { id = p.subel.Key, element = p.subel.Value }).ToList()
-                                 }
-                    ).ToList();
-
-
-
-
-
-            //List<SubJsonElement> bottom = documentContainer
-            //    .elements.Where(p => p.Value.children.Where(c => c.id == null).Count() == 0)
-            //    .Select(p=>new SubJsonElement { id = p.Key, element=p.Value })
-            //    .ToList();
-
-            //List<BuildJson> y = (
-            //    from e in documentContainer.elements
-            //    from c in e.Value.children
-            //    join b in bottom
-            //    on c.id equals b.id
-            //    group new { id = e.Key, el = e, subel = b } by e.Key  into g
-            //    select new BuildJson
-            //    {
-            //        element = new SubJsonElement { id = g.Key, element = g.Select(p => p.el.Value).FirstOrDefault() },
-            //        children = g.Select(p=>p.subel).ToList()
-            //    }
-            //).ToList();
-
-
-
-
-
-
-
-            XElement d = new XElement("document",
-                x.Where(p => p.element.id == documentContainer.root.Select(r => r.id).FirstOrDefault())
-                .Select(p => p.JsonToXml(x))
-            );
-            return d;
-            //JsonElement jsonDocument = documentContainer
-            //     .elements
-            //     .Where(p => p.Key == documentContainer.root.Select(r => r.id).FirstOrDefault())
-            //     .Select(p => p.Value)
-            //     .FirstOrDefault();
-
-            
-
-            
-            //XElement document = new XElement("document",
-            //    jsonDocument.children.GetJsonChildrens(documentContainer.elements)
-            //     //documentContainer
-            //     //.elements
-            //     //.Where(p => p.Key == documentContainer.root.Select(r => r.id).FirstOrDefault())
-            //     //.Select(p => p.Value)
-            //     //.SelectMany(p => p.children.GetJsonChildrens(documentContainer.elements))
-            //     ////.Select(p=>p.GetJsonChildren(documentContainer.elements))
-            //);
-            //return document;
-        }    
+        //public static XElement GetDocumentXML(this DocumentContainer documentContainer)
+        //{
+        //    XElement ee = documentContainer.GetDocumentContainerXML();
+        //    return ee;
+        //}    
         public static XElement GetXml(this Dictionary<string, JsonElement> elements, string elementId)
         {
             List<XElement> result = new List<XElement>();
@@ -1859,8 +1770,7 @@ namespace DIBAdminAPI.Data.Entities
                     }
                 }
             }
-            XElement document = documentContainer.GetDocumentContainerXML(document_id);
-            //XElement document = documentContainer.GetDocumentXML(document_id);
+            XElement document = documentContainer.GetDocumentContainerXML();
             TocJson tocJson = new TocJson(document,resourceId,segmentId);
 
             List<TocUpdate> tocUpdates = null;
@@ -1908,7 +1818,7 @@ namespace DIBAdminAPI.Data.Entities
             List<TocUpdate> tocUpdates = null;
             if (updateToc)
             {
-                XElement document = documentContainer.GetDocumentContainerXML(document_id);
+                XElement document = documentContainer.GetDocumentContainerXML();
 
                 TocJson tocJson = new TocJson(document, resourceId, segmentId);
 
@@ -2979,9 +2889,12 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class JsonDocumentCreate
     {
-        public string action { get; set; }
+        public string topicId { get; set; }
+        public string resourceId { get; set; }
+        public string segmentId { get; set; }
+        public int? resourcetypeId { get; set; }
+        public string op { get; set; }
         public string name { get; set; }
-        public int resourcetypeId { get; set; }
 
     }
     public class JsonPaste

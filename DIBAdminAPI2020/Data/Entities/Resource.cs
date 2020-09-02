@@ -68,7 +68,7 @@ namespace DIBAdminAPI.Data.Entities
         public Guid id { get;set; }
         public Guid topicId { get; set; }
         public Guid docId { get; set; }
-        public int resourcetypeId { get; set; }
+        public string resourcetypeId { get; set; }
         public string name { get; set; }
         public DateTime lastUpdate { get; set; }
         public string userName { get; set; }

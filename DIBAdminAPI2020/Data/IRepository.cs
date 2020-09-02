@@ -16,6 +16,10 @@ namespace DIBAdminAPI.Data
         Task<TopicDetail> ExecTopicDetail(string QueryName, object p, int? timeOut = null);
         Task<IEnumerable<TopicBase>> ExecTopics(string QueryName, object p, int? timeOut = null);
         Task<XElement> ExecRData(string QueryName, object p, int? timeOut = null);
+        Task<IEnumerable<ResourceDocuments>> GetResourceDocuments(object p, int? timeOut = null);
+        Task<XElement> CreateResourceDocument(object p, int? timeOut = null);
+        Task<XElement> SaveResourceDocument(object p, int? timeOut = null);
+        Task<XElement> ExecUpdateResult(string QueryName, object p, int? timeOut = null);
         //Task<ResourceNavigation> GetResourceByResourceIdAndId(object p, int? timeOut = null);
         //Task<XElement> ExecDocument(string QueryName, object p, int? timeOut = null);
         //Task<ResourceDataDocument> ExecDocumentResource(string QueryName, object p, int? timeOut = null);

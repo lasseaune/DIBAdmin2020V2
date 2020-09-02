@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Text.Encodings;
 
 namespace DIBAdminAPI.Controllers
 {
@@ -59,8 +60,8 @@ namespace DIBAdminAPI.Controllers
                 [FromQuery] string segmentId,
                 [FromQuery] string Id,
                 [FromQuery] string collectionId,
-                [FromQuery] string Search,
-                [FromQuery] string Version = "0"
+                [FromQuery] string Search
+               
         )
         {
 
@@ -74,9 +75,7 @@ namespace DIBAdminAPI.Controllers
                 session_id = "apitest",//_usrsvc.CurrentUser.session_id,
                 id = resourceId,
                 segment_id = segmentId ?? "",
-                collection_id = collectionId ?? "",
-                version = Version
-
+                collection_id = collectionId ?? ""
             };
 
 
@@ -109,48 +108,165 @@ namespace DIBAdminAPI.Controllers
             return Ok(result);
         }
         [HttpPost("create")]
-        public IActionResult Create([FromBody]JsonDocumentCreate jdc)
+        public async Task<IActionResult> Create([FromBody]JsonDocumentCreate jdc)
         {
-            string action = jdc.action;
-            string name = jdc.name;
-            XElement document = null;
-            string id = null;
-            switch (action.Trim().ToLower())
+            string transactionId = Guid.NewGuid().ToString();
+            
+            string op = jdc.op ?? "";
+            XElement result = null;
+            
+            if (op=="create" || op =="")
             {
-                case "new7":
-                    {
-                        id = Guid.NewGuid().ToString();
+                
+                if (jdc.topicId == null || jdc.resourcetypeId==null || jdc.name == null)
+                {
 
-                        document =
-                            new XElement("document",
-                                new XElement("section",
-                                    new XAttribute("id", id),
-                                    new XElement("h1",
-                                        new XAttribute("id", Guid.NewGuid().ToString()),
-                                        new XText("Overskrift 1")
-                                    ),
-                                    new XElement("p",
-                                        new XAttribute("id", Guid.NewGuid().ToString()),
-                                        new XText("Første setning....")
-                                    )
-                                )
-                            );
-                        
-                    }
-                    break;
-                default:
-                    return BadRequest("Kunne ikke opprette dokument til");
+                }
+                int resourcetypeId = jdc.resourcetypeId ?? 0;
+                XElement document = resourcetypeId.CreateXMLDocument();
+                TocJson tocJson = new TocJson(document);
+                XElement index = new XElement("index", tocJson.items.Nodes());
+                XElement container = new XElement("container2020",
+                        index,
+                        document
+                    );
+                var p = new
+                {
+                    jdc.topicId,
+                    jdc.name,
+                    resourcetypeId,
+                    session_id = "apitest",
+                    container,
+                    transactionId
+                };
+            
+                result = await _repo.ExecUpdateResult("[dbo].[CreateRecourceDocument]", p);
+            }
+            else if (op == "createeditable")
+            {
+                string segmentId = jdc.segmentId ?? "";
+                string resourceId = jdc.resourceId;
+                string topicId = jdc.topicId;
+                if (resourceId == null || topicId == null)
+                {
+                    return BadRequest("Missing resourceId or topicId");
+                }
+                string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
+
+                DocumentContainer documentContainer = null;
+                documentContainer = _cache.Get<DocumentContainer>(rid);
+                if (documentContainer == null) return BadRequest("Documentcontainer is missing");
+
+                XElement document = documentContainer.GetDocumentContainerXML();
+                TocJson tocJson = new TocJson(document, resourceId, segmentId);
+                XElement index = new XElement("index", tocJson.items.Nodes());
+                XElement container = new XElement("container2020", index, document);
+                var p = new
+                {
+                    topicId,
+                    segmentId,
+                    resourceId,
+                    name = "Kladd - " + documentContainer.name,
+                    session_id = "apitest",
+                    container,
+                    transactionId
+                };
+                result = await _repo.ExecUpdateResult("[dbo].[CreateRecourceDocumentEditable]", p);
             }
 
-            string resourceId = Guid.NewGuid().ToString();
-            DocumentContainer dc = new DocumentContainer(name, document, resourceId);
-            string segmentId = "";
-            string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
-
-            _cache.Set<DocumentContainer>(rid + "_document", dc);
-            return Ok(dc);
+            if (result==null)
+            {
+                return BadRequest();
+            }
+            if ((string)result.Attributes("value").FirstOrDefault() != "1")
+            {
+                return BadRequest((string)result.Attributes("message").FirstOrDefault());
+            }
+            else
+            {
+                string id = ((string)result.Attributes("id").FirstOrDefault() ?? "").ToLower();
+                var t = new
+                {
+                    jdc.topicId
+                };
+                IEnumerable<ResourceDocuments> rd = await _repo.GetResourceDocuments(t);
+                ObjectsApi oa = new ObjectsApi(rd);
+                TopicPartsAPI tp = new TopicPartsAPI
+                {
+                    root = new List<string> {id},
+                    objects = oa.objects
+                                .Where(v => v.Value.transactionId == transactionId)
+                                .ToDictionary(v => v.Key, v => v.Value)
+                };
+                return Ok(tp);
+            }
+            
         }
-        
+        [HttpPost("save")]
+        public async Task<IActionResult> Save([FromBody]JsonDocumentCreate jdc)
+        {
+            string transactionId = Guid.NewGuid().ToString();
+            string topicId = jdc.topicId;
+            string resourceId = jdc.resourceId;
+            string segmentId = jdc.segmentId??"";
+
+            if (topicId == null || resourceId == null)
+            {
+                return BadRequest("Missing input data");
+            }
+
+            string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
+            
+            DocumentContainer documentContainer = null;
+            documentContainer = _cache.Get<DocumentContainer>(rid);
+            if (documentContainer == null) return BadRequest("Documentcontainer is missing");
+            if (documentContainer.Edited == false)
+            {
+                
+            }
+
+            XElement document = documentContainer.GetDocumentContainerXML();
+            TocJson tocJson = new TocJson(document, resourceId, segmentId);
+            XElement index = new XElement("index", tocJson.items.Nodes());
+            XElement container = new XElement("container2020", index, document);
+            var p = new
+            {
+                Id = resourceId,
+                segmentId,
+                session_id = "apitest",//_usrsvc.CurrentUser.session_id,
+                container,
+                transactionId
+            };
+            XElement result = await _repo.SaveResourceDocument(p);
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            if ((string)result.Attributes("value").FirstOrDefault() != "1")
+            {
+                return BadRequest((string)result.Attributes("message").FirstOrDefault());
+            }
+            else
+            {
+                string id = ((string)result.Attributes("id").FirstOrDefault() ?? "").ToLower();
+                var t = new
+                {
+                    topicId
+                };
+                IEnumerable<ResourceDocuments> rd = await _repo.GetResourceDocuments(t);
+                ObjectsApi oa = new ObjectsApi(rd);
+                TopicPartsAPI tp = new TopicPartsAPI
+                {
+                    root = new List<string> { id },
+                    objects = oa.objects
+                                .Where(v => v.Value.transactionId == transactionId)
+                                .ToDictionary(v => v.Key, v => v.Value)
+                };
+                return Ok(tp);
+            }
+
+        }
+
         [HttpGet("s")]
         public async Task<IActionResult> Search(
                 [FromQuery] string search
@@ -191,6 +307,41 @@ namespace DIBAdminAPI.Controllers
             });
 
             return Ok(topics);
+        }
+        [HttpPost("upload")]
+        public Task<IActionResult> Upload(IFormFile file)
+        {
+
+            //try
+            //{
+            //    string topicId = "";
+            //    string folder_id = string.IsNullOrEmpty(topicId) ? string.Empty : topicId;
+            //    if (file == null)
+            //        return BadRequest("Fil må angis!");
+            //    string base64File;
+            //    using (var memoryStream = new MemoryStream())
+            //    {
+            //        await file.CopyToAsync(memoryStream);
+            //        base64File =Convert.ToBase64String(memoryStream.ToArray());
+            //    }
+            //    //var newDocument = new Document
+            //    //{
+            //    //    folder_id = folder_id,
+            //    //    navn = file.FileName,
+            //    //    b64file = base64File
+            //    //};
+            //    //var response = await _client.PostAsync("/api/Document/AddMyDocument", newDocument);
+            //    //var data = JsonConvert.DeserializeObject<MyFolder>(response);
+            //    //return Ok(data);
+            //    return Ok();
+            //}
+            //catch (Exception e)
+            //{
+            //    //_logger.LogError("<DocumentsController/AddDocument/(folder_id: {folder_id}, navn: {navn})> Message: {message}", folder_id, file.FileName, e.Message);
+            //    //return BadRequest(e.Message);
+            //    return BadRequest();
+            //}
+            return null;
         }
     }
 }
