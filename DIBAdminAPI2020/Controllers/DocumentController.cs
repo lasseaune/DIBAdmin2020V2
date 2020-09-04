@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Text.Encodings;
+using System.IO.Compression;
 
 namespace DIBAdminAPI.Controllers
 {
@@ -313,33 +314,134 @@ namespace DIBAdminAPI.Controllers
         {
             try
             {
-                
                 if (file == null)
                     return BadRequest("Fil må angis!");
-                string base64File;
+
+                byte[] fileBytes;
+                string name = file.FileName;
+                string extention = name.Split('.').LastOrDefault();
+                name = name.Split('.').FirstOrDefault();
                 using (var memoryStream = new MemoryStream())
                 {
                     await file.CopyToAsync(memoryStream);
-                    base64File = Convert.ToBase64String(memoryStream.ToArray());
+                    fileBytes = memoryStream.ToArray();
+                }
+                byte[] compressedBytes;
+                
+
+                using (var outStream = new MemoryStream())
+                {
+                    using (var archive = new ZipArchive(outStream, ZipArchiveMode.Create, true))
+                    {
+                        var fileInArchive = archive.CreateEntry(file.FileName, CompressionLevel.Optimal);
+                        using (var entryStream = fileInArchive.Open())
+                        using (var fileToCompressStream = new MemoryStream(fileBytes))
+                        {
+                            fileToCompressStream.CopyTo(entryStream);
+                        }
+                    }
+                    compressedBytes = outStream.ToArray();
                 }
 
-                //var newDocument = new Document
-                //{
-                //    folder_id = folder_id,
-                //    navn = file.FileName,
-                //    b64file = base64File
-                //};
-                //var response = await _client.PostAsync("/api/Document/AddMyDocument", newDocument);
-                //var data = JsonConvert.DeserializeObject<MyFolder>(response);
-                return Ok(topicId);
+                string base64File  = Convert.ToBase64String(compressedBytes);
+
+                XElement xml = new XElement("encoding",
+                    new XAttribute("filename", name),
+                    new XAttribute("fileextention", extention),
+                    new XElement("base64String", base64File)
+                );
+                string transactionId = Guid.NewGuid().ToString();
+                var p = new
+                {
+                    topicId,
+                    name,
+                    extention,
+                    xml,
+                    session_id = "apitest",//_usrsvc.CurrentUser.session_id,
+                    transactionId
+                };
+
+                XElement result = await _repo.ExecXElementQuery("[dbo].[SaveFile]", p);
+                if (result == null)
+                {
+                    return BadRequest();
+                }
+                if ((string)result.Attributes("value").FirstOrDefault() != "1")
+                {
+                    return BadRequest((string)result.Attributes("message").FirstOrDefault());
+                }
+                else
+                {
+                    string id = ((string)result.Attributes("id").FirstOrDefault() ?? "").ToLower();
+                    var t = new
+                    {
+                        topicId
+                    };
+                    IEnumerable<ResourceDocuments> rd = await _repo.GetResourceDocuments(t);
+                    ObjectsApi oa = new ObjectsApi(rd);
+                    TopicPartsAPI tp = new TopicPartsAPI
+                    {
+                        root = new List<string> { id },
+                        objects = oa.objects
+                                    .Where(v => v.Value.transactionId == transactionId)
+                                    .ToDictionary(v => v.Key, v => v.Value)
+                    };
+                    return Ok(tp);
+                }
             }
             catch (Exception e)
             {
                 //_logger.LogError("<DocumentsController/AddDocument/(folder_id: {folder_id}, navn: {navn})> Message: {message}", folder_id, file.FileName, e.Message);
                 //return BadRequest(e.Message);
                 return BadRequest();
+                
             }
-            
+
+        }
+        [HttpGet("file")]
+        public async Task<IActionResult> File([FromQuery] string resourceId)
+        {
+
+            try
+            {
+
+                var p = new
+                {
+                    session_id = "apitest",//_usrsvc.CurrentUser.session_id,
+                    resourceId
+                };
+
+                XElement encoding = await _repo.ExecXElementQuery("[dbo].[Getfile]", p);
+                if (encoding == null)
+                    return BadRequest("Error in File: encoding is null!");
+
+                encoding = encoding.DescendantsAndSelf("encoding").FirstOrDefault();
+                if (encoding == null)
+                    return BadRequest("Error in File: encoding is null!");
+
+                string filename = (string)encoding.Attributes("filename").FirstOrDefault();
+                filename = Regex.Replace(Regex.Replace(filename, @"[^a-zæøåA-ZÆØÅ0-9\s§]", ""), @"\s+", " ");
+                string fileextention = (string)encoding.Attributes("fileextention").FirstOrDefault();
+                string base64 = encoding.Elements("base64String").Select(p => p.Value).FirstOrDefault();
+                byte[] fileBytes = Convert.FromBase64String(base64);
+
+                Stream data = new MemoryStream(fileBytes);   //The original data
+                Stream unzippedEntryStream = null; ;         //Unzipped data from a file in the archive
+                var archive = new ZipArchive(data);
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    unzippedEntryStream = entry.Open(); // .Open will return a stream
+                }
+
+                string fileName = filename + "." + fileextention;
+                return File(unzippedEntryStream, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+            }
+            catch (Exception e)
+            {
+                //_logger.LogError("<api/file?id={id}> UserSession: {@userSession}, Message = {@ex}'",
+                //        id, _usrsvc.CurrentUser, e);
+                return BadRequest("Error in file: " + e.Message);
+            }
         }
     }
 }

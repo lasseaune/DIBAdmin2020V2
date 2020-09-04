@@ -29,9 +29,8 @@ namespace DIBAdminAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDistributedMemoryCache();
-            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddMvc()
-                .AddNewtonsoftJson();
+            
+            services.AddCors();
             
             services.AddControllers()
                 .AddNewtonsoftJson();
@@ -58,17 +57,15 @@ namespace DIBAdminAPI
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseRouting();
-            app.UseAuthentication();
-            app.UseEndpoints(endpoints =>
-                endpoints.MapControllerRoute("default", "{controller=Home}")
-            );
             app.UseCors(builder =>
                 builder.AllowAnyHeader()
                        .AllowAnyOrigin()
                        .AllowAnyMethod());
-            
+            app.UseEndpoints(endpoints =>
+                endpoints.MapControllerRoute("default", "{controller=Home}")
+            );
+
 
 
 

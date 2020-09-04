@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Xml.Serialization;
 using static DIBAdminAPI.Models.Result;
+using System.IO.Compression;
 
 namespace DIBAdminAPI.Helpers.Extentions
 {
@@ -223,8 +224,57 @@ namespace DIBAdminAPI.Helpers.Extentions
             bm = ((string)t.Parent.Attributes("bm").FirstOrDefault() ?? "") == "undefined" ? "" : ((string)t.Parent.Attributes("bm").FirstOrDefault() ?? "");
         }
     }
+    public static class CompressionHelper
+    {
+        public static byte[] Compress(byte[] data)
+        {
+            byte[] compressArray = null;
+            try
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    using (DeflateStream deflateStream = new DeflateStream(memoryStream, CompressionMode.Compress))
+                    {
+                        deflateStream.Write(data, 0, data.Length);
+                    }
+                    compressArray = memoryStream.ToArray();
+                }
+            }
+            catch (Exception exception)
+            {
+                // do something !
+            }
+            return compressArray;
+        }
+
+        public static byte[] Decompress(byte[] data)
+        {
+            byte[] decompressedArray = null;
+            try
+            {
+                using (MemoryStream decompressedStream = new MemoryStream())
+                {
+                    using (MemoryStream compressStream = new MemoryStream(data))
+                    {
+                        using (DeflateStream deflateStream = new DeflateStream(compressStream, CompressionMode.Decompress))
+                        {
+                            deflateStream.CopyTo(decompressedStream);
+                        }
+                    }
+                    decompressedArray = decompressedStream.ToArray();
+                }
+            }
+            catch (Exception exception)
+            {
+                // do something !
+            }
+
+            return decompressedArray;
+        }
+    }
     public static class Extentions
     {
+        
         public static XElement CreateXMLDocument(this int resourcetypeId)
         {
             XElement document = null;

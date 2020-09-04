@@ -329,7 +329,25 @@ namespace DIBAdminAPI.Data
             }
             return null;
         }
-
+        public async Task<XElement> ExecXElementQuery(string QueryName, object p, int? timeOut = null)
+        {
+            IEnumerable<XElement> result;
+            if (!timeOut.HasValue)
+                timeOut = 60;
+            try
+            {
+                using (IDbConnection conn = dbConnection)
+                {
+                    result = await conn.QueryAsync<XElement>(QueryName, p, null, null, CommandType.StoredProcedure);
+                }
+                return result.FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+            }
+            return null;
+        }
 
         //============================================================================================================
         //UTKOMMENTERT
