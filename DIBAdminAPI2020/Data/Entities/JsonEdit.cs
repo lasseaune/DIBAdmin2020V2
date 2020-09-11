@@ -1807,12 +1807,35 @@ namespace DIBAdminAPI.Data.Entities
             string document_id = "document;" + resourceId + ";" + segmentId;
             if (jsonUpdate.action != "update") return null;
             bool updateToc = false;
+            List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
             foreach (KeyValuePair<string, JsonElement> pair in jsonUpdate.elements)
             {
                 if (documentContainer.elements.ContainsKey(pair.Key))
                 {
                     if (pair.Value.name == "section") updateToc = true;
-                    documentContainer.elements[pair.Key] = pair.Value;
+
+                    if (pair.Value.otherprops == null)
+                    {
+                        documentContainer.elements[pair.Key] = pair.Value;
+                    }
+                    else
+                    {
+                        if (pair.Value.otherprops.Where(p => p.Key == "accounting" && p.Value == "false").Count() > 0)
+                        {
+                            pair.Value.otherprops.Remove("accounting");
+                            updated.Add(pair);
+                            documentContainer.elements[pair.Key] = pair.Value;
+                                                    }
+                        else if (pair.Value.otherprops.Where(p => p.Key == "accounting" && p.Value == "true").Count() > 0)
+                        {
+                            updated = pair.UpdateOtherProps(documentContainer.elements, "accounting", "accref");
+                            documentContainer.elements[pair.Key] = updated.Where(p => p.Key == pair.Key).Select(p => p.Value).FirstOrDefault();
+                        }
+                        else
+                        {
+                            documentContainer.elements[pair.Key] = pair.Value;
+                        }
+                    }
                 }
             }
             List<TocUpdate> tocUpdates = null;
@@ -1853,7 +1876,8 @@ namespace DIBAdminAPI.Data.Entities
             return new EditDocumentContainerResult
             {
                 json = new JsonObject {
-                    toc = tocUpdates==null  ? null : (tocUpdates.Count()==0 ? null : tocUpdates.Select(p=>p).ToDictionary(p=>p.newToc.Key, p=>p.newToc.Value))
+                    toc = tocUpdates == null ? null : (tocUpdates.Count() == 0 ? null : tocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
+                    elements = updated.Count()==0 ? null : updated.ToDictionary(p => p.Key, p => p.Value) 
                 },
                 documentContainer = documentContainer
             };

@@ -176,7 +176,7 @@ namespace DIBAdminAPI.Data.Entities
                             subname = p.Value.subname,
                             topictypeId = p.Value.topictypeId.ToLower(),
                             dataResourceId = p.Value.dataResourceId.ToLower(),
-                            dataId = p.Value.dataId.ToLower()
+                            dataId = p.Value.dataId == null ? null : p.Value.dataId.ToLower()
                             
                         }
                     }
@@ -333,7 +333,7 @@ namespace DIBAdminAPI.Data.Entities
                     subname = p.s.name,
                     topictypeId = p.r.topictypeId.ToLower(),
                     dataResourceId = p.r.resourceId.ToLower(),
-                    dataId = p.s.dataId.ToLower(),
+                    dataId = p.s.dataId == null ? null : p.s.dataId.ToLower(),
                     idx = p.s.idx,
                     transactionId = p.s.transactionId
                 }

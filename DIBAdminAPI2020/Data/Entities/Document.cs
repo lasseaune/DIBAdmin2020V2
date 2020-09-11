@@ -6,10 +6,13 @@ using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using static DIBAdminAPI.Models.Result;
 using DIBAdminAPI.Helpers.Extentions;
+using System.IO;
+using DIBAdminAPI.Services;
 
 namespace DIBAdminAPI.Data.Entities
 
 {
+    
     public class DocumentElementdata
     {
         public Dictionary<string, AccountingElementApi> elementdata { get; set; }
@@ -63,11 +66,12 @@ namespace DIBAdminAPI.Data.Entities
             dType = (string)idLink.Attributes("dname").FirstOrDefault();
         }
     }
+   
     public class DocumentContainer
     {
         public bool Edited = false; 
         public string id { get; set; }
-        public int ResourceTypeId { get; set; }
+        public string ResourceTypeId { get; set; }
         public bool access { get; set; }
         public bool companylookup { get; set; }
         public string name { get; set; }
@@ -121,7 +125,7 @@ namespace DIBAdminAPI.Data.Entities
         public DocumentContainer(ResourceHTML5 r)
         {
             id = r.id.ToLower();
-            ResourceTypeId = r.ResourceTypeId;
+            ResourceTypeId = r.ResourceTypeId.ToString();
             access = r.Accsess == 1 ? true : false;
             XElement map = r.ResourceMap;
             elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);

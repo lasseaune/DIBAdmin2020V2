@@ -348,7 +348,30 @@ namespace DIBAdminAPI.Data
             }
             return null;
         }
-
+        //[dbo].[GetResourceDibLinkData]
+        public async Task<IEnumerable<DIBLink>> GetResourceDibLinkData(object p, int? timeOut = null)
+        {
+            string QueryName = "[dbo].[GetResourceDibLinkData]";
+            IEnumerable<DIBLink> result;
+            if (!timeOut.HasValue)
+                timeOut = 60;
+            try
+            {
+                using (IDbConnection conn = dbConnection)
+                {
+                    using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, null, CommandType.StoredProcedure))
+                    {
+                        result = multi.Read<DIBLink>();
+                    }
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+            }
+            return null;
+        }
         //============================================================================================================
         //UTKOMMENTERT
         //============================================================================================================

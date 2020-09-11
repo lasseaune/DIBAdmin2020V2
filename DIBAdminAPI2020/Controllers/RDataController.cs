@@ -8,6 +8,7 @@ using DIBAdminAPI.Data;
 using DIBAdminAPI.Services;
 using DIBAdminAPI.Data.Entities;
 using System.Xml.Linq;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
 
 namespace DIBAdminAPI.Controllers
 {
@@ -24,10 +25,86 @@ namespace DIBAdminAPI.Controllers
             _tempstore = tempstore;
             _cache = cacheService;
         }
+
+        private class DeleteObject
+        {
+            public string resourceId { get; set; }
+            public string Id { get; set; }
+            public string ob { get; set; }
+            public string op { get; set; }
+        }
+
+        [HttpDelete("")]
+        public async Task<IActionResult> Delete([FromBody] IEnumerable<JsonRDataPatch> data)
+        {
+            string transactionId = Guid.NewGuid().ToString();
+            if ((data == null ? 0 : data.Count()) == 0)
+                return BadRequest("Bad input!");
+            List<DeleteObject> inputData =
+                data
+                .GroupBy(p => new { p.resourceId, Id = p.Id ?? "", p.ob, p.op })
+                .Select(p => new DeleteObject
+                {
+                    resourceId = p.Key.resourceId,
+                    Id = p.Key.Id ?? "",
+                    ob = p.Key.ob,
+                    op = p.Key.op
+                }
+                ).ToList();
+            if (inputData.Count() != 1)
+            {
+                return BadRequest("Mixed operations!");
+            }
+
+            DeleteObject deleteData = inputData.FirstOrDefault();
+
+            if (deleteData == null)
+                return BadRequest("Missing input!");
+
+            if (deleteData.op != "delete")
+            {
+                return BadRequest("Only delete operations supported!");
+            }
+
+            if (!("accline;taxline;tag;related".Contains(deleteData.ob)))
+            {
+                return BadRequest("Object not supported!");
+            }
+
+            var p = new
+            {
+                deleteData.resourceId,
+                deleteData.Id,
+                deleteData.ob,
+                deleteData.op,
+                transactionId,
+                values = new XElement("values", data.Select(p => p.values.Select(v => new XElement("value", new XAttribute(v.Key, v.Value))))),
+                session_id = "apitest" //_usrsvc.CurrentUser.session_id,
+            };
+            XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
+            if (result == null)
+            {
+                return BadRequest("No data");
+            }
+            if ((string)result.Attributes("value").FirstOrDefault() == "1")
+            {
+                TopicPartsAPI dp = new TopicPartsAPI
+                {
+                    root = new List<string>
+                            {
+                                (string)result.Attributes("id").FirstOrDefault()
+                            },
+                    objects = null
+                };
+                return Ok(dp);
+            }
+        }
+    
         [HttpPatch("")]
         public async Task<IActionResult> Patch([FromBody]JsonRDataPatch data)
         {
             string transactionId = Guid.NewGuid().ToString();
+            
             if (!(Guid.TryParse(data.resourceId, out Guid test)))
             {
                 return BadRequest();

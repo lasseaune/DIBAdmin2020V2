@@ -34,6 +34,7 @@ namespace DIBAdminAPI.Controllers
             _cache = cacheService;
 
         }
+        
         [HttpGet("{objectname}", Name = "GetResource")]
         public async Task<IActionResult> GetResource(
                 string objectname,
@@ -95,6 +96,31 @@ namespace DIBAdminAPI.Controllers
             if (data==null)
             { 
                     return BadRequest("Document missing!");
+            }
+
+            if (data.Document==null)
+            {
+                return BadRequest("Document missing!");
+            }
+            if (data.Document.Name == "encoding")
+            {
+                XElement encoding = data.Document;
+                string filename = (string)encoding.Attributes("filename").FirstOrDefault();
+                filename = Regex.Replace(Regex.Replace(filename, @"[^a-zæøåA-ZÆØÅ0-9\s§]", ""), @"\s+", " ");
+                string fileextention = (string)encoding.Attributes("fileextention").FirstOrDefault();
+                string base64 = encoding.Elements("base64String").Select(p => p.Value).FirstOrDefault();
+                byte[] fileBytes = Convert.FromBase64String(base64);
+
+                Stream filedata = new MemoryStream(fileBytes);   //The original data
+                Stream unzippedEntryStream = null; ;         //Unzipped data from a file in the archive
+                var archive = new ZipArchive(filedata);
+                foreach (ZipArchiveEntry entry in archive.Entries)
+                {
+                    unzippedEntryStream = entry.Open(); // .Open will return a stream
+                }
+
+                string fileName = filename + "." + fileextention;
+                return File(unzippedEntryStream, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
             }
 
             if ((Id == null ? "" : Id) == "" && result != null)

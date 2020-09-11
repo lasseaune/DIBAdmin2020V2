@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using DIBAdminAPI.Models;
 
 namespace DIBAdminAPI.Data.Entities
 {
@@ -168,6 +169,55 @@ namespace DIBAdminAPI.Data.Entities
 
     public static class OtherPropsOperations
     {
+        public static List<KeyValuePair<string, JsonElement>>  UpdateOtherProps(this KeyValuePair<string, JsonElement> ae, Dictionary<string, JsonElement> elements, string propsName, string refName)
+        {
+            List<KeyValuePair<string, JsonElement>> result = new List<KeyValuePair<string, JsonElement>>();
+
+            if (ae.Value.name == "section")
+            {
+                KeyValuePair<string, JsonElement> target = (
+                    from c in ae.Value.children
+                    join e in elements
+                    on c.id equals e.Key
+                    where Regex.IsMatch(e.Value.name.Trim().ToLower(), @"^h\d")
+                    select e
+                ).FirstOrDefault();
+                if (target.Key != null)
+                {
+                    if (target.Value.otherprops == null)
+                        target.Value.otherprops = new Dictionary<string, string>();
+                    if (!target.Value.otherprops.ContainsKey(refName))
+                        target.Value.otherprops.Add(refName, ae.Key);
+                    if (ae.Value.otherprops == null)
+                        ae.Value.otherprops = new Dictionary<string, string>();
+                    if (!ae.Value.otherprops.ContainsKey(propsName))
+                        ae.Value.otherprops.Add(propsName, "true");
+                    result.Add(target);
+                    result.Add(ae);
+                }
+                else
+                {
+                    if (ae.Value.otherprops == null)
+                        ae.Value.otherprops = new Dictionary<string, string>();
+                    if (!ae.Value.otherprops.ContainsKey(propsName))
+                        ae.Value.otherprops.Add(propsName, "true");
+                    if (!ae.Value.otherprops.ContainsKey(refName))
+                        ae.Value.otherprops.Add(refName, ae.Key);
+                    result.Add(ae);
+                }
+            }
+            else
+            {
+                if (ae.Value.otherprops == null)
+                    ae.Value.otherprops = new Dictionary<string, string>();
+                if (!ae.Value.otherprops.ContainsKey(propsName))
+                    ae.Value.otherprops.Add(propsName, "true");
+                if (!ae.Value.otherprops.ContainsKey(refName))
+                    ae.Value.otherprops.Add(refName, ae.Key);
+                result.Add(ae);
+            }
+            return result;
+        }
         public static void SetOtherProps(this KeyValuePair<string, JsonElement> ae, Dictionary<string, JsonElement> elements, string propsName, string refName)
         {
             if (ae.Value.name == "section")
