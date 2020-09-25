@@ -1,0 +1,3515 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<regexps>
+  <regexp>
+    <id>100_legal_front</id>
+    <description>Sjekker tegn foran</description>
+    <expression>
+      <part type="positive lookbehind" description="sjekker lovlige tegn foran">
+        <part type="single" description="lovlige tegn">
+          <text><![CDATA[^|\s|\(|\.|\,|\:|\/|\"]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp>
+    <id>note_til_x.x</id>
+    <description>henter alle forkortelser</description>
+    <expression>
+      <part type="named" name="note_ref_para" id="e319e613-761e-402d-88de-cfd750085a42">
+        <part type="named" name="note_name" id="10e0caa3-bf16-4594-b119-402bc4d2847f">
+          <part type="single" description="" id="6e825035-abd6-4d2f-baff-dadfe48f3bfc">
+            <text><![CDATA[note]]></text>
+          </part>
+        </part>
+        <part type="multiple" id="d0a175a6-4565-4f85-84fc-a6ffde8648ff">
+          <part type="single" description="" id="7e8475e4-7cb9-4730-81d3-aa21d6910084">
+            <text><![CDATA[\s+((eller|til|og)(\s+note)?\s)?]]></text>
+          </part>
+          <part type="named" name="note_no" id="7f64a2c2-b1bd-4a13-8f92-aee8da70b257">
+            <part type="single" description="" id="acc707fe-c8e6-44b9-af7f-aefb105ddbe2">
+              <text><![CDATA[\d+((\.\d+)+)?]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="single" description="" id="3668731c-305a-4769-8c7d-48495a3114b5">
+          <text><![CDATA[\s+til\s+§\s+]]></text>
+        </part>
+        <part type="named" name="note_paragraf" id="6a387569-37ca-495e-948c-b4549f854c58">
+          <part type="single" description="" id="aa48981c-866d-446b-9676-8af917b23dfc">
+            <text><![CDATA[\d+\-\d+([a-b])?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp>
+    <id>note_til_x.x_loven</id>
+    <description>henter alle forkortelser</description>
+    <expression>
+      <part type="named" name="note_ref" id="44115af5-4fc4-4b6e-b003-f295c74b4386">
+        <part type="named" name="note_name" id="aedcc7ea-bfc0-4950-a08b-706f44a9bad3">
+          <part type="single" description="" id="dab6fcbb-6e99-4334-94f0-8ae3493caed9">
+            <text><![CDATA[note]]></text>
+          </part>
+        </part>
+        <part type="multiple" id="777feda7-b957-4dfa-b832-e6246711507b">
+          <part type="single" description="" id="b7ebad9f-d3df-46cf-becd-a6e24be23b39">
+            <text><![CDATA[\s+((eller|til|og)(\s+note)?\s)?]]></text>
+          </part>
+          <part type="named" name="note_no" id="09248ef7-9ff6-4cd8-96c9-6d8e2142dbe5">
+            <part type="single" description="" id="5549ec57-b840-444f-bb16-e3be9391871c">
+              <text><![CDATA[\d+((\.\d+)+)?]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="single" description="" id="ebc960f8-d9ce-43fb-b5a3-11a12e89e97a">
+          <text><![CDATA[\s+til\s+]]></text>
+        </part>
+        <part type="named" name="note_lov" id="a2a680cc-3ed7-4326-a40a-8920d807776a">
+          <part type="single" description="" id="f2d65d11-0b78-4d9c-abca-c2bd30fde1fb">
+            <text><![CDATA[[a-zæøåA-ZÆØÅ]+loven]]></text>
+          </part>
+        </part>
+        <part type="single" description="" id="03a3de0f-237d-4d02-80f8-c959984463bf">
+          <text><![CDATA[\s+§\s+]]></text>
+        </part>
+        <part type="named" name="note_paragraf" id="b1090a20-9cdb-4329-b072-683fb2f16a8f">
+          <part type="single" description="" id="6a4b02af-2a3a-4c1f-ac31-3f07f61a13f5">
+            <text><![CDATA[\d+\-\d+([a-b])?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>idsources</id>
+    <description>henter alle forkortelser</description>
+    <expression>
+      <part type="external" name="idsources" location="dib" id="09276f24-7c83-4df8-9ffe-727604aecd24" />
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>exp_av_xxxloven</id>
+    <description>henter av skatteloven</description>
+    <expression>
+      <part type="single" description="lov om" id="d1dcc26b-0321-4d56-b54d-ad86842421fd">
+        <text><![CDATA[\s+av\s+([A-ZÆØÅa-zæøå\-]+)loven]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>exp_rparlovenlpar</id>
+    <description>henter (skatteloven)</description>
+    <expression>
+      <part type="single" description="lov om" id="636e8fb8-b217-4798-b888-801e15f1803f">
+        <text><![CDATA[(\s+)?\((\s+)?([A-ZÆØÅa-zæøå\-]+)loven(\s+)?\)]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>exp_mm_mv</id>
+    <description>henter mm. eller mv.</description>
+    <expression>
+      <part type="single" description="lov om" id="6e703beb-3a10-46a4-959a-67aef5bf7ad5">
+        <text><![CDATA[\s+(m(\.)?(v|m)(\.)?)]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>exp_av_date</id>
+    <description>henter av 2 juni 2009</description>
+    <expression>
+      <part type="single" description="lov om" id="9e7e5f5e-9f0e-4731-ab40-5bc10f9c2346">
+        <text><![CDATA[\s+av\s+]]></text>
+      </part>
+      <part type="single" id="bf753945-d74f-41b2-a7b0-18970fc8770a">
+        <text><![CDATA[\d{1,2}]]></text>
+      </part>
+      <part type="single" id="5e5a4f2a-9635-4186-94c5-4257a0a6c551">
+        <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+      </part>
+      <part type="or" id="9cbe9737-a853-453d-9414-3b2293a3c9f6">
+        <part type="regexp" name="month_word" id="9f79440c-6a0c-47f0-b670-f3fb9121aba4" />
+        <part type="single" id="2c5ed8f6-45ae-4608-aeac-3d91cddc412b">
+          <text><![CDATA[\d{1,2}]]></text>
+        </part>
+      </part>
+      <part type="single" id="535165b3-5171-4293-bb4a-19e42dc7f67e">
+        <text><![CDATA[(\s+)(\.)?(\s+)?]]></text>
+      </part>
+      <part type="single" id="fb030607-2684-4bca-aa09-bab7284be860">
+        <text><![CDATA[\d{4,4}]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>exp_blank_or_punktum</id>
+    <description>henter av 2 juni 2009 nr. 1000</description>
+    <expression>
+      <part type="multiple" id="a513feca-e121-41a2-8832-e74c11831541">
+        <part type="single" id="591389fc-37a9-455b-b8dc-50be28451ab7">
+          <text><![CDATA[[\s\.]]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>exp_av_date_nr</id>
+    <description>henter av 2 juni 2009 nr. 1000</description>
+    <expression>
+      <part type="named" name="lovdate" id="36286b4c-5c78-42a0-b09b-60f4d8029bc1">
+        <part type="named" name="day" id="5d791a85-1a1d-4d87-ba6e-ebe517537c69">
+          <part type="single" description="dag" id="ed8e760d-dc25-4f2b-82da-f635f4a4d198">
+            <text><![CDATA[(([0-3])?([0-9]))]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="exp_blank_or_punktum" id="33934493-4554-410a-9730-adf68a74a134" />
+        <part type="named" name="month" id="d894d420-6c55-4ace-86a7-869eb6e9316a">
+          <part type="or" id="0afd4175-2268-471e-a5ea-9cc63ca34baa">
+            <part type="regexp" name="month_word" description="mnd bokstavert" id="9a7f669a-c27f-4ef8-8575-d0fa30562a97" />
+            <part type="single" description="mnd nr" id="4a5e118e-9163-4dde-a8c8-a7aecd8bd388">
+              <text><![CDATA[(([0-1])([0-9])?)]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="regexp" name="exp_blank_or_punktum" id="228f8985-4dfd-44bc-976d-80ebae3b786a" />
+        <part type="named" name="year" id="6c25722d-e6f6-4863-8880-96175ed539e3">
+          <part type="or" id="35b75372-b802-49f9-a1fb-cc1df8bd2139">
+            <part type="single" description="år" id="df03ca57-80a8-4e40-a3b3-ab0a3414b22b">
+              <text><![CDATA[\d{2,2}]]></text>
+            </part>
+            <part type="single" description="år" id="cfff21fa-1afb-4775-864e-0393117b87e4">
+              <text><![CDATA[\d{4,4}]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="regexp" name="exp_blank_or_punktum" id="e1fab0b1-eeb2-4489-ba6b-86a68517f2eb" />
+      <part type="single" description="nr." id="c967abc4-bcec-4b26-9fcd-3661a48422f7">
+        <text><![CDATA[(N|n)r]]></text>
+      </part>
+      <part type="regexp" name="exp_blank_or_punktum" id="90c729cd-7c58-4e0c-8702-fe437535d11d" />
+      <part type="named" name="number" id="4106f4c4-1a1a-44f6-9c89-5c171b7209fe">
+        <part type="single" description="lov nr" id="3a971f56-67fc-4438-8629-26df59b1a1ef">
+          <text><![CDATA[\d{1,4}]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--ord for måned-->
+  <regexp type="single">
+    <id>nou</id>
+    <description>henter nou</description>
+    <expression>
+      <part type="named" name="nou" id="5efc08d7-86b6-4185-acb7-0ee066ff2792">
+        <part type="named" name="name1" id="f3b7f8c5-a524-4db2-b63e-ebf3ab1468bf">
+          <part type="single" id="87c610a8-0984-4d11-baed-bbe2dd22d0ad">
+            <text><![CDATA[((n|N)(o|O)(u|U))]]></text>
+          </part>
+        </part>
+        <part type="single" id="e556470b-d807-474d-937b-09f205be4bb6">
+          <text><![CDATA[(\s+)?(\.|\s)(\s+)?]]></text>
+        </part>
+        <part type="named" name="year" id="ea104eaf-fec8-442a-8cbb-051362d69dfd">
+          <part type="single" id="3b261db8-a658-467e-8ffd-ebdf04964772">
+            <text><![CDATA[(\d\d\d\d)]]></text>
+          </part>
+        </part>
+        <part type="single" id="0120c35e-c2a1-4e3c-a8ef-e8f57f35a867">
+          <text><![CDATA[(\s+)?(:)(\s+)?]]></text>
+        </part>
+        <part type="named" name="number" id="8888e8cb-4663-497e-966c-2a39fa7135f4">
+          <part type="single" id="e9dc6849-e5bc-4378-a68d-98ebcdab37b8">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>besl_innst_prop_st</id>
+    <description>henter innstilling</description>
+    <expression>
+      <part type="named" name="besl_innst_prop_st" id="87808ce4-eb57-4952-8ef1-c13af626640f">
+        <part type="named" name="name1" id="2d9b208b-8412-40f2-b62e-0bd351fe8f1c">
+          <part type="or" id="211c6379-6f4c-44d0-ad6a-8418253ea490">
+            <part type="single" id="913a1817-081b-41d8-9ed2-af74506df128">
+              <text><![CDATA[((i|I)(n|N)(n|N)?(s|s)(t|T))]]></text>
+            </part>
+            <part type="single" id="b26dd748-577c-4de6-9d13-6e4f715b4a11">
+              <text><![CDATA[((p|P)(r|R)(o|O)(p|P)))]]></text>
+            </part>
+            <part type="single" id="a30998b7-c108-4eb1-a58b-95e4e2429e39">
+              <text><![CDATA[((o|O)(t|T))]]></text>
+            </part>
+            <part type="single" id="4fea4ae2-f011-43f5-bdec-fb1df3977862">
+              <text><![CDATA[((b|B)(e|E)(s|s)(l|L))]]></text>
+            </part>
+            <part type="single" id="9a8f7954-305d-486b-b957-683d04dcbafd">
+              <text><![CDATA[((s|S)(t|T)]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="single" id="05828fb5-465b-4c0b-b82f-26cc7c35d747">
+          <text><![CDATA[(\s+)?(\.|\s)(\s+)?]]></text>
+        </part>
+        <part type="optional" id="41c2c126-022a-451f-b671-ea25c0295e54">
+          <part type="named" name="name2" id="ac370e91-25b8-42e3-976b-a4cf3e67d05c">
+            <part type="or" id="23223c34-89a0-4e73-bf13-bf1dfba0e51c">
+              <part type="single" id="3e0064e7-4ef6-45fe-af63-270ac15ecc02">
+                <text><![CDATA[((o|O))]]></text>
+              </part>
+              <part type="single" id="ba961c56-9540-48db-953e-3479336dd6c8">
+                <text><![CDATA[((s|S))]]></text>
+              </part>
+              <part type="single" id="07ccdde9-706a-40e8-9e05-df4b1b15cde4">
+                <text><![CDATA[((m|M)(e|E)(l|L)(d|D))]]></text>
+              </part>
+              <part type="single" id="c6b7fa2a-420e-4375-8a3d-c0858cbb9159">
+                <text><![CDATA[(p|P)(r|R)(p|P)]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="optional" id="9ce6ea94-148e-445c-b931-3feb6632f739">
+          <text><![CDATA[(\s+)?(\.|\s)(\s+)?]]></text>
+        </part>
+        <part type="optional" id="64b890c5-3343-4526-b4b5-997f44ab6566">
+          <part type="single" id="1f3d9e34-78c2-47f8-baa5-7ea415e95318">
+            <text><![CDATA[(N|n)(R|r)]]></text>
+          </part>
+          <part type="optional" id="93084e47-eafe-4412-947a-9bc53b17af03">
+            <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+          </part>
+        </part>
+        <part type="named" name="number" id="0321c955-09c5-4243-a9db-3550a3b9ed8f">
+          <part type="single" id="8c0db034-ec3b-4e68-b8ea-f7ccadf4c03e">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="optional" id="204bbc1b-437d-4705-8b2f-5c40651fdefe">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional" id="fcbb13bb-37e0-4b70-9528-d0cefccdb79e">
+          <part type="named" name="type" id="2dd0b430-ff3e-42e0-9f63-b7505e63fd9b">
+            <part type="single" id="f77e141b-4518-4a08-91db-9994b972477b">
+              <text><![CDATA[[lsLS]+]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="optional" id="779b43a1-c042-4c56-bb21-770966b765df">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional" id="2f662387-8600-44ee-9e08-b520eeb7aac4">
+          <text><![CDATA[([^\(\.]*)]]></text>
+        </part>
+        <part type="single" id="37e1224f-125a-4177-afae-460acfb07345">
+          <text><![CDATA[\(]]></text>
+        </part>
+        <part type="named" name="year" id="296bc22b-9dc9-4ac0-943b-c872b8ffff4e">
+          <part type="single" id="f580d527-fbf0-46be-a2a2-f79cfbc93457">
+            <text><![CDATA[\d\d\d\d]]></text>
+          </part>
+        </part>
+        <part type="optional" id="ac7550e7-5add-4d53-8aa6-832d8daa76c2">
+          <text><![CDATA[(\-|–)]]></text>
+        </part>
+        <part type="optional" id="529b99d6-ac4d-4fed-a828-6c44f48c8a82">
+          <text><![CDATA[\d\d(\d\d)?]]></text>
+        </part>
+        <part type="optional" id="a5989e1d-4f1b-4f65-9999-0d469bd00e65">
+          <text><![CDATA[\)]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>internal_avsnitt</id>
+    <description>henter innstilling</description>
+    <expression>
+      <part type="named" name="internal_avsnitt" id="1dc5e0c4-6af8-4db1-aca4-9d8f1edb50a3">
+        <part type="single" id="46277525-1e70-479e-b19b-bef7248b29c2">
+          <text><![CDATA[(i|til|fra|nærmere|jf(\.)?|behandlet|etter|gjelder)(\s+)(avsnitt|(P|p)kt(\.)?|(P|p)unkt|(K|k)apittel)(\s+)?]]></text>
+        </part>
+        <part type="multiple" id="b2620c70-9b6c-428c-a506-0fcf3e9e6935">
+          <part type="optional" id="50f350c1-f333-44a5-ad4c-1b1e011ad9f3">
+            <text><![CDATA[(\s+)?(og|til|eller|\,)(\s+)?((etter|gjelder))?(\s)((avsnitt|(P|p)kt(\.)?|(P|p)unkt|(K|k)apittel)(\s+))?]]></text>
+          </part>
+          <part type="named" name="number" id="1dcb73aa-4862-4593-9693-c2cc94ea3226">
+            <part type="single" id="6b06a455-47e1-463a-85fe-99c5e0705f66">
+              <text><![CDATA[\d+(((\s+)?\.\d+)+)?]]></text>
+            </part>
+          </part>
+          <part type="optional" id="c18d9f59-efa1-49bc-bdd2-7696edc28e74">
+            <text><![CDATA[(\s+)?(\.|\,)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>forarbeider</id>
+    <description>henter innstilling</description>
+    <expression>
+      <part type="named" name="name1" id="5091c83c-8a7b-454a-b29f-a43852ad7871">
+        <part type="single" id="7bc139b2-7adb-437c-997a-a9037668dbc4">
+          <text><![CDATA[(I|i)nnst|(P|p)rop|(S|s)t|(O|o)t|(n|N)(o|O)(u|U)]]></text>
+        </part>
+      </part>
+      <part type="optional" id="344184c6-9a90-4168-970b-815a871162ab">
+        <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+      </part>
+      <part type="optional" id="fdcc22e5-ff39-4a74-bc49-11ab39d6ddca">
+        <part type="named" name="name2" id="171cea9f-882b-40c9-a10d-f7f10caf532a">
+          <part type="single" id="307c9caa-7ea4-4935-9103-bffc3ff0780d">
+            <text><![CDATA[(O|o)|((P|p)(R|r)(P|p))|((M|m)(E|e)(L|l)(D|d))]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="optional" id="e2e5eb0b-0af4-46a2-9582-321fff968ebe">
+        <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+      </part>
+      <part type="optional" id="e2b0e30e-951c-42ab-985b-53044bc0b854">
+        <text><![CDATA[(N|n)(R|r)]]></text>
+      </part>
+      <part type="optional" id="b5bafe84-a2ae-409e-a333-d59f98e11d7b">
+        <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+      </part>
+      <part type="optional" id="fcc7f118-840d-4bbe-9935-f9060a10308f">
+        <part type="named" name="nr1" id="c81621c7-8b98-42b6-951d-10533ef85a3c">
+          <part type="single" id="7c9c4475-190b-48e4-9b84-f31913223401">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="optional" id="73974bbc-e320-49d9-9d85-71dbb59ac157">
+        <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+      </part>
+      <part type="optional" id="4606f171-9aae-4915-86d5-c4efb246722a">
+        <part type="named" name="type" id="43a673ca-7dd2-4b02-a78f-da5a9fcbb06a">
+          <part type="single" id="a5b7b819-a429-4000-b716-ef7f7442a7e9">
+            <text><![CDATA[[lsLS]+]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="optional" id="bf9f97e8-09ef-4f97-b100-6a805439982d">
+        <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+      </part>
+      <part type="optional" id="a12b1d51-41a0-457b-8c8e-1b43fbd92690">
+        <text><![CDATA[\s+for\s+]]></text>
+      </part>
+      <part type="named" name="year" id="fe2674d4-6a89-4b7d-85bf-8da21f4d24a9">
+        <part type="or" id="7fd48a44-fc51-48f1-85f7-1bcc7c4bb1e3">
+          <part type="chain" id="0bde95a4-0756-4613-a4e5-745cafdf2b7a">
+            <part type="named" name="year1" id="a2dba3a7-9d74-41f2-96e5-1ea33d091513">
+              <part type="single" id="7f759141-e693-4e7e-9e84-a6073d560a81">
+                <text><![CDATA[\d\d\d\d]]></text>
+              </part>
+            </part>
+            <part type="single" id="c95cf12e-8239-41a3-a26a-4b0063b98d6a">
+              <text><![CDATA[(\s+)?:(\s+)?]]></text>
+            </part>
+            <part type="named" name="nr2" id="08ab3e91-cd97-40cb-9544-0698f4095fc4">
+              <part type="single" id="6ca7be7a-a815-4132-888a-dd50efe968b7">
+                <text><![CDATA[\d+]]></text>
+              </part>
+            </part>
+          </part>
+          <part type="chain" id="2df720f7-b878-46d6-9f37-70f953b3114a">
+            <part type="single" id="7eb06cc1-d1e1-485f-81f1-a8fc801a40a8">
+              <text><![CDATA[\(]]></text>
+            </part>
+            <part type="named" name="year1" id="4a9d89b1-6f34-43a8-b67b-4dd1662b60ff">
+              <part type="single" id="e18e1111-9b79-476a-a91c-38355f2636e0">
+                <text><![CDATA[\d\d\d\d]]></text>
+              </part>
+            </part>
+            <part type="optional" id="c3d462d3-5bd4-45c1-8b8f-75a518e7a4aa">
+              <part type="single" id="c2e26340-4da4-4c34-83ec-e5bd3bbc7231">
+                <text><![CDATA[(\s+)?(-|–)(\s+)?]]></text>
+              </part>
+              <part type="named" name="year2" id="1735c200-b4d6-4da3-9863-bfd405d251b6">
+                <part type="single" id="013249c8-157a-4fb3-911d-1ec1a6232bad">
+                  <text><![CDATA[\d\d(\d\d)?]]></text>
+                </part>
+              </part>
+            </part>
+            <part type="single" id="a649fee6-b5eb-448f-b5a3-302784125114">
+              <text><![CDATA[\)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>month_word</id>
+    <description>Henter ord for måned</description>
+    <expression>
+      <part type="container" id="db912b33-463d-41e5-9a37-6f39f02950e6">
+        <part type="single" id="6f39490b-cf29-4490-b251-d064e3c21dc9">
+          <text><![CDATA[(J|j)anuar|(J|j)an|(F|f)ebruar|(F|f)eb|(M|m)ars|(M|m)ar|(A|a)pril|(A|a)pr|(M|m)ai|(J|j)uni|(J|j)un|(J|j)uli|(J|j)ul|(A|a)ugust|(A|a)ug|(S|s)eptember|(S|s)ep|(O|o)ktober|(O|o)kt|(N|n)ovember|(N|n)ov|(D|d)esember|(D|d)es]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--tallord-->
+  <regexp type="single">
+    <id>tallord</id>
+    <description>Henter tallord</description>
+    <expression>
+      <part type="container" id="d1b03ab0-047e-4487-843a-20ca58e51b79">
+        <part type="single" description="tallord" id="1da02092-c760-43c1-b472-268f4ffff381">
+          <text><![CDATA[fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>split_chain</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or" id="cf69f4f7-a6f2-4b39-8a63-a05c910971a7">
+        <part type="single" id="688fa877-e3a4-4156-b700-a3af949bec95">
+          <text><![CDATA[\s+(og|eller|til|(J|j)f([r])?(\.)?)\s+]]></text>
+        </part>
+        <part type="single" id="8dbe7bef-cd0e-4ba0-8476-c76a97c73e3f">
+          <text><![CDATA[(\s+)?\,(\s+)?]]></text>
+        </part>
+      </part>
+      <part type="optional" id="f9c8cc42-0c78-4df6-9909-1836fa1ef115">
+        <part type="single" id="3ad3a92c-50f9-40ca-894b-55a036635b5a">
+          <text><![CDATA[(J|j)f([r])?(\.)?\s+]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>split_chain_element</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or" id="d3f0f77a-ea6b-4e8b-af00-1251291c7384">
+        <part type="single" id="1ab8d956-b814-4744-a63b-eaedeef8e0be">
+          <text><![CDATA[\s+(og|eller|til|(J|j)f([r])?(\.)?)\s+]]></text>
+        </part>
+        <part type="single" id="6d614720-1c81-4898-8a6f-66c15bd68192">
+          <text><![CDATA[(\s+)?\,(\s+)?]]></text>
+        </part>
+        <part type="single" id="724f3199-b3e2-4b09-8202-878087512b5e">
+          <text><![CDATA[\s+]]></text>
+        </part>
+      </part>
+      <part type="optional" id="ceeca213-142b-4e87-ab72-a77b3c459f88">
+        <part type="single" id="ecc663db-b2fc-4f5e-901f-3d09ea42adc8">
+          <text><![CDATA[(J|j)f([r])?(\.)?\s+]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>roman_number</id>
+    <description>Henter romertall</description>
+    <expression>
+      <part type="or" id="57a7636c-cbe3-4547-bb11-5ec72a67d8ff">
+        <part type="single" id="412cbdaa-894a-4d54-b6fc-20a9b13c9738">
+          <text><![CDATA[ii|iii|iv|v|vi|vii|viii|ix|x|xii|xiii|xiv|xv|xvi|xvii|xviii|xix|xx|I|II|III|IV|V|VI|VII|VIII|IX|X|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX]]></text>
+        </part>
+        <part type="chain" id="b96a721d-634d-43f0-9f19-8baf83ac917b">
+          <part type="single" description="nummer kjede" id="4f6bf351-4fa4-4767-b071-13ff8fed8827">
+            <text><![CDATA[[i]]]></text>
+          </part>
+          <part type="negative lookahead" id="79fb6b41-7467-4e93-af8c-7f355c19bae9">
+            <part type="single" description="nummer kjede" id="b963409a-9350-40ce-ae95-8f1486dc8eac">
+              <text><![CDATA[\s+]]></text>
+            </part>
+            <part type="single" description="nummer kjede" id="a6b8382a-40e8-4747-a276-6bc5ac119ee0">
+              <text><![CDATA[([^\s])?(\s+)?(forskrift|lov|regelen|denne|visse|inntekt)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>letter_lower</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or" description="nummer kjede" id="c13819d4-382a-42fa-a67a-6444fd424ad4">
+        <part type="chain" id="183cba73-3157-4af9-9001-44bc1e30d991">
+          <part type="single" description="nummer kjede" id="4091eb81-3ea6-41c0-9426-d735adde5779">
+            <text><![CDATA[[a-hj-zæøå]]]></text>
+          </part>
+          <part type="negative lookahead" id="d499c2bf-47b0-4095-a4e7-7d0f5738fc36">
+            <part type="or" id="a45243e0-f9da-4de2-8eb8-a666037a8f17">
+              <part type="single" description="nummer kjede" id="4d2c611f-e387-4c5c-880c-92f15d1cb6d4">
+                <text><![CDATA[[a-zæøå]+]]></text>
+              </part>
+              <part type="single" description="nummer kjede" id="6ea608f4-6769-4b5a-98ed-0576b14bfa58">
+                <text><![CDATA[\s+påvise]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="chain" id="c8098c49-7e0d-4244-ae22-fa0a9017cbbf">
+          <part type="negative lookbehind" id="5340446a-fcb4-49d7-9e45-9f3c5e38bc2c">
+            <part type="single" description="nummer kjede" id="13a34982-ae70-4f9f-9935-3e318926f7e0">
+              <text><![CDATA[\d+(\s+)?(\,)(\s+)?]]></text>
+            </part>
+          </part>
+          <part type="single" description="nummer kjede" id="07881460-fc33-4cd4-8b79-aca68a2ddf5c">
+            <text><![CDATA[[i]]]></text>
+          </part>
+          <part type="negative lookahead" id="c559115f-0cf9-4e94-9c99-0c5ff58391b8">
+            <part type="single" description="nummer kjede" id="637f2631-b99a-4e3b-8234-c35f61547b84">
+              <text><![CDATA[\s+]]></text>
+            </part>
+            <part type="single" description="nummer kjede" id="7857e2d9-0176-40cc-a8c1-83497bcc1cb8">
+              <text><![CDATA[([^\s]+)?(\s+)?(forskrift|lov|regelen|denne|visse|inntekt|[a-zæøå]+((l|f)\.))]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>del_title</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="regexp" name="100_legal_front" />
+      <part type="single" description="nummer kjede" id="257ccd35-56c5-4e8a-963d-fa177ffdc440">
+        <text><![CDATA[(D|d)el(\.)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>split_chain_del</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="single" description="nummer kjede" id="b6aafb64-c3a0-422a-b437-3e3e990da979">
+        <text><![CDATA[(\s+)?(\,|og|eller|samt)(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>del_chain_alfa</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="del" id="8b74876b-b060-4690-a149-d62325b0c64e">
+        <part type="regexp" name="split_chain_element" id="44b9aeda-a6ff-4b89-af0d-78365f93d1a5" />
+        <part type="regexp" name="del_title" id="e9ddd332-ad4c-4b66-a6f2-6a5ea9e0a577" />
+        <part type="single" description="nummer kjede" id="0a879af1-d9de-4e66-83d6-e0311221116b">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="delnr" id="1ec83182-1a04-4ed0-95d4-bdbcdc498068">
+          <part type="single" description="nummer kjede" id="aebcf6a5-cff0-4502-907a-e488f2b1875f">
+            <text><![CDATA[[a-zA-Z]]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" id="2723a830-575c-4d8a-b90c-b1aeda7d4a22" />
+        <part type="optional" id="7dcb6749-fb1c-46f4-9a02-4dc82b06e5e1">
+          <part type="positive lookahead" id="fa36aa85-d5f1-44f5-8137-7e3989fb1ab2">
+            <part type="regexp" name="split_chain_del" id="3d28a401-14de-4a83-b0bf-d901a850b472" />
+            <part type="optional" id="0dc8598a-6bd9-43a5-878f-ad8ba52b14b3">
+              <part type="regexp" name="del_title" id="449b5b9c-25af-456b-8489-60f37b779186" />
+              <part type="optional" description="nummer kjede" id="fa750c6b-ddaf-4d65-b8fd-4b0c8e154672">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede" id="29176c45-be61-4b7b-bd3d-6dd3bfae62b4">
+              <text><![CDATA[[a-zA-Z]]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" id="0a2ada1a-0ff5-4d16-9ac4-a9f8c6056c9e" />
+          </part>
+          <part type="multiple" id="d2f43e08-dc2d-4fb8-80fc-96a7096a2e46">
+            <part type="regexp" name="split_chain_del" id="458a2b3c-e04b-429f-898a-39336a68ae00" />
+            <part type="optional" id="93a3e441-1502-4caf-bff0-5ab7a945e2df">
+              <part type="regexp" name="del_title" id="7c277040-a5f0-4945-8d3b-f8b6accf333b" />
+              <part type="optional" description="nummer kjede" id="9b717cf1-c137-479f-95d9-1692b19328a7">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="delnr" id="85001cae-2187-441c-adc5-47e1da7dc4bc">
+              <part type="single" description="nummer kjede" id="13938445-2557-46a9-a527-5460ee948ecb">
+                <text><![CDATA[[a-zA-Z]]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" id="4b4fca3e-36c6-4023-9ce9-ce09fab1f75b" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>del_chain_roman</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="del" id="42de42e5-6126-4c12-9fde-c4bde19cc7b8">
+        <part type="regexp" name="split_chain_element" id="f4b7b245-b295-40b7-9b92-c7dba4a51004" />
+        <part type="regexp" name="del_title" id="af91a87f-1dab-496a-adca-1d62a82fbfb9" />
+        <part type="single" description="nummer kjede" id="c6cff0c9-2418-4203-9385-8579c1365035">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="delnr" id="8964a853-dc9c-41fb-b8cf-a2f7691c6842">
+          <part type="regexp" name="roman_number" id="7b465ec3-4f94-4eb8-afd0-bf2e84e6308d" />
+        </part>
+        <part type="regexp" name="letter_end_check" id="68370315-c478-45aa-96ad-bc82f69d0551" />
+        <part type="optional" id="e235de08-3bef-4bc7-ade6-6daff95730fc">
+          <part type="positive lookahead" id="184647c0-8e2e-4a48-b4c3-0ffea7c2d87e">
+            <part type="regexp" name="split_chain_del" id="6a970160-fd8b-44cb-85dc-b0f969492a21" />
+            <part type="optional" id="d70c9592-8048-4f5c-8da5-a092a3fbed4e">
+              <part type="regexp" name="del_title" id="35fd0cca-9ef7-4a21-b407-74137438d911" />
+              <part type="optional" description="nummer kjede" id="13cdce90-0843-4281-8f57-823829e78ea0">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="roman_number" id="8fa9b63b-c412-4fc1-914a-3c5b74dff8ea" />
+            <part type="regexp" name="letter_end_check" id="9e3ee220-71f7-4770-b63a-9a0b8bf69656" />
+          </part>
+          <part type="multiple" id="8c41f42d-2d94-4013-b373-fccd543b494b">
+            <part type="regexp" name="split_chain_del" id="5f27c14a-cdbe-4433-aa29-c4a2df576e55" />
+            <part type="optional" id="1f864125-f45c-4a12-bffd-a075b9d286f2">
+              <part type="regexp" name="del_title" id="6ee8ffd6-408a-46d5-8d51-c26fc69f7932" />
+              <part type="optional" description="nummer kjede" id="858e7ce5-e8af-47b1-84ad-ea30dc831fed">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="delnr" id="046a5e56-732d-4887-989e-99f2262db607">
+              <part type="regexp" name="roman_number" id="7e266d56-b326-4c1b-808b-ecbd975706b3" />
+            </part>
+            <part type="regexp" name="letter_end_check" id="6bcec232-c4a0-4b3d-b417-1f65b6167d7a" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>del_chain_decimal</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="del" id="3a0f92fc-1eb6-468d-9030-969fb53fcd30">
+        <part type="regexp" name="split_chain_element" id="8936eea0-35df-4bb1-86a3-65014b474514" />
+        <part type="regexp" name="del_title" id="4c6a6975-f084-44b1-b0b4-7d5734c99b82" />
+        <part type="single" description="nummer kjede" id="b6f28cc2-6812-42e8-aa44-1d6ed88228a2">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="delnr" id="a3979143-d066-4994-868f-6eb9018a7b2b">
+          <part type="single" description="nummer kjede" id="38f3ba19-a49d-4fcd-ba72-4c9b54d510ab">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" id="786ba562-5d60-4f23-806b-01827dd90a2f" />
+        <part type="optional" id="85d84f5f-3bf7-4f0d-a293-5538ce09a7b6">
+          <part type="positive lookahead" id="07c6f99a-d90d-40e9-9744-b80dbba2b058">
+            <part type="regexp" name="split_chain_del" id="6280cf68-871a-4a1c-b31a-6286f238b21e" />
+            <part type="optional" id="fe84d019-3c73-4439-b177-82630a8f369d">
+              <part type="regexp" name="del_title" id="9861ea03-c259-4dbe-a075-64656ffc6e74" />
+              <part type="optional" description="nummer kjede" id="b908d324-3483-4c8d-889e-cc06ce5837d6">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede" id="2a3658be-a547-454a-8e9d-2fe44de2b122">
+              <text><![CDATA[\d+]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" id="de981789-0d65-4ae8-a841-54fb1befa4f9" />
+          </part>
+          <part type="multiple" id="09a937ab-5dbc-49f7-a0ea-d23350285ef5">
+            <part type="regexp" name="split_chain_del" id="05cf31c7-df26-4dfa-b7ea-dba0f04150de" />
+            <part type="optional" id="25fd6754-f67b-49f3-8aba-cfebed675443">
+              <part type="regexp" name="del_title" id="9f9bf4f7-53bb-48f0-a76d-7b402e1e125e" />
+              <part type="optional" description="nummer kjede" id="373127e6-3d0b-41b8-96c0-99df8152adf3">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="delnr" id="eea8a5f5-3c24-40cb-b4b7-7cb672fb8fb5">
+              <part type="single" description="nummer kjede" id="6f069f71-3b5c-4ce0-bf76-b04330fb38bc">
+                <text><![CDATA[\d+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" id="2d0efd48-4530-4054-992b-bcfb1b72f516" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>kap_title</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="regexp" name="100_legal_front" />
+      <part type="or" id="43a646a8-4e9e-45e2-8943-cc2bca472ada">
+        <part type="single" description="nummer kjede" id="17660946-e7f8-4e78-a0b5-761f1fdb5a7c">
+          <text><![CDATA[(K|k)ap(\.)?]]></text>
+        </part>
+        <part type="single" description="nummer kjede" id="d6b0aefc-c504-4a76-a683-47caec73f428">
+          <text><![CDATA[(K|k)apittel]]></text>
+        </part>
+        <part type="single" description="nummer kjede" id="5aca5aad-7b0c-46b5-a1e0-92ffa5fb310f">
+          <text><![CDATA[(K|k)apitel]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>split_chain_kap</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="single" description="nummer kjede" id="d6b7cb5d-2912-4e5f-be86-df1c65204195">
+        <text><![CDATA[(\s+)?(\,|og|eller)(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>kap_chain_alfa</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="kap" id="34c15508-0915-48ba-9b06-49a9db475374">
+        <part type="regexp" name="split_chain_element" id="413a09b5-b6f7-46d0-8920-415e02159575" />
+        <part type="regexp" name="kap_title" id="f6074b9c-019e-49e0-a4c3-80ec3682af44" />
+        <part type="single" description="nummer kjede" id="c516dba6-82d2-4178-b545-cba77ac722a6">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="kapnr" id="f7ef9bfb-abf6-43db-a23d-68f64b3d432e">
+          <part type="single" description="nummer kjede" id="54eb8e63-42c3-4607-bd55-ceb7f06c0b1b">
+            <text><![CDATA[[a-zA-Z]]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" id="da02282b-4333-43b1-b873-79678af04bd8" />
+        <part type="optional" id="25b1b71c-f470-4486-af25-236d43788cf5">
+          <part type="positive lookahead" id="781199e5-af96-4355-8817-48728df2e2e9">
+            <part type="regexp" name="split_chain_kap" id="8a09234d-5009-4cad-abd0-d21e2bd5f933" />
+            <part type="optional" id="48e0e434-2b4b-46c6-ad96-a5b52a41cf57">
+              <part type="regexp" name="kap_title" id="0b4bb7e9-ddbb-40d8-a964-7c09c66143e2" />
+              <part type="optional" description="nummer kjede" id="bcd89a9f-86a9-41f5-8e14-cdb7e1190fb1">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede" id="29cd7b00-16d4-4c04-9dcb-eefebf5c1ca0">
+              <text><![CDATA[[a-zA-Z]]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" id="c23d5197-3613-4b55-a08b-04e012d7298a" />
+          </part>
+          <part type="multiple" id="52de590e-413f-4ac1-9d9d-ed2858fbf671">
+            <part type="regexp" name="split_chain_kap" id="c2c0147e-1f9c-4720-8825-8d6606e059ed" />
+            <part type="optional" id="edfd88d3-1fbc-4c2e-a6a0-e4967a35b90b">
+              <part type="regexp" name="kap_title" id="7c7bfa0c-b0e5-45ee-aa56-d10153b9b658" />
+              <part type="optional" description="nummer kjede" id="43033cee-7306-4703-b75f-a96a35f6f05c">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="kapnr" id="b2f8fa61-0d30-43f0-99b5-0379cd21548c">
+              <part type="single" description="nummer kjede" id="ac137dd3-ebef-4ef1-997f-8a26fc2e95d6">
+                <text><![CDATA[[a-zA-Z]]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" id="128fbb4b-0b5f-404e-8292-798a819a1c83" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>kap_chain_roman</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="kap" id="64e5a981-0e3e-47fd-9e25-e6045471177d">
+        <part type="regexp" name="split_chain_element" id="d3cef5f4-2623-4bce-82d0-5af8c021c0eb" />
+        <part type="regexp" name="kap_title" id="7f3ed04b-37e9-4466-904f-37ff28a1d5cb" />
+        <part type="single" description="nummer kjede" id="3bd76162-9760-4242-a2fc-e69f6574a9cf">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="kapnr" id="893189d7-1612-45bb-85bd-4ea2bba33336">
+          <part type="regexp" name="roman_number" id="4b88a7e8-8dbb-4d7f-a958-144a3902914a" />
+        </part>
+        <part type="regexp" name="letter_end_check" id="f9869f9e-dcc9-48f5-9042-c790a24224ff" />
+        <part type="optional" id="13dbc3c1-af1d-49c8-bbb2-0912d1f74280">
+          <part type="positive lookahead" id="b44869e0-3197-4b26-a98a-8eae764de847">
+            <part type="regexp" name="split_chain_kap" id="3169ffe4-bdd7-4c38-9655-b5acfd839e8d" />
+            <part type="optional" id="a2a4ee63-8203-44c3-b8a2-604834d3bc13">
+              <part type="regexp" name="kap_title" id="19e25b51-f8b3-4585-adea-86e532ee3065" />
+              <part type="optional" description="nummer kjede" id="a9132bce-5873-4e9d-b073-c25c51eab126">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="roman_number" id="ebe6438e-dc68-43dd-a902-b20e6264f03a" />
+            <part type="regexp" name="letter_end_check" id="ce7d3040-1fa3-4f04-8a90-55bd1318fc50" />
+          </part>
+          <part type="multiple" id="4709d48a-7393-49b0-ba1a-d94220dbb407">
+            <part type="regexp" name="split_chain_kap" id="0c20d1a9-3aa7-47c8-aae6-9f8db94f977a" />
+            <part type="optional" id="10336677-b886-4798-84a1-9d39fbac4031">
+              <part type="regexp" name="kap_title" id="d1d1f636-089b-4299-8e2c-2b00252728d9" />
+              <part type="optional" description="nummer kjede" id="7d28f84e-b1a2-423e-9444-031d0755c6d1">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="kapnr" id="7b04a536-25b6-4936-8d4e-66ceee242b9c">
+              <part type="regexp" name="roman_number" id="9933f7f2-3a61-4e78-ad77-d149a09fa5c4" />
+            </part>
+            <part type="regexp" name="letter_end_check" id="f3952e35-c562-4bc7-b73d-2967f212e47e" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>kap_chain_decimal</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="kap" id="6538a0f8-160a-430c-90f6-817a4a65be5a">
+        <part type="regexp" name="split_chain_element" id="0d525f43-612a-404b-bd51-554555808c72" />
+        <part type="regexp" name="kap_title" id="21661cb9-6b33-46ca-841c-51db9d4f17ee" />
+        <part type="single" description="nummer kjede" id="5e0dab4f-f23a-4e12-a8d1-048813b65c62">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="kapnr" id="ac157886-5d38-40a4-85dd-04409e583694">
+          <part type="single" description="nummer kjede" id="346ef302-3ce9-44d0-aebe-8eb2baf2fae5">
+            <text><![CDATA[\d+([a-zA-Z])?]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" id="b70af42a-8cc5-48a4-af1d-0aaf39a04f57" />
+        <part type="optional" id="856f6412-8c86-470b-8cf7-4ba4d2a38823">
+          <part type="positive lookahead" id="50999043-59ae-4772-88e8-90679cc2ad19">
+            <part type="regexp" name="split_chain_kap" id="eee38806-ae39-4547-b613-0cec92ddb6b3" />
+            <part type="optional" id="94beb47d-ea7b-4f21-805d-04b7b29c5c11">
+              <part type="regexp" name="kap_title" id="a8238916-6b11-49c4-b53c-b3951cfa719d" />
+              <part type="optional" description="nummer kjede" id="c72f847a-df71-4ff2-b98d-3f1eae0bcca6">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede" id="58a2bd95-a07c-4704-9cb5-73f69038e2b5">
+              <text><![CDATA[\d+([a-zA-Z])?]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" id="5618619a-3cdc-442b-9648-82b7c1879161" />
+          </part>
+          <part type="multiple" id="ddbbbdbc-5c87-4611-ace7-8e9643397483">
+            <part type="regexp" name="split_chain_kap" id="9df631ba-437e-4253-8222-4883a5ac94fc" />
+            <part type="optional" id="a221866c-1180-4e10-97c5-9bdf6da5986c">
+              <part type="regexp" name="kap_title" id="5646cd40-9374-41ef-9797-ad53eeaf7a3d" />
+              <part type="optional" description="nummer kjede" id="12c5542c-351e-4bab-bc4e-4809ca5c8a2d">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="kapnr" id="1f28d9ca-1c69-4ff7-9c33-11421de542bd">
+              <part type="single" description="nummer kjede" id="1681c636-f80c-42aa-bb02-22b251721a01">
+                <text><![CDATA[\d+([a-zA-Z])?]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" id="46ad6ec0-b9c4-4e18-a3b0-cc0e34c8a429" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>letter_end_check</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="negative lookahead" id="3f964a9b-a870-42c0-8509-5056dfad8beb">
+        <part type="single" id="9a7168e0-66fb-4bd4-9faa-a5f65102520c">
+          <text><![CDATA[[^\:\,\.\s\(]]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>punktum_chain_simple01</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="or" id="6189f1f7-ab4f-48e0-ac13-00ea2c5c740f">
+        <part type="container" id="c4abaef3-d4c7-42d0-9536-ae3ff1d0abbc">
+          <part type="multiple" id="a62c5ea4-9159-448d-bb51-877a8370edc6">
+            <part type="regexp" name="split_chain_para" id="b689aa73-74f7-4b56-a102-ed4d2d9a7954" />
+            <part type="single" id="be26994c-3d18-4b31-845e-bc821814883e">
+              <text><![CDATA[\d+(\.)?(\s+)?((P|p)unktum|pkt(\.)?)]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" id="74a969d0-b147-4494-9bdf-4f418b7ac3d9" />
+          </part>
+        </part>
+        <part type="container" id="87412b55-9a2c-40e7-b227-c16cebc6d18d">
+          <part type="multiple" id="4d07284c-ef1d-4f03-863d-768286d09277">
+            <part type="regexp" name="split_chain_para" id="fa493454-3ee1-45d1-91cd-25dcdd27db1a" />
+            <part type="regexp" name="tallord" id="288dfb54-6158-4a97-a991-f8723e1579aa" />
+            <part type="single" description="nummer kjede" id="1a9da88a-b169-4527-b011-af4e08429db2">
+              <text><![CDATA[\s+((P|p)unktum|pkt(\.)?)]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" id="2f65dff0-36fe-4b49-99b8-16d5bc29adcf" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>number_chain_simple01</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="or" id="eba8fe8c-76df-403d-a4d3-145d2e03d033">
+        <part type="container" description="number_chain_simple" id="9853e52d-82a1-46db-9e98-2dbc5f08a326">
+          <part type="multiple" id="e43d37ee-5865-4e55-8d39-ac6dd844dce4">
+            <part type="regexp" name="split_chain_para" id="d9fecdd6-4b8e-4e3c-a423-456952acbadf" />
+            <part type="named" name="number" id="a16429ba-95ae-492f-9f5d-c1f34775bd6a">
+              <part type="single" id="9e6d9922-38eb-4373-9be9-171574b6a797">
+                <text><![CDATA[\d+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" id="56666c18-a295-4618-96a4-50a067c9790e" />
+          </part>
+        </part>
+        <part type="container" description="number_chain_number" id="95af4728-e63b-41a8-8067-8935dccff7fd">
+          <part type="multiple" id="0ac68808-1687-4d41-bdd7-f81df910f055">
+            <part type="regexp" name="split_chain_para" id="43fd7dee-557f-4a8e-a4f9-feec6c85abcc" />
+            <part type="single" id="3b33c692-d4eb-4c4f-97f4-38bea4ed4bde">
+              <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+            </part>
+            <part type="named" name="number" id="e588d8da-daf6-4c63-a0e0-7d5a52be4a8c">
+              <part type="single" id="d8698022-c80f-4e6f-a834-ea9c479a8aa6">
+                <text><![CDATA[\d+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" id="11e79d4e-48cf-4f78-9947-f8bfec16f5f4" />
+          </part>
+        </part>
+        <part type="container" description="number_chain_roman" id="bbde4714-9a3c-4e75-995d-342ab69d00e1">
+          <part type="multiple" id="32d05630-06fe-4cad-aa17-6f630bcb0a84">
+            <part type="regexp" name="split_chain" id="fabe742e-8cf5-4af9-b3e7-7d85604c2337" />
+            <part type="single" id="c7fb36c1-f577-47d0-906c-99132d8eae1b">
+              <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+            </part>
+            <part type="named" name="number" id="8b209c3d-24cf-4943-8d50-e55f1a2cc3fc">
+              <part type="regexp" name="roman_number" id="3d5fba3e-a625-483e-b209-9bffe88ecf0c" />
+            </part>
+            <part type="regexp" name="letter_end_check" id="e4cc786d-a4cf-45de-9ab6-d85a36a85200" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>letter_chain_simple01</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or" id="e42a1cb5-d0e7-40ff-80dc-2184af3982d8">
+        <part type="multiple" id="984e891c-9899-4199-8f04-9607fbc3ede2">
+          <part type="optional" id="d7555833-5f46-44ef-94f3-fa1f78942443">
+            <part type="regexp" name="split_chain_para" id="785ddef1-4a01-452e-9ce4-4f6177753bcd" />
+          </part>
+          <part type="single" id="c0b55c54-0061-49bb-a815-323219be3b28">
+            <text><![CDATA[\(]]></text>
+          </part>
+          <part type="named" name="litra" id="ab99b122-3551-4642-895e-a8edc73a6f39">
+            <part type="single" id="d060977f-bb36-4511-8b0c-52a530bdea71">
+              <text><![CDATA[([a-zA-Z])]]></text>
+            </part>
+          </part>
+          <part type="single" id="0a29d56e-ac38-4ddf-acdd-79d03b7fffa9">
+            <text><![CDATA[\)]]></text>
+          </part>
+        </part>
+        <part type="multiple" id="78fa0784-460a-4c11-9186-8061a6cfe78a">
+          <part type="regexp" name="split_chain_para" id="6cb01765-a1d7-4b90-961a-5abd8d4896d1" />
+          <part type="named" name="litra" id="51eff2b1-1eee-46d0-8856-9c45d120daf8">
+            <part type="regexp" name="letter_lower" id="c34585bb-b0c2-4820-8b2a-9658bc67849c" />
+          </part>
+          <part type="regexp" name="letter_end_check" id="10f30868-bb5a-4df9-9262-a65789f3184a" />
+        </part>
+        <part type="multiple" id="c1498f10-32aa-4dfe-8b79-8ae6682ef3f8">
+          <part type="regexp" name="split_chain_para" id="c5d5b6c5-ae46-421f-bc56-c9a1b4dd27e6" />
+          <part type="named" name="litra" id="a9c9dbde-57c4-483a-b6d2-2a328b5b8884">
+            <part type="single" id="83080af0-51ab-4e71-9c26-50ad991c5bb6">
+              <text><![CDATA[[A-ZÆØÅ]]]></text>
+            </part>
+          </part>
+          <part type="regexp" name="letter_end_check" id="70e8ec2f-2e60-4eb8-bca0-4db1122e4467" />
+        </part>
+        <part type="multiple" id="57dce62f-8b23-4959-a617-12efd5e217d4">
+          <part type="regexp" name="split_chain_para" id="9eed24dd-dd0f-4cd3-833b-590328f3b017" />
+          <part type="optional" id="3cf1d646-c3e7-4cc7-bcbb-963e90dd495a">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="named" name="litra" id="f4742683-4ea5-43c8-8379-469d68ee472a">
+            <part type="regexp" name="letter_lower" id="c2fe9502-ecd1-4b9b-8204-fc8a18502566" />
+          </part>
+          <part type="regexp" name="letter_end_check" id="595850b3-0315-437e-a115-691661a46a04" />
+        </part>
+        <part type="multiple" id="0c6abb64-3351-4b84-8d0f-d49abee5ffa4">
+          <part type="regexp" name="split_chain_para" id="d45a55de-01a9-4605-aef5-700698dbf159" />
+          <part type="optional" id="057fece4-a468-46bf-b097-2287edffa37c">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="named" name="litra" id="68fbf1ed-b5b8-43f5-9e8c-28322d1b0e3d">
+            <part type="single" id="d693ecae-fab3-480c-9850-6662ec95cb4c">
+              <text><![CDATA[[A-ZÆØÅ]]]></text>
+            </part>
+          </part>
+          <part type="regexp" name="letter_end_check" id="3269e877-20d6-451f-887e-e5ae8f144da5" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>ledd_chain_simple01</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="or" id="0ffeb87b-2a70-4855-b16d-a1bb8211d0f2">
+        <part type="multiple" id="edb741ae-a9c8-4ac3-a49d-242336c9c35e">
+          <part type="regexp" name="split_chain_para" id="e7ab355e-cf7f-4c3f-a193-22d6ca738ace" />
+          <part type="named" name="ledd" id="14c7e000-fa71-4718-a0a0-310116878c2c">
+            <part type="regexp" name="tallord" id="61388a6a-d75b-4724-8873-1aefe66bea0b" />
+          </part>
+          <part type="single" description="nummer kjede" id="132ef811-b239-4486-874a-afbb9be275fe">
+            <text><![CDATA[\s+(L|l)edd]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" id="2d2dd6a9-2491-4450-af81-b3b7edd41b67" />
+        </part>
+        <part type="multiple" id="a7648f11-b549-467d-a7a9-5d678d87b163">
+          <part type="regexp" name="split_chain_para" id="b43aad61-9bfc-45d6-9767-b2c3ade7ea64" />
+          <part type="named" name="ledd" id="7913a5c9-35f6-48d6-a365-c4af8fe0c5e5">
+            <part type="single" id="b3269e5d-aeb6-48af-a2b2-f3490be7a611">
+              <text><![CDATA[\d+]]></text>
+            </part>
+          </part>
+          <part type="single" id="3447a0c5-c945-4245-94ba-9e178c2b2d7f">
+            <text><![CDATA[(\.)?(\s+)?(L|l)edd]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" id="6780b1c4-a372-4dc6-8921-39851e054449" />
+        </part>
+        <part type="multiple" id="11ed5c5d-f660-4e1e-bc27-16a9e9a0087b">
+          <part type="regexp" name="split_chain_para" id="7365cf4c-f19c-4afb-b7c3-eb009e38ea19" />
+          <part type="named" name="ledd" id="68488086-eaeb-4100-94f1-483a674a067d">
+            <part type="single" id="458a1a8d-24ee-4bf3-8257-1b4bac4aa242">
+              <text><![CDATA[\d+]]></text>
+            </part>
+          </part>
+          <part type="single" id="b9678047-6988-4f97-96cf-e8f2db16d815">
+            <text><![CDATA[(\.)?(\s+)?L\.]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" id="54c3619a-402d-4331-8a1a-6c52d810a4be" />
+        </part>
+        <!--<part type="multiple">
+          <part type="or">
+            <part type="regexp" name="split_chain_para" />
+            <part type="single">
+              <text><![CDATA[\(]]></text>
+            </part>
+            <part type="named" name="ledd">
+              <part type="single">
+                <text><![CDATA[\d+]]></text>
+              </part>
+            </part>
+            <part type="single">
+              <text><![CDATA[\)]]></text>
+            </part>
+          </part>
+          <part type="regexp" name="split_chain_para" />
+          <part type="single">
+            <text><![CDATA[\(\d+\)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>-->
+        <part type="multiple" id="8f4fa020-a92a-4133-b131-7df80cec48a1">
+          <part type="optional" id="e7b3b578-0b15-4b36-830b-2ebc56e20880">
+            <part type="regexp" name="split_chain_para" id="21cc739a-7807-4f81-9985-84e9f349c36c" />
+          </part>
+          <part type="single" id="bc1f0000-60f1-4b2f-afaa-f0ca4684d0e9">
+            <text><![CDATA[\(]]></text>
+          </part>
+          <part type="named" name="ledd" id="3d912b0d-7542-4ce5-a023-8287aa601b1b">
+            <part type="single" id="6747341a-0c93-4fcc-9e73-cc64b86dee9a">
+              <text><![CDATA[\d+]]></text>
+            </part>
+          </part>
+          <part type="single" id="0dd14a2b-70a3-4964-9641-5fc14e3862e1">
+            <text><![CDATA[\)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" id="c21de59a-e6ba-4630-aa09-a86b5f50e729" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--ledd_chain slutt-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  NY Lov og forskriftsreferanser start
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--nxlovname: Finner lovnavn-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>nxlovname</id>
+    <description>Finner lovnavn</description>
+    <expression>
+      <part type="or" id="dd75afc9-33bc-4d5d-b96f-fd899a205b9f">
+        <part type="container" id="97acf766-c5fc-4e59-8908-c6b8e88c3b89">
+          <part type="named" name="nxlovname" id="e9c7b81b-8d36-4e92-bc1a-7f43df680623">
+            <part type="single" description="punktum" id="4816c848-41c0-484b-84a1-8e3228a63bbc">
+              <text><![CDATA[[a-zæøåA-ZÆØÅ\-]+lov(en|a|ene|er)?(\s+\d\d\d\d)?]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="container" id="b703f130-e35f-47c3-ab38-db123cf83086">
+          <part type="single" description="" id="52c0bbf5-41ff-4a77-9578-be3888918c4e">
+            <text><![CDATA[\((\s+)?]]></text>
+          </part>
+          <part type="named" name="nxlovname" id="43912861-53d9-4353-9fb8-5bc074b14f20">
+            <part type="single" description="punktum" id="37035f9f-ceb5-4016-ad27-f33980916be8">
+              <text><![CDATA[[a-zæøåA-ZÆØÅ\-]+lov(en|a|ene|er)?(\s+\d\d\d\d)?]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="optional" >
+        <part type="single">
+          <text><![CDATA[s]]></text>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="single" description=" av 1. " id="dba02ce6-daf7-49f2-840a-0a1b2dca93c9">
+          <text><![CDATA[(\s+)?\([^\)]+\)(\s+)?]]></text>
+        </part>
+      </part>
+      <part type="optional" description="" id="e071d797-60ff-4ac0-8220-f09ce6a73a81">
+        <part type="single" description=" av 1. " id="dba02ce6-daf7-49f2-840a-0a1b2dca93c9">
+          <text><![CDATA[\s+av\s+\d+(.)?\s+]]></text>
+        </part>
+        <part type="regexp" name="month_word" description="mnd bokstavert" id="6420f2b8-e270-4a59-8db5-473bfaa3e4c7" />
+        <part type="single" description=" 1999" id="9aecdaa2-1bd0-46a0-8aaa-0690a336f80a">
+          <text><![CDATA[\s+\d\d\d\d]]></text>
+        </part>
+      </part>
+      <part type="optional" description="" id="2a18bc66-503a-4e90-9f36-c44f32795960">
+        <text><![CDATA[(\s+)?\)(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <!--nxformane: Finner forskriftnavn-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>nxforname</id>
+    <description>Finner forskriftnavn</description>
+    <expression>
+      <part type="or" id="80f3b0b3-9e12-4ae7-840d-d8dd53a3b4a3">
+        <part type="container" id="888f0f2c-653b-463f-9a03-00207b0078ba">
+          <part type="named" name="nxforname" id="5aaabb59-9a2b-49f8-b3a3-2eb5816cd1ad">
+            <part type="single" description="punktum" id="1975591b-182c-41e4-887a-83c966eadb1e">
+              <text><![CDATA[[a-zæøåA-ZÆØÅ\-]+forskrift(en|a|ene|er)?]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="container" id="7e6755c4-25ff-4f4d-9dde-07d58df40a85">
+          <part type="single" description="" id="aa93b3cf-63b2-4ceb-bc8e-6a95cbfd220f">
+            <text><![CDATA[\((\s+)?]]></text>
+          </part>
+          <part type="named" name="nxforname" id="8a61ff37-c076-401d-a71a-2ba5eaddb70b">
+            <part type="single" description="punktum" id="7d7ee4fd-0aba-46d9-a409-a9baadd8d2da">
+              <text><![CDATA[[a-zæøåA-ZÆØÅ\-]+forskrift(en|a|ene|er)?]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="single" description=" av 1. " id="dba02ce6-daf7-49f2-840a-0a1b2dca93c9">
+          <text><![CDATA[(\s+)?\([^\)]+\)(\s+)?]]></text>
+        </part>
+      </part>
+      <part type="optional" description="" id="cb5a07df-53c0-4e0f-b95a-ca58229dbcbf">
+        <part type="single" description=" av 1. " id="8e587a36-42d6-4c00-80de-039b54ab9daa">
+          <text><![CDATA[\s+av\s+\d+(.)?\s+]]></text>
+        </part>
+        <part type="regexp" name="month_word" description="mnd bokstavert" id="f022d6e9-1a21-4a42-ad40-82a39de3e416" />
+        <part type="single" description=" 1999" id="1e79f137-c6ff-4eb6-9d5c-44e71172ca92">
+          <text><![CDATA[\s+\d\d\d\d]]></text>
+        </part>
+      </part>
+      <part type="optional" description="" id="63c314ea-a877-4f20-b0ef-0acd7c9ccda0">
+        <text><![CDATA[(\s+)?\)(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <group>document</group>
+    <case>0</case>
+    <id>lovref_trailing_split</id>
+    <description>text etter lovref om</description>
+    <expression>
+      <part type="single" id="b5feeb6a-f4d9-401f-b0fa-452baf12e45e">
+        <text><![CDATA[(\s+endringer\s+i\s+lov|\sfølger\sat|\.\s[A-ZÆØÅ]|\sog\som|\s(og|eller)\slov\s|\sgjelder|\sknyttet\stil|\seller\sandre\stilsvarende\savtaler|\sopphevet|\sanses\sikke|\setter\slov|\,\s(se|(J|j)f(r)?(\.)?)\s|\seller\snår)]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <group>document</group>
+    <case>0</case>
+    <id>lovref_trailing_text</id>
+    <description>text etter lovref om</description>
+    <expression>
+      <part type="container" id="72931e0a-442f-41d9-be8c-d852b0b0fdeb">
+        <part type="container" id="6a8c70e5-f7e2-484b-97fc-44e56832438d">
+          <part type="negative lookahead" id="1c6e37f1-8356-496b-a4b0-529ef9598074">
+            <part type="regexp" name="lovref_trailing_split" id="5470a207-c468-45c1-b6be-53c018bb0a9e" />
+          </part>
+          <part type="single" id="5728e3c7-1509-4c70-bb69-34987d9150b6">
+            <text><![CDATA[([^\.§\(])]]></text>
+          </part>
+        </part>
+        <part type="single" id="446f99cc-43c5-4290-b867-47475b23aebd">
+          <text><![CDATA[*]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--lovref_trailing delutrykk for å hente text etter lovnavn eller lovdate-->
+  <regexp type="single_multi">
+    <group>document</group>
+    <case>0</case>
+    <id>lovref_trailing</id>
+    <description>text etter lovref om</description>
+    <expression>
+      <part type="regexp" name="lovref_trailing_text" id="2a9a4535-a00e-4350-97b1-a53a25746019" />
+      <part type="optional" id="23c51547-b6fc-4f48-9ab5-fdce2239431a">
+        <part type="positive lookbehind" id="07af8d45-0082-4063-a71d-48a0c73fa2cf">
+          <part type="single" id="5368beaf-bc5e-43ed-b288-457d6a368eb8">
+            <text><![CDATA[mv]]></text>
+          </part>
+        </part>
+        <part type="single" id="4f4a47b6-dcbd-4de1-9919-874e3f07b4ee">
+          <text><![CDATA[\.]]></text>
+        </part>
+      </part>
+      <part type="optional" id="fc09bac1-f9fb-4be3-a34a-4440ead94cb7">
+        <part type="container" id="e6d99aca-ca8d-47f2-baa6-1dba604520ba">
+          <part type="positive lookbehind" id="c8668e74-3955-42c7-8edc-131ca11fbe40">
+            <part type="single" id="b5754754-5bcb-4d2e-9c40-bbf35087165b">
+              <text><![CDATA[pr]]></text>
+            </part>
+          </part>
+          <part type="single" id="4bfa153a-6362-4148-8786-41efa87595d9">
+            <text><![CDATA[\.]]></text>
+          </part>
+        </part>
+        <part type="single" id="bfadc085-5c23-47f3-812f-84085c1e55f3">
+          <text><![CDATA[\s+\d{1,2}(\.)?\s+]]></text>
+        </part>
+        <part type="regexp" name="month_word" description="mnd bokstavert" id="947e4e51-8c15-4029-a48e-af1e50c8cf67" />
+        <part type="single" id="d9da239a-931f-4d98-b3bb-87b6be886519">
+          <text><![CDATA[(\.)?\s+\d{4,4}]]></text>
+        </part>
+        <part type="regexp" name="lovref_trailing_text" id="b78f46a4-a798-4dc8-bff9-31cc083fce06" />
+      </part>
+      <part type="optional" id="fb32a820-b6da-4e12-a76d-7894bee6a64b">
+        <part type="single" id="15dcd1e4-55bc-4c8a-b498-bfddf07b1e53">
+          <text><![CDATA[(?<=\snr)(\.\s+\d+[a-z])]]></text>
+        </part>
+      </part>
+      <part type="optional" id="a091a792-49bd-406f-a574-8a70c98f6ec4">
+        <part type="single" id="fa468b9b-b686-4745-8699-8bfe81d8bdf0">
+          <text><![CDATA[\.m\.|\.v\.|mv\.]]></text>
+        </part>
+      </part>
+      <part type="optional" id="b8efb310-2829-41ae-b002-aa64d2a523d3">
+        <part type="multiple" id="2d139df6-35f8-4f3e-8ecc-bee784cfd884">
+          <part type="single" id="0cd9fe4d-2477-469f-a603-ad0081f13868">
+            <text><![CDATA[(\s+)?\(([a-zæøåA-ZÆØÅ0-9\.\-\/\s]+)(\(EF\))?([a-zæøåA-ZÆØÅ0-9\.\-\/\s]+)?\)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--dennesammelov: denne/samme lov -->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennesammelov</id>
+    <description>Finner denne/samme lov</description>
+    <expression>
+      <part type="named" name="dennesammelov" id="28284e39-60b5-4e84-be79-e63922262e19">
+        <part type="single" description="denne lov" id="ba0344c3-a336-4221-b6a8-0fc33db897a8">
+          <text><![CDATA[((D|d)enne|(S|s)amme)\s+(L|l)ov(a|en|ens)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--dennesammefor: denne/samme forskrift-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennesammefor</id>
+    <description>Finner denne/samme lov</description>
+    <expression>
+      <part type="named" name="dennesammefor" id="e8fdce99-1b5a-4385-969e-0bd722c4594b">
+        <part type="single" description="lov text" id="3d9c777b-9048-4937-ad2f-58d51686877d">
+          <text><![CDATA[((D|d)enne|(S|s)amme)\s+(F|f)orskrift(a|en|ens)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--mlovom-->
+  <regexp type="multi">
+    <case>0</case>
+    <id>exp_om_lov_desc</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="named" name="om_lov_desc" id="8f024c90-d208-4f0a-a909-239ad96c1cfb">
+        <part type="single" description="lov om" id="d3ec8838-2908-4318-bc12-29127f6d0274">
+          <text><![CDATA[([a-zæøå\-]){4,}]]></text>
+        </part>
+        <part type="optional" id="1a8d5e6f-ed6f-4912-842c-1f268347407e">
+          <part type="container" id="086dd68b-b345-43ac-8608-859195a248d9">
+            <part type="multiple" id="84f19bc1-f3f5-4751-910b-76f535dd4f2b">
+              <part type="negative lookahead" id="9a0437b6-4001-4125-8227-9f157111ade2">
+                <part type="or" id="b90970d8-c1b2-4624-b0e1-0e5be9c0a499">
+                  <part type="regexp" name="exp_mm_mv" id="dbf4b9a2-114e-430f-8f02-141e415ff64e" />
+                  <part type="regexp" name="exp_av_date" id="5b512c5c-20e1-40ee-b75b-62b7b772fc0d" />
+                  <part type="regexp" name="exp_mm_mv" id="c024cf5b-1ab1-47f0-8898-d9a2d48ca06a" />
+                  <part type="regexp" name="exp_rparlovenlpar" id="2b9b67e5-d06f-4383-acdb-c8b165470ea7" />
+                  <part type="single" description="lov om" id="854181aa-2a27-4f6d-ba08-baa1b18fc24e">
+                    <text><![CDATA[(\s+gjelder)?\s+(tilsvarende|i\s+så\s+fall)]]></text>
+                  </part>
+                  <part type="single" description="lov om" id="64ae1025-f558-4dcb-85ac-d63b9cbf1eb3">
+                    <text><![CDATA[\s+brukes\s+i|\s+(K|k)ap(\.)?(it(t)?el)?\s+|\s+(D|d)el\s+|\s+eller\s+]]></text>
+                  </part>
+                </part>
+              </part>
+              <part type="single" description="lov om" id="ddb78145-3b4c-46f1-9616-98f800aecb03">
+                <text><![CDATA[(\s+|(\s+)?\,\s+|\s+og\s+)]]></text>
+              </part>
+              <part type="single" description="lov om" id="dd456cb0-7450-42b5-9f07-b79ebabe3b63">
+                <text><![CDATA[([A-ZÆØÅ])?([a-zæøå\-])+]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="optional" id="e34fd04b-cf4e-4cf3-a555-3abbbdd4e8db">
+          <part type="regexp" name="exp_mm_mv" id="295643a9-f2f0-4aa7-ae5d-56dadcdee6f7" />
+        </part>
+      </part>
+      <part type="optional" id="8e48fe1f-46fc-44a9-9c6a-b46ef001b4fc">
+        <part type="multiple" id="4215c0d0-4ed9-4d1c-9c64-115aa1d991bd">
+          <part type="or" id="cd7d6750-339b-48fd-a259-77484f89d12f">
+            <part type="container" id="2337e352-ae73-41fd-a275-fd0c54d465e1">
+              <part type="single" id="774fe9e0-7e0a-4c96-830f-8fcac864b341">
+                <text><![CDATA[\s+av\s+]]></text>
+              </part>
+              <part type="regexp" name="exp_av_date_nr" id="2cca707d-7756-4ed9-a209-704acc7183be" />"
+            </part>
+            <part type="regexp" name="exp_av_date" id="3be1b9f1-c6ab-4f52-8f4c-0f4911c1fb00" />
+            <part type="regexp" name="exp_mm_mv" id="625ba9a8-59b7-4468-9b74-5d62083e7513" />
+            <part type="regexp" name="exp_rparlovenlpar" id="5312b37b-e5bd-41b5-8320-7bc0ce8a3e61" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <group>document</group>
+    <case>0</case>
+    <id>mlovom</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="named" name="mlovom" id="82a1471a-de89-4198-8de0-88b1bf4cc569">
+        <part type="named" name="mlovom_name" id="db4852fa-9bd2-4993-9fe5-b520c4a16b97">
+          <part type="or" id="c4be40d8-c0bc-4c56-914f-1c1cff046ea6">
+            <part type="single" id="e981d9e7-243f-4c84-9acf-65a7c593e4e3">
+              <text><![CDATA[(L|l)ov]]></text>
+            </part>
+            <part type="single" id="8a2da06a-6cba-48e5-8051-2ff56f1d0503">
+              <text><![CDATA[(F|f)orskrift]]></text>
+            </part>
+          </part>
+          <part type="single" description="lov om" id="80a5eef3-0259-433a-9a52-441f626c8c18">
+            <text><![CDATA[\s+om\s+]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="exp_om_lov_desc" id="a4fdf350-1688-4661-9caf-88fb3bffd088" />
+      </part>
+    </expression>
+  </regexp>
+  <!--mlovdate-->
+  <regexp type="multi">
+    <group>document</group>
+    <case>0</case>
+    <id>mlovdate</id>
+    <description>Finner lov av 10. juni 1988 nr. 40</description>
+    <expression>
+      <part type="named" name="mlovdate" id="d280bafb-33ab-4503-b576-2eb3bd5741c4">
+        <part type="optional" id="0cd9463d-f581-4417-894e-70b7b5b2d85c">
+          <part type="or" id="6277ed66-6092-44f0-80d0-54b5407605f9">
+            <part type="named" name="typelov" id="403bda81-62c5-46b9-95c7-0e50afaf757d">
+              <part type="single" description="type" id="fd3c337e-8c61-423a-a65e-90d42b7bbe8f">
+                <text><![CDATA[L\.|(([^\s])*)?(L|l)ov(er|ene|en)?]]></text>
+              </part>
+            </part>
+            <part type="named" name="typefor" id="d2c0b8b1-dc8f-4604-96d2-aaaad2554488">
+              <part type="single" description="type" id="2eff5ce4-5bbe-4a90-81dd-fd8bccd8e3ca">
+                <text><![CDATA[F\.|(([^\s])*)?(F|f)orskrift(er|ene|en)?]]></text>
+              </part>
+            </part>
+            <part type="named" name="typeres" id="b6373cfc-869f-4a3f-827b-4477570e000c">
+              <part type="single" description="type" id="87357d22-298b-4856-bc98-9f9eb9c18dbf">
+                <text><![CDATA[((K|k)ongelig\s+)?(R|r)esulusjon|(R|r)es(\.)?]]></text>
+              </part>
+            </part>
+          </part>
+          <part type="optional" id="320ec00d-58e7-44ef-8994-9a3bc41692fd">
+            <part type="single" description="type" id="38a6fd9b-2a64-425d-9a51-b5896b8c6573">
+              <text><![CDATA[\s+av]]></text>
+            </part>
+          </part>
+          <part type="single" description="type" id="a250fd66-522b-4ae5-ab8d-f05971f4ab1d">
+            <text><![CDATA[\s+]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="exp_av_date_nr" id="d45a67dc-4bb8-4ff7-8d3d-6ef5c8b738cc" />
+      </part>
+      <part type="optional" id="f06d7914-5386-4d8a-98fa-9466d2a7dd0e">
+        <part type="single" description="lov om" id="59ff53eb-608e-47e8-b656-66994f01b5d9">
+          <text><![CDATA[\s+om\s+]]></text>
+        </part>
+        <part type="regexp" name="exp_om_lov_desc" id="d1ee7d28-1735-4776-8b57-96f95faf0070" />
+      </part>
+    </expression>
+  </regexp>
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  NY Lov og forskriftsreferanser slutt
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <regexp type="single">
+    <id>tag_utv</id>
+    <description>Henter utv</description>
+    <expression>
+      <part type="chain" id="f680a221-bb17-4aaf-b888-41e7df1c15e7">
+        <part type="named" name="tag1" id="44b44a59-ef29-4194-8556-9bf8eb870dfe">
+          <part type="single" description="Finnes bfu eller utv" id="000fc68b-c1a2-4bb4-a880-41a27e509684">
+            <text><![CDATA[((U|u)(T|t)(V|v))]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1" id="8bb14717-104c-4f91-a8bc-6d7b097b33b9">
+          <text><![CDATA[(\.)?(\s+nr(\.)?)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="tag2" id="58d163d9-a3f1-4c68-b71b-81b7d0c92422">
+          <part type="single" description="1.1" id="0b4ac5e4-54b5-4e35-94dd-00107fd003b8">
+            <text><![CDATA[(\d{1,4}|[ivxIVX]+)]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1" id="211b6cae-8b7c-4499-9dfc-57fda6adaae8">
+          <text><![CDATA[(\s+)?(side|s\.|\/)(\s+)?]]></text>
+        </part>
+        <part type="named" name="tag3" id="f13428e7-54e6-41d5-8fd1-86a2605ae37a">
+          <part type="single" description="1.1" id="c31dc650-6e6d-4d09-ab1f-df8b855bcfe1">
+            <text><![CDATA[\d{1,4}]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_bfu</id>
+    <description>Henter bfu</description>
+    <expression>
+      <part type="chain" id="287190ba-052d-42c8-b664-eab025c93f0a">
+        <part type="named" name="bfu" id="4fa3c0f2-2b75-4a1d-ba20-2389a92f17ce">
+          <part type="single" description="Finnes bfu eller utv" id="c22d9220-4d12-4a45-964b-203453734f97">
+            <text><![CDATA[(((S|s)kattedirektoratets\s+bindende\s+forhåndsuttalelse)|(B|b)(F|f)(U|u))]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1" id="aab1f0fc-26d3-4539-b6fd-067891983931">
+          <text><![CDATA[(\.)?(\s+nr(\.)?)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="tag2" id="c5680ebb-7dfe-4110-9c97-2986525326dc">
+          <part type="single" description="1.1" id="37bef559-5704-4844-8570-91dcae0f098b">
+            <text><![CDATA[\d{1,4}]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1" id="92f8bce1-3988-4840-8ced-697f2270b460">
+          <text><![CDATA[(\s+)?(\/)(\s+)?]]></text>
+        </part>
+        <part type="optional" description="1.1" id="6ea418a0-c0d7-465f-b841-95db828ff812">
+          <text><![CDATA[(\d\d)(?=\d\d)]]></text>
+        </part>
+        <part type="named" name="tag3" id="d2c5c39d-7b1c-487a-8545-167c08eb6b8b">
+          <part type="single" description="1.1" id="20858e31-53d7-4f87-a9d9-1e98a1ec8829">
+            <text><![CDATA[\d\d]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_lonnkode</id>
+    <description>Henter lønnskoder</description>
+    <expression>
+      <part type="chain" id="268fb6a5-9805-425a-ba02-3426d0ad0e0c">
+        <part type="optional" id="e2906149-59bd-40e9-801b-9adbade8b5eb">
+          <part type="single" description="Finnes Lønnskode" id="31fd1ed6-55cc-4750-9db4-24ce65996bd3">
+            <text><![CDATA[(L|l)ønn(s)?]]></text>
+          </part>
+        </part>
+        <part type="named" name="tag_lonnkode" id="b4477433-e11f-4319-bc3c-6274df5265b2">
+          <part type="named" name="kode" id="b7ba6dcd-1aa5-47fe-be7f-f0c2d93b2f7e">
+            <part type="single" description="Finnes Lønnskode" id="27387785-d1ce-4d83-9489-960d4bf666fc">
+              <text><![CDATA[(K|k)ode(gruppe|ne)?]]></text>
+            </part>
+          </part>
+          <part type="multiple" id="1bbfa32a-4d53-4db0-9f2a-05700cad9363">
+            <part type="single" description="Finnes mellomrom" id="e61f7ce6-08d0-491d-833a-5f1a8f80ddf6">
+              <text><![CDATA[((\s+)?(\,)?\s+ev(\.|entuelt)\s+|\s+eller\s+|\s+og\s+|(\s+)?(\,|\-)(\s+)?|\s+samt\s+|\s+)((\s+)?((L|l)ønn(s)?)?(K|k)ode\s+)?]]></text>
+            </part>
+            <part type="named" name="kodenr" id="a1a19ca0-a6a7-4180-8663-19925cd21f6a">
+              <part type="single" description="1.1" id="dfc08686-c72e-497a-8f80-a81601dbb8b1">
+                <text><![CDATA[\d\d\d]]></text>
+              </part>
+            </part>
+            <part type="optional" description="1.1" id="da421360-8ebf-4b34-b1ca-5c35a6cd0dcb">
+              <part type="named" name="kodeacent" id="3c5b14d6-672d-4901-9650-16277f528018">
+                <part type="or" id="2c8c2bb0-59aa-459f-9f9c-9d6f867fcd22">
+                  <part type="single" description="Finnes mellomrom" id="3be2405d-d2f4-4878-b6a7-d09bb03ad9b9">
+                    <text><![CDATA[\-[A]]]></text>
+                  </part>
+                  <part type="single" description="Finnes mellomrom" id="fc244e75-b61b-4689-a52b-a41112b0b435">
+                    <text><![CDATA[(\s+)?\-(\s+)?[A]]]></text>
+                  </part>
+                  <part type="single" description="Finnes mellomrom" id="b0e20c92-ff67-4733-9e6d-8969819779b0">
+                    <text><![CDATA[(\s+)?[A]]]></text>
+                  </part>
+                  <part type="single" description="Finnes mellomrom" id="6cfc2ea6-f59b-4089-bf24-60826f37775c">
+                    <text><![CDATA[(\s+)?(\-)\([A]\)]]></text>
+                  </part>
+                  <part type="single" description="Finnes mellomrom" id="04b10814-cbe7-4191-ae6d-3a8927ac1e1d">
+                    <text><![CDATA[(\s+)?\(\-[A]\)]]></text>
+                  </part>
+                </part>
+              </part>
+              <part type="negative lookahead" id="3512d1c0-5bfd-4c70-82c9-369a0abbce7b">
+                <part type="single" description="1.1" id="bd10f62d-6a58-43b7-a9b7-2fb211203625">
+                  <text><![CDATA[\d]]></text>
+                </part>
+              </part>
+            </part>
+            <part type="optional" description="1.1" id="24b94881-7f0f-46d7-96c9-b7dc9052c26d">
+              <part type="single" description="Finne kommentar i parantes" id="10d333a2-046a-4fe0-9661-fd5eb1ffdb0e">
+                <text><![CDATA[(\s+)?\([^\d\)]+\)]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_kontoplan</id>
+    <description>Henter konto</description>
+    <expression>
+      <part type="chain" id="68863e00-b440-4780-baa8-c5184ee08201">
+        <part type="named" name="tag_konto" id="3348e080-38eb-440e-879c-5e2ad0335c85">
+          <part type="named" name="konto" id="9fabd249-27d1-4cd8-8b98-2a6138454eb8">
+            <part type="single" description="Finnes Lønnskode" id="0c822280-acd5-471b-aa35-37f500bd3b50">
+              <text><![CDATA[(K|k)onto]]></text>
+            </part>
+          </part>
+          <part type="multiple" id="785ea82a-a943-45c6-9243-41a77ea74287">
+            <part type="single" description="Finnes mellomrom" id="e1fd9a20-32f8-4c47-b2b8-301e37a939e6">
+              <text><![CDATA[(\s+eller\s+|\s+og\s+|(\s+)?(\,|\-)(\s+)?|\s+samt\s+|\s+)((\s+)?(K|k)onto\s+)?]]></text>
+            </part>
+            <part type="named" name="kontonr" id="578f5a93-dc40-48cd-8217-ee8f6fac0f8e">
+              <part type="single" description="1.1" id="4c69e10c-01de-4005-b10c-69f15411e7d2">
+                <text><![CDATA[\d\d(\d|x|X)(\d|x|X)]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_kl</id>
+    <description>Henter klagenemndssaker</description>
+    <expression>
+      <part type="chain" id="30eb4f7b-143b-4f6d-8d08-6fecc6bd9ae9">
+        <part type="named" name="tag1" id="b54d52da-7b12-4585-b192-572ea9a649e1">
+          <part type="single" description="Finnes kl eller klagesak" id="f5f20f78-8be1-4076-82e1-eda9266b088c">
+            <text><![CDATA[(((K|k)(L|l))|KMVA)]]></text>
+          </part>
+        </part>
+        <part type="optional" id="3452a7bf-6819-47ed-8a49-568143dabb2a">
+          <part type="or" id="b5222969-b1ae-48c7-8661-91de4f55d520">
+            <part type="single" description="Finnes kl eller klagesak" id="f771b6b5-fdb4-4379-9f66-4ee939bb2242">
+              <text><![CDATA[agenem(n)?d(s)?sak(ene)?]]></text>
+            </part>
+            <part type="single" description="Finnes kl eller klagesak" id="5007437e-d1e1-4a09-98c8-059e5fa13d41">
+              <text><![CDATA[agesak(ene)?]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="optional" id="b15e26af-dfe9-44f6-b5d2-83d2232747d6">
+          <part type="single" description="1.1" id="25400db2-1601-4812-927e-a5e8ec09a8e4">
+            <text><![CDATA[\.]]></text>
+          </part>
+        </part>
+        <part type="multiple" id="3d88a61c-2ea8-4cae-bd40-2068f3c9a01d">
+          <part type="single" description="1.1" id="7ef069d6-f07d-4f93-a72c-0d3e7b0aefff">
+            <text><![CDATA[((\s+)?\,(\s+)?|\s+og+\s+|\s+)?(nr(\.)?\s+)?]]></text>
+          </part>
+          <part type="named" name="tag2" id="99192200-dfac-4003-9491-ee8a344d4acf">
+            <part type="single" description="1.1" id="4ba4ca94-1bc6-4bd2-9230-bc2a5632b2ea">
+              <text><![CDATA[(\d\d\d\d)((\s)?[a-dA-D])?]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_ifrs</id>
+    <description>Henter ifrs</description>
+    <expression>
+      <part type="named" name="st_ifrs" id="3477c6af-6ffb-41bf-9d1a-9c494c96abd6">
+        <part type="named" name="stname" id="1d33e9f5-cbc1-4c95-8aa6-520d48e9edef">
+          <part type="single" description="1.1" id="5cf0511d-cb3c-4886-a607-dfde93fe778b">
+            <text><![CDATA[(IFRS|IAS|IFRIC|SIC)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="b985d629-9b37-43d4-97a1-9c668186c574">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr" id="3c2ee8d3-b702-40d6-9369-42105fdd6a4a">
+          <part type="single" description="1.1" id="c0f74567-138d-473b-9a9d-6fabd07f3071">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="6b6389b0-6537-4dd6-a382-284557489d65">
+          <part type="or" id="e60fb5fd-5499-4f25-aff4-9ec5cf34ec2c">
+            <part type="single" description="1.1" id="b609cb38-9e7e-464f-b273-ee33bccaab79">
+              <text><![CDATA[\.(?=(B|IE|BC|BCZ|AG|D|IN|A)?\d+)]]></text>
+            </part>
+            <part type="single" id="d374eb00-cddd-423f-9235-0e3a6cbb2984">
+              <text><![CDATA[\s+(n|N)(r|R)(\.)?\s+]]></text>
+            </part>
+          </part>
+          <part type="named" name="stpara" id="7a723501-3b77-4545-9703-2b3a5d8824f6">
+            <part type="single" description="1.1" id="517c15da-c782-4e53-b4a4-1bc397281888">
+              <text><![CDATA[(B|IE|BC|BCZ|AG|D|IN|A)?\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+            </part>
+            <part type="optional" description="1.1" id="078f5fa3-c98d-48ba-8e29-495af256b9a7">
+              <part type="multiple" id="3afa1c2c-627f-4892-9bb3-9ada8353f949">
+                <part type="single" description="1.1" id="7669bf41-38b5-4110-8cf1-c257cbdbfa5c">
+                  <text><![CDATA[\.\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="optional" description="1.1" id="0cd6a93a-00dc-4c7a-b623-992b5f4da124">
+            <part type="single" description="1.1" id="8def8091-2e30-4a76-ba2d-ac6b0ccf0c39">
+              <text><![CDATA[(?<=\d)([a-z])(?![a-zæøåA-ZÆØÅ])]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_isa_sa_nrs</id>
+    <description>Henter ISA/SA/NRS</description>
+    <expression>
+      <part type="named" name="st_isa_sa_nrs" id="6cb74b49-c6e9-45fe-9dbb-ef464d705705">
+        <part type="named" name="stname" id="d4fbba7e-86a2-4726-9226-c4c618f394be">
+          <part type="single" description="1.1" id="376c3a4c-4bbc-4efd-a03e-b7285f2d7dae">
+            <text><![CDATA[(ISRE|ISAE|ISRS|ISQC|ISA|SA|NRS)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="f7e2bb45-0942-4df2-a8ee-7bbe6750e22e">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="or">
+          <part type="container">
+            <part type="named" name="stnr" id="fc65513d-c3a2-4087-b021-bbdf22bacd28">
+              <part type="single" description="1.1" id="ce35dc74-9044-4594-ab98-514c9cb3129b">
+                <text><![CDATA[\((F|f|HU|hu|V|v)\)]]></text>
+              </part>
+            </part>
+          </part>
+          <part type="container">
+            <part type="named" name="stnr" >
+              <part type="single" description="1.1">
+                <text><![CDATA[\d+(\-\d+)?([a-zæøåA-ZÆØÅ])?]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="30798c77-806c-419b-957f-80ea4f2a1332">
+          <part type="multiple" id="63f943b8-de2a-4362-9624-81d72c6429ca">
+            <part type="container">
+              <part type="or">
+                <part type="single">
+                  <text><![CDATA[(\s+)?\,(\s+)?]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\.]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\s+og\s+]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\-]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\s]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\s(og\s)?pkt(\.)?\s]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\sparagraph\s]]></text>
+                </part>
+              </part>
+              <part type="positive lookahead">
+                <part type="single">
+                  <text><![CDATA[(A|V)?\d+]]></text>
+                </part>
+              </part>
+            </part>
+            <!--<part type="single" description="1.1" id="3ee3ab4e-0df4-40a6-b8fd-f8d9800bf558">
+              <text><![CDATA[((\s+)?\,(\s+)?|\.|\s+og\s+|\-|\s|\s(og\s)?pkt(\.)?\s)(?=(paragraph\s)?(A|V)?\d+)]]></text>
+            </part>-->
+            <part type="container">
+              <part type="named" name="stpara" id="5dd894f3-51c7-4d54-9885-742aff348716">
+                <part type="single" description="1.1" id="9413b49b-24dc-46ad-84b4-2d5b9f8ab849">
+                  <text><![CDATA[(A|V)?\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+                </part>
+                <part type="optional" description="1.1" id="b108069d-cf46-4783-becb-3ad15b65b4f4">
+                  <part type="multiple" id="44a5e0d6-828b-4352-8e3a-20cc91b31527">
+                    <part type="single" description="1.1" id="40c20ed1-69c7-4f96-92b3-cad134c1b69b">
+                      <text><![CDATA[\.\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+                    </part>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_fin_skd</id>
+    <description>Henter FIN/SKD</description>
+    <expression>
+      <part type="named" name="tag_fin_skd" id="21576261-0990-41af-8702-ec8463cba8fb">
+        <part type="named" name="stname" id="325b6a5b-2264-4894-9828-41feb3f47219">
+          <part type="single" description="1.1" id="cc5231f0-e57c-4be1-a7e0-75f892f95ee1">
+            <text><![CDATA[(S|s)(K|k)(D|d)|FIN]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="a2de188b-6ec2-4718-bbd8-7682cb3c3fe6">
+          <text><![CDATA[(\.)?(\s+)?(nr(\.)?)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="stnr" id="faa3e460-2e56-461b-9007-f361e743dc55">
+          <part type="single" description="1.1" id="a8dbf437-a50a-498f-86d7-3b8cbe5a0a0c">
+            <text><![CDATA[\d+(\/\d+)?|\d+\.\d+\.\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_etisk_rad</id>
+    <description>Henter etisk råd</description>
+    <expression>
+      <part type="named" name="tag_etisk_rad" id="558cc3fc-bfba-4030-9139-19e15e667eab">
+        <part type="named" name="stname" id="3bdef998-d6b2-4826-a9d6-bfe432ad44ae">
+          <part type="single" description="1.1" id="b5246ba5-fb38-493a-a391-59905131df23">
+            <text><![CDATA[ER]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="e06e92d0-f9ef-49bd-8867-0da881ab1533">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr" id="ddfdd816-e2de-4c56-9020-33347dfbc241">
+          <part type="single" description="1.1" id="e5980f02-62b2-4f8b-ad60-a5d7958a6ca1">
+            <text><![CDATA[\d\d\d\d\/\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_rettstidene</id>
+    <description>Henter RT</description>
+    <expression>
+      <part type="named" name="tag_rettstidene" id="6a1305a6-f9dd-4a4d-b560-668fe394005e">
+        <part type="named" name="stname" id="c228f4ee-df53-4733-aa91-0167ab034fd6">
+          <part type="single" description="1.1" id="9f1dbd19-4319-4821-beb5-e44601d35cd0">
+            <text><![CDATA[(r|R)(t|T)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1">
+          <text><![CDATA[\.]]></text>
+        </part>
+        <part type="optional" description="1.1" id="6ea3a25c-8c52-4fa3-ac63-5571027354c5">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr1" id="ab1341fc-8955-41b8-bef3-56106e45e7a1">
+          <part type="single" description="1.1" id="d0e79928-aa39-4556-8b8e-d0416169ff0c">
+            <text><![CDATA[\d\d\d\d]]></text>
+          </part>
+        </part>
+        <part type="or" id="40205c70-57d3-4e72-9a04-85b503a12e0e">
+          <part type="single" description="1.1" id="809f8275-b077-4909-890a-52f538dd7ce2">
+            <text><![CDATA[\/]]></text>
+          </part>
+          <part type="single" description="1.1" id="e0df2c94-14a5-4537-8f28-ee353fbd0ff5">
+            <text><![CDATA[(\s+)(s\.|side)(\s+)]]></text>
+          </part>
+        </part>
+        <part type="named" name="stnr2" id="254e43de-7e56-4f85-ad80-63aaab864990">
+          <part type="single" description="1.1" id="4f94c8b9-7dec-4337-a030-67c7507912d0">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_rettens_gang</id>
+    <description>Henter RT</description>
+    <expression>
+      <part type="named" name="tag_rettens_gang" id="9f7466da-30bb-45e3-81b3-f9dc4f1af032">
+        <part type="named" name="stname" id="c4df4875-7537-4f0b-84a8-c3accb7e8365">
+          <part type="single" description="1.1" id="a83f0fc1-5464-4998-9799-0b87432e4a21">
+            <text><![CDATA[RG]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="53bf5142-338a-4bd4-b546-a9b2c7356172">
+          <text><![CDATA[\.]]></text>
+        </part>
+        <part type="optional" description="1.1" id="53bf5142-338a-4bd4-b546-a9b2c7356172">
+          <text><![CDATA[\s+|\-]]></text>
+        </part>
+        <part type="named" name="stnr1" id="ca4a8b0c-fdd0-419c-8b3e-8e4c5fae917c">
+          <part type="single" description="1.1" id="03517422-ea1a-4dc6-b07d-66912b071e74">
+            <text><![CDATA[\d\d\d\d]]></text>
+          </part>
+        </part>
+        <part type="or" id="5a9ca422-b956-4ae9-8982-6888d3661a50">
+          <part type="single" description="1.1" id="0d629e85-8f2e-43ec-abec-521378502798">
+            <text><![CDATA[\/]]></text>
+          </part>
+          <part type="single" description="1.1" id="cfc8d5c4-23af-4abe-a3f2-dd43aa0c1d5a">
+            <text><![CDATA[\-]]></text>
+          </part>
+          <part type="single" description="1.1" id="cfc8d5c4-23af-4abe-a3f2-dd43aa0c1d5a">
+            <text><![CDATA[\s+(side|s\.)\s+]]></text>
+          </part>
+        </part>
+        <part type="named" name="stnr2" id="c76c7ea1-435d-469d-ab90-137891a81bd0">
+          <part type="single" description="1.1" id="3592461c-bb45-4194-b71f-cc3230d0442a">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_dommer</id>
+    <description>Henter dommer</description>
+    <expression>
+      <part type="named" name="tag_dommer" id="f1605826-fbe9-4278-a700-d604d631ae91">
+        <part type="named" name="stname" id="d4c311dd-681a-4e13-ab18-5b34c1e6993e">
+          <part type="single" description="1.1" id="5247d1cc-c5f0-4c13-b19b-beecdac71181">
+            <text><![CDATA[(HRD|LB|LF|LA|LE|LH|LG)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="535680d7-29b3-4fb8-90b1-52ee77afb90e">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr" id="d400191f-255f-45ea-a95b-87d1755e8d25">
+          <part type="single" description="1.1" id="02054451-1a88-44f9-90cc-edfd9ba3d550">
+            <text><![CDATA[\d\d\d\d\-\d+(\-[A-Z])?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_oslobors1</id>
+    <description>Henter oslo børs</description>
+    <expression>
+      <part type="named" name="tag_oslobors1" id="650715b0-44a7-4896-90cd-eb1510e6fed0">
+        <part type="named" name="stname" id="d07ad2fe-1e1f-466c-9291-9e7dd466deb3">
+          <part type="single" description="1.1" id="56ef32d3-a136-4a67-80fc-38f04526ae58">
+            <text><![CDATA[(OBS|(B|b)ørssirkulær(e)?|Sirkulære fra Oslo Børs)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="e9f8f883-a534-44e8-bfd9-26fb7032abdd">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr" id="cb1f4036-6f32-40c0-9c47-a593a0da4dba">
+          <part type="single" description="1.1" id="c93c893e-3c13-4c6e-847f-1f12d944bfa1">
+            <text><![CDATA[\d+\/\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_oslobors2</id>
+    <description>Henter oslo børs</description>
+    <expression>
+      <part type="named" name="tag_oslobors2" id="9f3073a6-0609-4400-afe5-e1d0caefc3c8">
+        <part type="named" name="stname" id="d4ca5464-843f-409c-a925-ece6c915f812">
+          <part type="single" description="1.1" id="020fa326-7bb8-4352-bc5a-37e8b044b335">
+            <text><![CDATA[OB]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="96dc7cd4-b6b1-4628-bdb4-3e4226a6c8b8">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr" id="e31e278d-a46a-41f9-bf5f-635b7dfc4f7c">
+          <part type="single" description="1.1" id="43fa59b2-94a3-420d-87c1-3b398ad2034c">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_gbs</id>
+    <description>Henter godbokføringskikk</description>
+    <expression>
+      <part type="named" name="tag_gbs" id="a6d7e9ea-83c6-43b4-939c-bfd411b35177">
+        <part type="named" name="stname" id="7a7ca3d2-ad59-4814-a525-5ecc81a31767">
+          <part type="single" description="1.1" id="b45fbc19-b307-4202-827e-38714151caf0">
+            <text><![CDATA[(GBS|GRFS)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="83f7cea6-eb11-4750-bf7b-dc18506a6c0c">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr" id="41bc4ad8-7da0-45de-9550-c4ec8f89e2e9">
+          <part type="single" description="1.1" id="573e13c0-027a-4a93-9c8b-f1e3f0e0135f">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_urevf</id>
+    <description>Henter uttalelser fra Revisorforeningen</description>
+    <expression>
+      <part type="named" name="tag_urevf" id="e8f04ab1-1ac0-4582-8772-b894a21002ce">
+        <part type="named" name="stname" id="e0ce62f2-bd1a-4300-ad6c-4e0d69c96ccc">
+          <part type="single" description="1.1" id="0afffcef-3c5f-45ad-806e-748db05457be">
+            <text><![CDATA[D(N|n)R(S)?]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1" id="e34018f9-d5d7-4a44-a766-430053ae79b6">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr" id="c3b60be3-ffbe-4d2b-9c9e-a13b406d6332">
+          <part type="single" description="1.1" id="a08bde47-5585-46b6-9593-b6e021a7b6b8">
+            <text><![CDATA[(\d+|\d\d\d\d\-\d+)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>tag_jotun</id>
+    <description>Henter ref til jotun</description>
+    <expression>
+      <part type="named" name="tag_jotun">
+        <part type="named" name="stname">
+          <part type="single">
+            <text><![CDATA[(JAI|JAS)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr">
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="multiple">
+          <part type="container">
+            <part type="or">
+              <part type="single">
+                <text><![CDATA[(\s+)?\,(\s+)?]]></text>
+              </part>
+              <part type="single">
+                <text><![CDATA[\.]]></text>
+              </part>
+              <part type="single">
+                <text><![CDATA[\s+og\s+]]></text>
+              </part>
+              <part type="single">
+                <text><![CDATA[\-]]></text>
+              </part>
+              <part type="single">
+                <text><![CDATA[\s]]></text>
+              </part>
+            </part>
+            <part type="positive lookahead">
+              <part type="single">
+                <text><![CDATA[\d+((\.\d+)+)?]]></text>
+              </part>
+            </part>
+          </part>
+          <part type="container">
+            <part type="named" name="stpara">
+              <part type="single">
+                <text><![CDATA[\d+((\.\d+)+)?]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////
+100 PARACORE START
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+  <regexp type="single">
+    <id>100_month</id>
+    <description>Henter ord for måned</description>
+    <expression>
+      <part type="container" id="d8cad3ab-12c2-4ac3-a794-2d8f7a96bad8">
+        <part type="single" id="d7c49fbf-4d07-4b0a-a043-b73f43fea505">
+          <text><![CDATA[(J|j)anuar|(J|j)an|(F|f)ebruar|(F|f)eb|(M|m)ars|(M|m)ar|(A|a)pril|(A|a)pr|(M|m)ai|(J|j)uni|(J|j)un|(J|j)uli|(J|j)ul|(A|a)ugust|(A|a)ug|(S|s)eptember|(S|s)ep|(O|o)ktober|(O|o)kt|(N|n)ovember|(N|n)ov|(D|d)esember|(D|d)es]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--tallord-->
+  <regexp type="single">
+    <id>100_number_word</id>
+    <description>Henter tallord</description>
+    <expression>
+      <part type="container" id="eb040f0d-e74c-4919-91b4-261aaa766748">
+        <part type="single" description="tallord" id="57714ce6-c3e4-4ba0-a839-5b91cf986369">
+          <text><![CDATA[(F|f)yrste|(F|f)ørste|(A|a)ndre|(A|a)nnet|(T|t)redje|(T|t)reje|(F|f)jerde|(F|f)emte|(S|s)jette|(S|s)juande|(S|s)juende|(S|s)yvende|(Å|å)ttende|(Å|å)ttande|(N|n)iende|(N|n)iande|(T|t)iende|(T|t)iande|(S|s)iste]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_nb_pnumber</id>
+    <description>Sjekker bak om lovlige tegn etter pargrafnummer</description>
+    <expression>
+      <part type="negative lookahead" description="sjekk bak om 1. ledd el lignende" id="47d0b896-aa75-4e38-aef0-a6cf676b685a">
+        <part type="or" id="7e0730cc-5dc9-4b93-8e89-ef07a684351e">
+          <part type="single" description="finnes paranummer" id="f41e1d4b-2f64-414a-a30f-189dd967b36b">
+            <text><![CDATA[\.\d+]]></text>
+          </part>
+          <part type="single" description="finnes paranummer" id="b715d868-e85d-4a50-a9ab-d8c5fb3e730d">
+            <text><![CDATA[(\.)?(\s+)?(L\.|(L|l)edd|(P|p)unktum)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_nf_pnumber</id>
+    <description>Sjekker foran etter ulovlige tegn</description>
+    <expression>
+      <part type="negative lookbehind" id="2bc263a1-1d4a-43a6-ad66-b3122d7dda7d">
+        <part type="or" id="38ac0a41-2d35-4ab5-8255-bc5d1a812f64">
+          <part type="single" description="finnes paranummer" id="951cea08-c732-48bc-be0a-90b053d45207">
+            <text><![CDATA[\d+(\,|\.)(\s+)?]]></text>
+          </part>
+          <part type="single" description="finnes paranummer" id="6a0b9fdb-d1ae-42b3-93c2-30bcd0f9a716">
+            <text><![CDATA[(\s+)(N|n)r(\.)?(\s+)?(\d+)?(\s+)?(\,|og|eller)?(\s+)?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_punkt</id>
+    <description>henter space</description>
+    <expression>
+      <part type="single" description="finnes paranummer" id="69ec91b9-3319-4c35-a035-ca94bbb75623">
+        <text><![CDATA[\.]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_punkt-</id>
+    <description>henter space</description>
+    <expression>
+      <part type="optional" description="finnes paranummer" id="fcbfdf95-07cb-4dcc-a4f2-64119f311183">
+        <text><![CDATA[\.]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_space</id>
+    <description>henter space</description>
+    <expression>
+      <part type="single" description="finnes paranummer" id="792822e8-20fb-4bfc-aba6-e5cb61564129">
+        <text><![CDATA[\s+]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_space-</id>
+    <description>henter space</description>
+    <expression>
+      <part type="single" description="finnes paranummer" id="f9fc993a-844d-4678-90a7-54ad93629607">
+        <text><![CDATA[(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_number</id>
+    <description>henter nummer</description>
+    <expression>
+      <part type="single" description="finnes paranummer" id="5de2f74d-28d5-4f7a-a10f-fa7a7c182889">
+        <text><![CDATA[\d+]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_number_roman</id>
+    <description>Henter romertall</description>
+    <expression>
+      <part type="or" id="920ba17e-6f5c-4c65-a2ca-cca6dc032fb9">
+        <part type="single" id="13ff3b24-42fc-4a72-bba9-be6f46b128e8">
+          <text><![CDATA[ii|iii|iv|v|vi|vii|viii|ix|x|xii|xiii|xiv|xv|xvi|xvii|xviii|xix|xx|I|II|III|IV|V|VI|VII|VIII|IX|X|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX]]></text>
+        </part>
+        <part type="chain" id="e049281c-720c-434a-bdde-db7f7a7ce50a">
+          <part type="single" description="nummer kjede" id="71721d79-c6b5-42de-a2fc-4d047a0a4133">
+            <text><![CDATA[[i]]]></text>
+          </part>
+          <part type="negative lookahead" id="52d74fd9-53cc-49d7-b82c-4d0b14dbb581">
+            <part type="single" description="nummer kjede" id="d9aed4e7-f419-4aea-85ed-dc0d1416231a">
+              <text><![CDATA[\s+]]></text>
+            </part>
+            <part type="single" description="nummer kjede" id="00aef78e-3445-4040-98ad-91c41cd29613">
+              <text><![CDATA[([^\s])?(\s+)?(forskrift|lov|regelen|denne|visse|inntekt)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="positive lookahead" description="sjekk bak om 1. ledd el lignende" id="7c0e8b17-2084-44ee-93cd-66d4cd26d836">
+        <part type="single" description="finnes paranummer" id="a22f3e24-eb66-49eb-9274-af44fc3b3da9">
+          <text><![CDATA[(\s|\.|\,|\:|\;|$|\)|\))]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_one_word</id>
+    <description>Sjekker foran etter ulovlige tegn</description>
+    <expression>
+      <part type="single" description="finnes paranummer" id="ff86ba0d-fd3a-4e30-8c77-aaf7fa10f1d7">
+        <text><![CDATA[[a-zæøåA-ZÆØÅ]{2,}]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>100_pnumber_single_letter</id>
+    <description>Sjekker bokstav etter paramummer</description>
+    <expression>
+      <part type="optional" description="finnes bokstav i paranummer" id="d86b223e-ba54-4894-9fd6-f73e45e18234">
+        <part type="named" name="pnsingleletter" id="1ac0e8b9-5d8a-43fb-a90c-7e10a4919b1a">
+          <part type="container" id="0d0fcfdf-9b88-41f5-a4c3-a05f3261734c">
+            <part type="or" id="45c63bca-ccdd-41a7-a5b7-ef6dacc264aa">
+              <part type="container" id="e0430b9e-6be0-4e91-9906-b9aa3d862bcf">
+                <part type="positive lookbehind" id="e834c1a0-dc0e-49a9-8c7a-d2804bba42ac">
+                  <part type="regexp" name="100_number" id="38368622-fb62-45e9-bfd9-6e672a8e06cb" />
+                </part>
+                <part type="regexp" name="100_space" id="bd4ff024-aad0-4d76-aaf8-33033eac1d28" />
+                <part type="single" description="finnes paranummer" id="00757529-729b-46cf-9ec5-86025b30d275">
+                  <text><![CDATA[[a-hj-zæøåA-ZÆØÅ]]]></text>
+                </part>
+                <part type="negative lookahead" description="sjekk bak om 1. ledd el lignende" id="d47e17fe-745d-46c0-a525-cfa5091ea881">
+                  <part type="regexp" name="100_space" id="4be591fd-8432-4e1d-bec2-49f7ce995128" />
+                  <part type="single" id="48def3cf-594d-4bb0-8879-c7420c5cd5b0">
+                    <text><![CDATA[(og|til|eller|\,)]]></text>
+                  </part>
+                  <part type="regexp" name="100_space" id="a263b6d4-92d1-4eb2-99ee-5723f50a8fc7" />
+                  <part type="single" description="finnes paranummer" id="dd37e284-da5c-47c1-b92f-58e84e9214a4">
+                    <text><![CDATA[[a-hj-zæøåA-ZÆØÅ]]]></text>
+                  </part>
+                  <part type="regexp" name="100_space" id="51c2301d-a29c-465a-bfd2-58a9f51dcabe" />
+                </part>
+                <part type="positive lookahead" description="sjekk bak om 1. ledd el lignende" id="124ca375-e606-43b4-a5d6-55641aa46909">
+                  <part type="regexp" name="100_space" id="952c608a-501a-45f0-acaf-acf40b819514" />
+                  <part type="regexp" name="100_one_word" id="fa3db99f-e8e7-4ad5-8e39-43115b25d2a5" />
+                </part>
+              </part>
+              <part type="container" id="692a16da-c43a-4ec3-8210-84bb40463583">
+                <part type="positive lookbehind" id="0917070b-2aed-4c5e-99d7-3f6136115083">
+                  <part type="regexp" name="100_number" id="c37bc95e-e320-4e63-8193-dccbafa2ec1c" />
+                </part>
+                <part type="regexp" name="100_space" id="393f97f5-8ca2-4c18-8543-cbfbc4adc281" />
+                <part type="single" description="finnes paranummer" id="5f3170c0-9494-4330-9ee9-4a16ab6cec93">
+                  <text><![CDATA[[i]]]></text>
+                </part>
+                <part type="negative lookahead" id="4037685e-7f7e-47db-962a-b200bc1ed884">
+                  <part type="single" description="nummer kjede" id="3f3a3bfe-89f4-4fe7-86f8-74645d874a02">
+                    <text><![CDATA[\s+]]></text>
+                  </part>
+                  <part type="single" description="nummer kjede" id="d8fcdf24-5b12-4a0e-97f9-f0e0b93faad2">
+                    <text><![CDATA[([^\s]+)?(\s+)?(forskrift|lov|regelen|denne|visse|inntekt|[a-zæøå]+((l|f)\.))]]></text>
+                  </part>
+                </part>
+              </part>
+              <part type="container" id="ba661909-876f-42f2-90a6-d98681958e48">
+                <part type="positive lookbehind" id="4e5dfa1c-9683-49c0-9ee8-3cfa71d5bb97">
+                  <part type="regexp" name="100_number" id="e3ec5c05-d7b0-46ee-baa9-8074c0e0672f" />
+                </part>
+                <part type="single" description="finnes paranummer" id="42a8c045-919f-4bdc-8dfa-c84b4f2f3f1e">
+                  <text><![CDATA[[a-zæøåA-ZÆØÅ]]]></text>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>100_para_core</id>
+    <description>Henter paragraf number</description>
+    <expression>
+      <part type="named" name="paranr" description="navngitt utrykk for paragrafnummer" id="f28a59ba-5313-47d1-810c-c8709c0f7cb7">
+        <part type="container" description="henter første siffer i paragrafnummer" id="175a2190-e869-4d2f-8dd9-aba793a99ae5">
+          <part type="regexp" name="100_nf_pnumber" id="2d21e3b7-063a-4003-a151-5b52c3e28788" />
+          <part type="single" description="henter nummer" id="8865dffa-2e28-4d42-8feb-a614a391374c">
+            <text><![CDATA[(\d+)]]></text>
+          </part>
+          <part type="regexp" name="100_nb_pnumber" id="dbb577a4-fba4-4e24-ade8-2b46c1be86b9" />
+        </part>
+        <part type="regexp" name="100_pnumber_single_letter" id="681b8a52-303e-4950-b485-a04639978c15" />
+        <part type="optional" id="2fd32ec8-e9ce-4a82-9489-f2b804de70fa">
+          <part type="multiple" id="f0806022-3368-4478-99ac-1733bde2e7c8">
+            <part type="container" id="62ce6b1e-562e-4378-97f9-633f425e2fd8">
+              <part type="single" description="finnes paranummer" id="f8267cca-22a2-41a3-8c41-4ba3aa452b2a">
+                <text><![CDATA[(\-)(\d+)]]></text>
+              </part>
+              <part type="regexp" name="100_nb_pnumber" id="c57112ed-f5ca-450d-a3ef-d5f5a52f22c9" />
+            </part>
+            <part type="regexp" name="100_pnumber_single_letter" id="73c539f4-1afa-4ad2-ae9a-fa348da52ada" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>100_split</id>
+    <description>henter bindeord mellom ledd</description>
+    <expression>
+      <part type="or" id="876c2e41-57c9-4ed6-88f2-657f48e4d9eb">
+        <part type="container" id="e4af3e04-e0ae-4961-b29e-849a45de1f57">
+          <part type="regexp" name="100_space" id="2aa5edd9-fc5b-42ce-ad32-b9d69a397cba" />
+          <part type="named" name="split" id="e463e7c2-d0d7-4147-aa4a-0962f958cdb2">
+            <part type="single" description="nummer kjede" id="5c436d27-cfc3-4ab5-87f6-a48fac6667b5">
+              <text><![CDATA[til\s+og\s+med|til|eller|samt|og|se(\s+også)|(J|j)f([r])?(\.)?]]></text>
+            </part>
+          </part>
+          <part type="regexp" name="100_space" id="f64c6c5a-76c3-4075-810a-38a406fa681a" />
+        </part>
+        <part type="container" id="bcd7138c-29dc-4f05-8cd1-0d353779e16e">
+          <part type="regexp" name="100_space-" id="3dadcab6-a116-48dc-913c-7872dfc454a4" />
+          <part type="named" name="split" id="4fcba780-0057-4222-a48c-fcc60de4ef99">
+            <part type="single" description="nummer kjede" id="0c18f27e-9837-469c-99fb-1574db753714">
+              <text><![CDATA[\,]]></text>
+            </part>
+          </part>
+          <part type="regexp" name="100_space-" id="a4996f88-f9d0-4289-a208-42a11bfd067a" />
+        </part>
+        <part type="container" id="cfa7f216-955a-430e-b8ec-0743e5110ef2">
+          <part type="single" description="nummer kjede" id="b25e98f3-ab73-48d1-b6cb-12603b2aace5">
+            <text><![CDATA[\s+]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="optional" description="nummer kjede" id="c9aa441b-c6e0-4925-b168-9b4c29db032d">
+        <text><![CDATA[(J|j)f([r])?(\.)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>100_ledd_chain</id>
+    <description>Henter ledd</description>
+    <expression>
+      <part type="or" id="397ea366-3022-47c7-8ee8-ed9b58e0873d">
+        <part type="multiple" id="bae964ab-ecbd-491c-85f1-cd09af21ef9e">
+          <part type="regexp" name="100_split" id="3685bd3f-22ef-4c39-91c7-558eb8ed5ec9" />
+          <part type="named" name="leddnumber" id="7179eccb-d7c8-47c3-8305-7a9acac81824">
+            <part type="regexp" name="100_number_word" id="e504758f-acb1-4b89-9ebe-026d65af691a" />
+          </part>
+          <part type="single" description="nummer kjede" id="cd9ad4d8-8016-4502-8560-905f94f215d8">
+            <text><![CDATA[\s+(L|l)edd]]></text>
+          </part>
+        </part>
+        <part type="multiple" id="5dbe6b40-c20f-48da-a97a-587a87a97982">
+          <part type="regexp" name="100_split" id="e5b12444-030f-49b6-b533-1561ea88ee04" />
+          <part type="named" name="leddnumber" id="f069e43d-bce5-4bdd-9bd7-8770c7872bcf">
+            <part type="regexp" name="100_number" id="3c6a4df9-edab-4832-8604-220f4e5727f7" />
+          </part>
+          <part type="single" id="90ff57b4-cb15-42eb-9b52-dc550c2d014d">
+            <text><![CDATA[(\.)?(\s+)?(L|l)(\.)?(edd)?]]></text>
+          </part>
+        </part>
+        <part type="multiple" id="6bdc2e0e-a238-48aa-a313-9de029b9122b">
+          <part type="regexp" name="100_split" id="9c3fe74a-ceb1-46f0-bc59-e9578c730357" />
+          <part type="named" name="leddnumber" id="93c4248d-5eb4-43c4-b71e-38170a28e5a5">
+            <part type="regexp" name="100_number" id="d663f94c-3ec4-43ce-b903-47f72f7b7e70" />
+            <part type="single" id="2c116c3f-075b-414d-9c48-2345b3b09b6f">
+              <text><![CDATA[(\.)?(\s+)?L\.]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="multiple" id="45765efb-2e23-4b6c-ac78-07374c49865e">
+          <part type="regexp" name="100_split" id="2007c922-b8f9-4b72-b574-66abe78aa45f" />
+          <part type="single" id="165a0eb7-417f-4ba0-a5bf-afdd48872f2d">
+            <text><![CDATA[\(]]></text>
+          </part>
+          <part type="named" name="leddnumber" id="54d0474f-ebb2-4f2e-ba6e-adcdaedd2725">
+            <part type="regexp" name="100_number" id="dac5121c-92bb-420b-b1e7-18614f8522e0" />
+          </part>
+          <part type="single" id="4d4101bb-f5d4-4b00-a282-88a7d61e98bd">
+            <text><![CDATA[\)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>100_number_chain</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="or" id="0a6e7101-6be5-45ed-8753-1676c92c06d9">
+        <part type="container" description="number_chain_simple" id="283eb43d-f970-4d4c-b1f8-9d5465254cd3">
+          <part type="multiple" id="6d699227-7e0d-4cfe-92b9-be5298c74952">
+            <part type="regexp" name="100_split" id="e3abdbc4-17fa-4f6a-a349-f390c798cce8" />
+            <part type="named" name="pktnumber" id="d77bd148-affe-458f-9780-ce96babdcd3c">
+              <part type="regexp" name="100_number" id="8a869fd5-cc76-4cd0-bf4f-48c7a52e05d1" />
+            </part>
+            <part type="negative lookahead">
+              <part type="single">
+                <text><![CDATA[-]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="container" description="number_chain_number" id="b084f9ef-ca80-466a-ac22-89ca941e20bb">
+          <part type="multiple" id="c3e53b30-00ad-4d86-af85-10a44f293260">
+            <part type="regexp" name="100_split" id="6ac7be00-e866-4ed6-be60-33ff06e87098" />
+            <part type="single" id="361009a7-8c3d-49ab-9dd7-1585d49aaaca">
+              <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+            </part>
+            <part type="named" name="pktnumber" id="ae2f90ad-f964-4b52-886c-4361ea54b403">
+              <part type="regexp" name="100_number" id="e7e8b84f-e3dd-459f-98f5-434ab1d657d0" />
+            </part>
+            <part type="negative lookahead">
+              <part type="single">
+                <text><![CDATA[-]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="container" description="number_chain_roman" id="b6ba5c58-169b-4e72-b66a-4e3713c0894d">
+          <part type="multiple" id="a65ddcfa-7f5d-44bb-bed1-021481211a44">
+            <part type="regexp" name="100_split" id="f26b6e71-0b43-487e-bcc2-4bfe73f254c8" />
+            <part type="single" id="1f1384a0-5a09-4c97-94f7-30fe65e5fd40">
+              <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+            </part>
+            <part type="named" name="pktnumber" id="aaa8178f-d6c1-4d88-965c-d7b037944d87">
+              <part type="regexp" name="100_number_roman" id="0a31f28e-820a-45a3-8f21-19194b638ac1" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_one_letter</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="container" id="73f8a070-4c78-4484-97e9-2d4d8b729a4e">
+        <part type="single" description="En bokstav" id="c3273a28-da2c-4cec-8526-12c05b560899">
+          <text><![CDATA[[a-zæøåA-ZÆØÅ]]]></text>
+        </part>
+        <part type="positive lookahead" description="sjekk bak om 1. ledd el lignende" id="a336e3c6-daed-4157-88cd-a2b8319c00e7">
+          <part type="single" description="finnes paranummer" id="4b1e7b18-64db-4ea9-8b91-ab21299e4a75">
+            <text><![CDATA[(\s|\.|\,|\:|\;|$|\)|\))]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_lower_letter</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or" description="nummer kjede" id="e2ea4234-542e-430f-9f09-40bb6e4bb608">
+        <part type="chain" id="805c297d-bd81-47ef-ba3e-218b24f3afec">
+          <part type="single" description="nummer kjede" id="eeb72f01-e28b-42e3-a767-c4fce0b5730a">
+            <text><![CDATA[[a-hj-zæøå]]]></text>
+          </part>
+          <part type="negative lookahead" id="9d1ca3e8-3a84-44ed-ad91-5f2394cef97d">
+            <part type="or" id="45b49f83-d0cd-4825-9c31-901482fc0ea3">
+              <part type="single" description="nummer kjede" id="85bee82c-78db-4569-a063-2fd28fe736bd">
+                <text><![CDATA[[a-zæøå]+]]></text>
+              </part>
+              <part type="single" description="nummer kjede" id="2f1bd7f7-a2da-4cdd-a8ec-1447999ec44a">
+                <text><![CDATA[\s+påvise]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="chain" id="9d66809c-6062-4b09-a0fb-e85bb38af23c">
+          <part type="negative lookbehind" id="146a8c56-4525-41f7-8185-8c1c00c36f0c">
+            <part type="single" description="nummer kjede" id="d643b0fe-cabd-479a-a472-32475ac2fa0d">
+              <text><![CDATA[\d+(\s+)?(\,)(\s+)?]]></text>
+            </part>
+          </part>
+          <part type="single" description="nummer kjede" id="5604a38c-f897-4119-aef7-d97c0338eb1b">
+            <text><![CDATA[[i]]]></text>
+          </part>
+          <part type="negative lookahead" id="88801c4b-123b-47b4-9548-df07c3514c7c">
+            <part type="single" description="nummer kjede" id="33d1bebf-bb4c-4206-8a55-ee26a3d5db86">
+              <text><![CDATA[\s+]]></text>
+            </part>
+            <part type="single" description="nummer kjede" id="5429e0d1-c632-470b-8ac6-3d2d6e4c151e">
+              <text><![CDATA[([^\s]+)?(\s+)?(forskrift|lov|regelen|denne|visse|inntekt|[a-zæøå]+((l|f)\.))]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_upper_letter</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="single" description="nummer kjede" id="2f3bd29b-c30b-4336-a242-3d93f66ca062">
+        <text><![CDATA[[A-ZÆØÅ]]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>100_letter_chain</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or" id="50ead6e8-a4c2-49d5-8329-bda444c5678c">
+        <part type="multiple" id="50f1138f-8f2b-4d3a-872b-5188baffa6ad">
+          <part type="regexp" name="100_split" id="1a720152-6f03-4061-82bf-1ba29b31ea45" />
+          <part type="named" name="letternumber" id="30c086ba-5c56-4252-810d-7d401117a438">
+            <part type="regexp" name="100_lower_letter" id="74a8819f-441b-498f-9397-01f61596a4d9" />
+          </part>
+        </part>
+        <part type="multiple" id="6738413f-efa6-40e1-af5c-f331f34e199b">
+          <part type="regexp" name="100_split" id="17d4d97a-e441-406f-9bd3-6d17f7409758" />
+          <part type="named" name="letternumber" id="a010b62c-0b6c-4c9d-b9fd-b9d4f8d621f0">
+            <part type="regexp" name="100_upper_letter" id="b75802a7-4316-4340-a5c7-fcc96e4c3212" />
+          </part>
+        </part>
+        <part type="multiple" id="dd2db65d-aacf-46e8-a4fc-31ac99b61ed5">
+          <part type="regexp" name="100_split" id="9e51fe8e-db6c-4771-9416-2b4929a29a81" />
+          <part type="optional" id="2bd81a44-625d-4eeb-af70-d68aaed6e06f">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="named" name="letternumber" id="66582f9c-4b2f-482d-ae71-6c965547da23">
+            <part type="regexp" name="100_lower_letter" id="debe660f-24e7-4f59-a47b-791e40ffc58a" />
+          </part>
+        </part>
+        <part type="multiple" id="6434c329-1d3e-4b3d-8dd1-31c0b99750b9">
+          <part type="regexp" name="100_split" id="328396e9-54ca-41da-a921-05e582d5fe6c" />
+          <part type="optional" id="aa76cbc8-076d-4bb0-8e6a-4c0c19e100f9">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="named" name="letternumber" id="b7f2c22d-b883-4bcc-98dd-c842d109a80c">
+            <part type="regexp" name="100_upper_letter" id="370a853f-1999-45f1-b44f-0c74bcb36dd8" />
+          </part>
+        </part>
+      </part>
+      <part type="negative lookahead" id="e7e79c0e-07cc-44c6-b0cf-b3a1608aed3b">
+        <part type="single" description="nummer kjede" id="8a536225-705d-4680-8da8-0c85d7d6bb45">
+          <text><![CDATA[[a-zæøåA-ZÆØÅ0-9]]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>100_punktum_chain</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="or" id="5c51229f-912e-4289-b7d2-9ce7aada687d">
+        <part type="container" id="e090b6fe-72ad-4c31-a6bd-857352ea5584">
+          <part type="multiple" id="a8b39219-e03a-4bb2-8e0e-4144d88818e5">
+            <part type="regexp" name="100_split" id="6b288670-6858-4b7f-a2a8-e45d52bfbed9" />
+            <part type="named" name="punumber" id="e5f9b663-5b06-46e9-b07a-366bb60f5b26">
+              <part type="regexp" name="100_number" id="997fdfb6-dd69-4d81-917f-2d3bd8f98c13" />
+            </part>
+            <part type="single" id="1d4a1a7a-c893-4ae1-b132-ea8896beec53">
+              <text><![CDATA[(\.)?(\s+)?((P|p)unktum|pkt(\.)?)]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="container" id="5a88692e-db60-4e8d-afe8-6d470063189c">
+          <part type="multiple" id="00c4a436-7e61-4122-b059-e26564411838">
+            <part type="regexp" name="100_split" id="414e4a4b-6c9b-4294-ae42-1322b3888b07" />
+            <part type="named" name="punumber" id="242c0e34-e78f-41a6-adf7-6ec46db4b889">
+              <part type="regexp" name="100_number_word" id="7a24f492-88b5-4e03-bec7-9fe27cbb7cc8" />
+            </part>
+            <part type="single" description="nummer kjede" id="4c64f122-960e-41c6-9e7a-5cc917a95673">
+              <text><![CDATA[\s+((P|p)unktum|pkt(\.)?)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_comment_bracket_quote</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="single" description="Finne kommentar i kursiv" id="7f18a222-e2a4-475d-836e-8e8ce22adac0">
+        <text><![CDATA[(\s+)?«[^»]+»]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_comment_bracket_normal</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="single" description="Finne kommentar i kursiv" id="bfb4bf57-cb6c-4b0c-9d72-1a2184175351">
+        <text><![CDATA[(\s+)?\([^\)]+\)]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <!--100_kap start-->
+  <regexp type="single">
+    <id>100_title_chapter</id>
+    <description>Henter kapittel tittel</description>
+    <expression>
+      <part type="regexp" name="100_legal_front" />
+      <part type="single" description="nummer kjede" id="45d4ff44-77be-45fb-85d6-6ed7aa53f1eb">
+        <text><![CDATA[(K|k)ap(\.)?(it(t)?el)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_title_part</id>
+    <description>Henter kapittel tittel</description>
+    <expression>
+      <part type="regexp" name="100_legal_front" />
+      <part type="single" description="nummer kjede" id="64858587-04ea-463a-b619-af111a40f29e">
+        <text><![CDATA[(D|d)el]]></text>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>100_chapter</id>
+    <description>Henter kapittel</description>
+    <expression>
+      <part type="optional" id="23ba3d12-8c4d-48b2-9cf3-89654d1b70ec">
+        <part type="named" name="kapnr" id="e3083ce4-fdc2-4b63-a522-831c3d64abf8">
+          <part type="or" id="ec1ae7ae-474b-4369-9aac-29bac9bc356d">
+            <part type="regexp" name="100_number_word" id="5c39d346-b6d3-4028-b6da-15ee0812d4d5" />
+            <part type="regexp" name="100_number" id="4bc4992c-c0cd-4357-8383-e5f283aab160" />
+          </part>
+        </part>
+        <part type="regexp" name="100_punkt-" id="c09ab536-4c87-4f5e-9be0-b9a7d5b89aac" />
+        <part type="regexp" name="100_space" id="4fc800f9-b690-483c-8d5a-7e318a6c7242" />
+      </part>
+      <part type="regexp" name="100_title_chapter" id="0d97347c-dbfa-41d5-85e0-14dace683f40" />
+      <part type="optional" id="ae47f7c0-b368-4a4e-9666-1c5cbcf36ead">
+        <part type="multiple" id="d76a2261-3e6e-4209-9123-5489aac6f93c">
+          <part type="regexp" name="100_split" id="ca32668a-f8bf-49b9-b917-532d470df01f" />
+          <part type="or" id="89b0bed6-2d10-41be-bee4-e32ed7137c4e">
+            <part type="container" id="5e96c2f2-2335-4371-be30-f084e8d22dd7">
+              <part type="named" name="kapnr" id="b3527c54-52fe-4088-bd33-d37bd7d222d8">
+                <part type="or" id="1cd88123-8d69-4b4e-ab08-8433f768c8c4">
+                  <part type="regexp" name="100_number_word" id="fc2e9dd9-6598-4d99-a935-ee5b663b879c" />
+                  <part type="regexp" name="100_number" description="En bokstav" id="5ff839ab-0b1d-4c8a-b6f8-c6ee2c52075a" />
+                </part>
+              </part>
+              <part type="regexp" name="100_punkt-" id="931837e8-cfb6-4fdd-8a2c-feb9ecdab6a5" />
+              <part type="regexp" name="100_space" id="e5dd143f-1eea-4208-a8f1-9fb59c015ccc" />
+              <part type="regexp" name="100_title_chapter" id="ca1f9ce1-a8ad-4aa8-9ba0-5cfbfe1b2ce0" />
+            </part>
+            <part type="container" id="7c47cdf4-6ff4-44bb-8093-75bfdb8ee6d5">
+              <part type="optional" id="4f23b8be-f016-4504-8e1c-acb176b6824f">
+                <part type="regexp" name="100_title_chapter" id="1222a910-eb87-4fc3-9327-f63ff04315d1" />
+                <part type="regexp" name="100_punkt-" id="e294caea-80da-4eb7-b051-0e73fe1340e4" />
+                <part type="regexp" name="100_space" id="3aae2861-8d91-4fb3-8b9e-0b734275309f" />
+              </part>
+              <part type="named" name="kapnr" id="a1780603-a370-4916-bc77-a2c2fd5b8d71">
+                <part type="or" id="410a10fd-1abe-45b4-be0b-afd67add9a50">
+                  <part type="regexp" name="100_number_roman" description="En bokstav" id="f191b63f-83a4-4717-be8b-a1f28ce331f8" />
+                  <part type="regexp" name="100_one_letter" description="En bokstav" id="ed0c0984-0668-45fe-849f-3fdbb9cd83f2" />
+                  <part type="regexp" name="100_number" description="En bokstav" id="0dde5da0-4d81-48f9-a7cc-10d464c18020" />
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>100_part</id>
+    <description>Henter del</description>
+    <expression>
+      <part type="optional" id="215e7cac-c944-4720-b1df-87a8d54b6e60">
+        <part type="named" name="delnr" id="b823e9e8-afa0-449a-81ec-3b7aeb590d53">
+          <part type="or" id="c9a33c43-6604-4cf1-b637-247447a70f90">
+            <part type="regexp" name="100_number_word" id="21d8cb71-da05-4752-94a3-db54007ea811" />
+            <part type="regexp" name="100_number" id="87e2d7fc-f233-48ea-a5b5-ee262021133b" />
+          </part>
+        </part>
+        <part type="regexp" name="100_punkt-" id="081ed8af-58ed-4045-9119-7ad93db7ad7a" />
+        <part type="regexp" name="100_space" id="2d4f1841-4faa-470f-97e2-3e47250b3a02" />
+      </part>
+      <part type="regexp" name="100_title_part" id="a0c1832b-e095-4d56-be8d-7efbf18daf40" />
+      <part type="optional" id="afb891c6-b87b-4d20-9131-fa7ba777961e">
+        <part type="multiple" id="e53508ac-bb4a-4cc9-8581-78fe09dd9ed7">
+          <part type="or" id="c47f403b-6faa-4233-b6ca-2878d8aeecb1">
+            <part type="container" id="f717330d-72cb-4efe-9329-6a6153fa9aed">
+              <part type="regexp" name="100_split" id="dcad1100-55a2-4333-9a76-666d5858a7e4" />
+              <part type="named" name="delnr" id="33b5b2e7-34b2-4dce-b635-b65406c109bb">
+                <part type="or" id="86efb738-07ed-41b5-833c-0503699802c2">
+                  <part type="regexp" name="100_number_word" id="e5c1ee7f-94ed-443e-bce6-d4e56e9e783c" />
+                  <part type="regexp" name="100_number" description="En bokstav" id="a08b16e0-fdbf-4a56-89fc-bc55288065a1" />
+                </part>
+              </part>
+              <part type="regexp" name="100_punkt-" id="209f102a-ef0c-433f-8ccd-79be87e1afbe" />
+              <part type="regexp" name="100_space" id="7313887c-7745-4311-bc70-b642934a541d" />
+              <part type="regexp" name="100_title_part" id="10271fba-0173-4a88-bc96-565a8f45b95d" />
+            </part>
+            <part type="container" id="747811e4-5dd3-4d2d-9467-96307cef9895">
+              <part type="regexp" name="100_split" id="df90a65c-c7e8-426e-9406-4368bd1fbd11" />
+              <part type="optional" id="4bf0bfcb-666f-4cd8-a4a7-ff175bf4d0b5">
+                <part type="regexp" name="100_title_part" id="5237fefb-a018-4394-b99b-4fdfed3e480e" />
+                <part type="regexp" name="100_punkt-" id="9a5a9fa3-fc6d-4489-b43d-c42dd4860741" />
+                <part type="regexp" name="100_space" id="683ebe48-ad38-476c-bfbe-86185329037d" />
+              </part>
+              <part type="named" name="delnr" id="9f274572-6b63-4a7f-9f18-1c1008634ce0">
+                <part type="or" id="eaed7cc6-2767-4d03-bd28-e53603b71eac">
+                  <part type="regexp" name="100_number_roman" description="Romertall" id="cee0a6a6-6bb8-4918-899c-8e1bda1dd84b" />
+                  <part type="regexp" name="100_one_letter" description="bokstav" id="6f6c71df-8a17-4699-88da-4e9c6a1e6f37" />
+                  <part type="regexp" name="100_number" description="Nummer" id="aa6d1968-9cd1-4031-92c2-9c47d8b740d1" />
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--100_kap slutt-->
+  <regexp type="multi">
+    <id>100_para_single</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="named" name="pararef" id="c98ac3ff-06c2-4cdc-a0a7-c32f831024fa">
+        <part type="chain" id="2ec1db49-d25d-486a-9b33-4746179b1d85">
+          <part type="optional" id="6d61e6b5-3ad2-4475-8ad8-0b116d625bc1">
+            <text><![CDATA[§+(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="100_para_core" id="0fa1b172-9769-4d3f-9484-66b9ae936768" />
+          <part type="optional" id="28082504-1c6d-4930-acd2-2c72e4a8a8d3">
+            <part type="multiple" id="fb6546c0-5891-4dfe-a2bf-caf24ab55df1">
+              <part type="or" id="d3c6306e-341e-4fad-bc13-755e5a13114d">
+                <part type="regexp" name="100_ledd_chain" id="6de9432a-9b8c-4adc-b647-82f22debe90c" />
+                <part type="regexp" name="100_number_chain" id="cfeacea8-e6ed-48a0-814f-3aece5c76a4d" />
+                <part type="regexp" name="100_letter_chain" id="c801cdcb-ed60-45ee-8e6d-178e4c2e1e35" />
+                <part type="regexp" name="100_punktum_chain" id="033d88d0-1491-4869-a3dc-da6ec5e751af" />
+                <part type="regexp" name="100_comment_bracket_quote" id="1667c044-a26f-4848-a3cc-94185f69bae7" />
+                <part type="regexp" name="100_comment_bracket_normal" id="a2ea0fb8-4c9d-4e93-b96d-1173a7a2254f" />
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>100_single_expression</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="named" name="lovrefs" id="b2cd8015-ce8c-4a25-9d37-39e1f8570f06">
+        <part type="or" id="9964a07d-6a8c-40c7-83c9-8e1ec9884dc6">
+          <part type="regexp" name="100_chapter" id="128dc52c-109f-434d-8c7f-4cbe7015ad3b" />
+          <part type="regexp" name="100_part" id="a6025160-116e-4486-82dc-8a6a5a43a1a2" />
+          <part type="regexp" name="100_para_single" id="62187777-f995-4b4e-a373-c023b731d4ba" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>100_split_para</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="named" name="split_para" id="1bdb8787-2502-4202-83db-c7d90ef0319b">
+        <part type="or" description="Finn og, til, eller, samt og se etter uttykk med pararef" id="4b591d67-f838-4b6d-97fa-f9a8584c5c03">
+          <part type="single" description="or" id="ea3a6fb6-8ee7-40c7-aff8-c387ca192c0e">
+            <text><![CDATA[(\s+)?og\s+overgangsregel\s+til\s+]]></text>
+          </part>
+          <part type="single" description="or" id="c9356808-4a4e-45e3-889f-2a65eb0b0552">
+            <text><![CDATA[(\s+)?kombinert\s+med\s+]]></text>
+          </part>
+          <part type="single" description="or" id="f6831349-975e-470d-b831-f1f82c74c3e4">
+            <text><![CDATA[(\s+)?flg\s+]]></text>
+          </part>
+          <part type="single" description="or" id="c3e7437c-dfdf-48a7-b43b-0c64eb3ed472">
+            <text><![CDATA[(\s+)?flg\.\s+]]></text>
+          </part>
+          <part type="single" description="or" id="a034d26f-d341-4044-adef-0b2cba4d1005">
+            <text><![CDATA[(\s+)?og\s+]]></text>
+          </part>
+          <part type="single" description="or" id="44a1c6fc-97e6-4f7e-ae34-82642b12597e">
+            <text><![CDATA[(\s+)?(om\s+([^\s]*))?eller\s+]]></text>
+          </part>
+          <part type="single" description="or" id="1a71675d-724b-48fe-99e3-dd5c4b56209d">
+            <text><![CDATA[(\s+)?og\s+i\s+enten\s+]]></text>
+          </part>
+          <part type="single" description="or" id="ccd3e2c3-4695-4696-85bf-b456f08c9778">
+            <text><![CDATA[(\s+)?og\s+enten\s+]]></text>
+          </part>
+          <part type="single" description="or" id="5c3c4c90-2725-44ad-81b5-0a37ffcad12a">
+            <text><![CDATA[(\s+)?til(\s+og\s+med)?\s+]]></text>
+          </part>
+          <part type="single" description="or" id="08cec630-2213-4e38-8f4a-d9a45b6fc47c">
+            <text><![CDATA[(\s+)?(\,)?(\s+)?samt\s+]]></text>
+          </part>
+          <part type="single" description="or" id="1b183f0a-4de1-4790-b8c8-5d215b0a423f">
+            <text><![CDATA[(\s+)?se\s+]]></text>
+          </part>
+          <part type="single" description="or" id="de63e8e6-b528-4a3e-bdfb-797ecd8465d7">
+            <text><![CDATA[(\s+)?((\,)?(\s+)?((((J|j)f(r)?)(\.\s+|\s+)))?)(samme\s+lov(s)?)?(?!((F|L)\.\s+\d))]]></text>
+          </part>
+          <part type="single" description="or" id="a0e5691c-3caf-448d-99cc-0176d2c5a50c">
+            <text><![CDATA[(\s+)?\.(\s+)?(Unntak(\:)?)(\s+)?]]></text>
+          </part>
+          <part type="single" description="or" id="bd49ea65-1b93-4877-a410-b406d89cac7f">
+            <text><![CDATA[(\s+)?\/(\s+)?]]></text>
+          </part>
+          <part type="single" description="or" id="d623c804-8200-4d90-8328-5a216baf6d0a">
+            <text><![CDATA[\s+]]></text>
+          </part>
+          <part type="single" description="or" id="93a51dc2-3478-4d83-b8f5-bbfa76ae7a6d">
+            <text><![CDATA[(\s+(og))(?=§)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>100_paratotal</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="regexp" name="100_single_expression" id="5d804d52-243c-4e4d-80cf-26108df049b6" />
+      <part type="optional" id="661f9ae2-4a8f-4dfc-bd4f-025fe091cbc5">
+        <part type="multiple" id="2692f5cb-6f38-4644-b4c3-a0ccc5e543bc">
+          <part type="regexp" name="100_split_para" id="cbcc3c5f-6f55-494e-b0ef-d8e1e8bfa288" />
+          <part type="regexp" name="100_single_expression" id="efc8552d-4675-4126-983a-9d6d2e479a10" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////
+100 PARACORE END
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+  <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////
+100_TOTAL_START
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+  <regexp type="multi">
+    <id>100_total</id>
+    <description>Henter token + source paragraf referanse</description>
+    <expression>
+      <part type="positive lookbehind" description="sjekker lovlige tegn foran" id="483aeb1e-b0ee-4159-98f7-a54ced313049">
+        <part type="single" description="lovlige tegn" id="ffc44735-260a-4325-a89d-56eca677ca2f">
+          <text><![CDATA[^|\s|\(|\.|\,|\:|\/|\"]]></text>
+        </part>
+      </part>
+      <part type="or" id="73cba344-1d58-4580-a6cc-450d9df4b430">
+        <part type="named" name="source_para" level="1" id="a45cf212-e5ed-47ae-ba89-ba1ab11e53f0">
+          <part type="optional" id="328bf8c7-0abe-45e6-a138-82c6a52ffe98">
+            <part type="named" name="lov_before" id="903127ea-e1b6-48a3-b446-3c9fb81faab0">
+              <part type="or" id="7a3fa58f-b1c1-4b9d-98e9-4c4f2f6f62b3">
+                <part type="container" id="df10dd69-1098-42a0-ae79-cec2646292da">
+                  <part type="named" name="source_name" id="65399d7f-4f55-418e-a5d5-b3ac7ecb3663">
+                    <part type="regexp" name="idsources" id="15f2a295-5546-4028-a253-1a95ab676e41" />
+                  </part>
+                  <part type="optional" id="5aae0499-4d61-4abe-9264-e48fae6082bf">
+                    <part type="positive lookbehind" description="sjekker lovlige tegn foran" id="2246ffba-cae4-4013-be7f-6aef98ca8b41">
+                      <part type="single" description="lovlige tegn" id="b99f4ff7-0319-4423-a347-53212567f844">
+                        <text><![CDATA[loven|forskriften|reglen(e)?]]></text>
+                      </part>
+                    </part>
+                    <part type="single" description="mellomrom" id="7b318deb-43c8-48d3-8e88-ba05cd6b6c05">
+                      <text><![CDATA[s]]></text>
+                    </part>
+                  </part>
+                  <part type="optional" id="86d4dadf-f79d-4cea-95a9-1ae9b329e4be">
+                    <part type="single" description="mellomrom" id="9925259e-5e98-41a9-a1fc-9e1dcf9a7a2a">
+                      <text><![CDATA[\s+(har\s+i|etter|i)]]></text>
+                    </part>
+                  </part>
+                </part>
+                <part type="regexp" name="mlovdate" id="d86dc109-b21e-4405-ad66-787427fbbcbc" />
+                <part type="regexp" name="mlovom" id="1f62b503-8bd6-4604-8c9e-4d66d0099b4a" />
+                <part type="regexp" name="nxlovname" id="bb5fe5df-2f01-443b-b046-ce988c776332" />
+                <part type="regexp" name="nxforname" id="1461f8e0-308d-45f9-bcd8-3b009e566f69" />
+                <part type="regexp" name="dennesammelov" id="63c0b39f-3811-4cc1-ac34-e9a91155a0ea" />
+                <part type="regexp" name="dennesammefor" id="2f411819-c51b-4f87-9ec8-7643502f46b3" />
+              </part>
+            </part>
+            <part type="single" description="mellomrom" id="41c7dff2-d0e9-4b9c-9785-bd76b4482b94">
+              <text><![CDATA[(\s+)?]]></text>
+            </part>
+          </part>
+          <part type="named" name="para" id="b11df430-a402-4cf8-a4d3-75ae9cce03ea">
+            <part type="regexp" name="100_paratotal" id="ec5f39aa-d2c6-4d33-b8dd-12dd2adf7e1e" />
+          </part>
+          <part type="optional" id="83a0cedb-1291-42c6-b91d-1a02730cd1ff">
+            <part type="named" name="lov_after" id="cfa4c215-159d-4eb1-922d-6cc4f7987ef3">
+              <part type="single" description="mellomrom" id="edb1869a-3496-4913-a315-156ad7de7b21">
+                <text><![CDATA[\s+i\s+]]></text>
+              </part>
+              <part type="container" id="dafe67ac-ecd2-4d9d-9e2e-6144c91a5c66">
+                <part type="or" id="d5a58ba3-1ceb-409f-80fd-d4918a05c7c0">
+                  <part type="named" name="source_name" id="ac754926-8fa0-4f4b-9df9-e540b17fc129">
+                    <part type="regexp" name="idsources" id="7dbcfa58-3c7a-4c40-b8fc-e029d440163f" />
+                  </part>
+                  <part type="regexp" name="mlovdate" id="70e57990-21b6-4a75-bfe9-7efbc49aaeb6" />
+                  <part type="regexp" name="mlovom" id="359f7dcc-3105-48b4-9ab0-ac0630018baf" />
+                  <part type="regexp" name="nxlovname" id="20f523e4-6f27-4f6c-b0eb-a827fbfd49dc" />
+                  <part type="regexp" name="nxforname" id="07d8e488-32b7-4b1f-80ba-4b77ae16fbc8" />
+                  <part type="regexp" name="dennesammelov" id="de03238c-c846-4e7c-b9fc-0afb2ae0a2be" />
+                  <part type="regexp" name="dennesammefor" id="4c6354e0-d7fb-4de9-8dfc-0601235e4db3" />
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="named" name="tag_lovname" level="1" id="a76b39b5-1546-4384-baf4-d2f0ad0711d7">
+          <part type="or" id="675397a3-a566-4f38-9234-ad99cbeb92ba">
+            <part type="named" name="source_name" id="43fe88b7-a19c-4c5d-92a2-28b9b4fa4d42">
+              <part type="regexp" name="idsources" id="a47479d3-75df-4924-932d-a9351b83c298" />
+            </part>
+            <part type="regexp" name="mlovdate" id="d9e84509-59bf-4ef8-83eb-1673def9efe0" />
+            <part type="regexp" name="mlovom" id="0af03012-3284-46c0-ad45-c5f73b699ea6" />
+            <part type="regexp" name="nxlovname" id="e295216e-746e-4850-a3dc-8340c685c6cb" />
+            <part type="regexp" name="nxforname" id="84e9ea60-ae81-402f-ac30-818980c20d1a" />
+          </part>
+        </part>
+        <part type="named" name="tag_kl" level="1" id="8401231c-dff0-49c6-b5b4-6c9a0431c56a">
+          <part type="regexp" name="tag_kl" id="b28b722b-f2cf-46c5-92ab-dab4c510268b" />
+        </part>
+        <part type="named" name="tag_lonnkode" level="1" id="3928b321-6c6a-478e-bb1b-85eabc421a78">
+          <part type="regexp" name="tag_lonnkode" id="6496759b-5c73-488a-a01e-c04d16e0979f" />
+        </part>
+        <part type="named" name="tag_utv" level="1" id="d10af24e-2c31-4f02-80a5-65837b379326">
+          <part type="regexp" name="tag_utv" id="356f0d64-6d19-488b-9c28-097ace52774c" />
+        </part>
+        <part type="named" name="tag_bfu" level="1" id="49dd9a82-187b-43e8-8638-0d451fa14376">
+          <part type="regexp" name="tag_bfu" id="3e625ebd-24e0-4ffe-a0ee-94a02571df99" />
+        </part>
+        <part type="regexp" name="tag_ifrs" id="04a86703-3fb1-4717-b196-aa2634454d07" />
+        <part type="regexp" name="tag_isa_sa_nrs" id="d1b2d5cb-2ee1-4427-9b50-271b8008756b" />
+        <part type="regexp" name="tag_fin_skd" id="23818cc7-38c5-4901-8e53-35cc99bbbdfe" />
+        <part type="regexp" name="nou" id="53b3bfc8-bde1-4e54-a924-a4d38048eaf6" />
+        <part type="regexp" name="besl_innst_prop_st" id="0464252c-09e4-409a-b6a6-9249261ff7e4" />
+        <part type="regexp" name="tag_rettstidene" id="bfd1b717-f9e6-43b2-b90c-5c2c0c0aa002" />
+        <part type="regexp" name="tag_rettens_gang" id="e13455a5-0ace-4bb9-b853-c415526a603a" />
+        <part type="regexp" name="tag_etisk_rad" id="1b81af11-bbd8-4169-803f-bff14fba2a6f" />
+        <part type="regexp" name="tag_kontoplan" id="b286bccd-faee-405f-9a13-2b3327f76b21" />
+        <part type="regexp" name="tag_dommer" id="9252d674-26cf-48b6-985e-a025c5568fee" />
+        <part type="regexp" name="tag_urevf" id="c5a9db9f-a87b-4973-9065-ffaaa7b169e6" />
+        <part type="regexp" name="tag_gbs" id="318a004d-349c-49be-ac32-d75b9d0bec56" />
+        <part type="regexp" name="tag_oslobors1" id="a699df3a-f311-4c02-8b70-c23b4b8ddb34" />
+        <part type="regexp" name="tag_oslobors2" id="d0aea875-729c-4b30-9aab-a4b27495551a" />
+      </part>
+      <part type="positive lookahead" description="sjekker lovlige tegn foran" id="e55bc8f4-6f31-4b5e-b89a-54ccfadc50bb">
+        <part type="single" description="lovlige tegn" id="059508f1-4909-48d3-b542-ff94a5397d9c">
+          <text><![CDATA[\s|\.|\,|$|\)|\(|\:|\;|\/|\"]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--//////////////////////////////////////////////////////////////////////////////////////////////////////////
+100_TOTAL_END
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+  <regexp type="single">
+    <id>para_nr_core</id>
+    <description>Henter paramumber kjerne</description>
+    <expression>
+      <part type="or">
+        <part type="container">
+          <part type="named" name="paranr">
+            <part type="single" description="finnes paranummer">
+              <text><![CDATA[(\d+)]]></text>
+            </part>
+          </part>
+          <part type="optional">
+            <part type="multiple">
+              <part type="single" description="finnes paranummer" id="39d5b1cd-f664-46f3-8f2b-38593617e158">
+                <text><![CDATA[((\s+)?\,(\s+)?|\s+og\s+)]]></text>
+              </part>
+              <part type="named" name="paranr">
+                <part type="single" description="finnes paranummer">
+                  <text><![CDATA[(\d+)]]></text>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="container">
+          <part type="named" name="paranr" id="a77fe8a0-89c2-4135-a345-6627baea7d39">
+            <part type="container" id="6b5a088b-ee13-4ba2-8a85-d93d04582553">
+              <part type="single" description="finnes paranummer" id="39d5b1cd-f664-46f3-8f2b-38593617e158">
+                <text><![CDATA[(\d+)]]></text>
+              </part>
+              <part type="negative lookahead" id="ee83664b-283c-4d10-977f-53853452ad71">
+                <part type="single" description="finnes paranummer" id="0cfee0db-f3b8-413c-ac2c-8fa58820a676">
+                  <text><![CDATA[(\.)?(\s+)?(L\.|(L|l)edd|(P|p)unktum)]]></text>
+                </part>
+              </part>
+            </part>
+            <part type="optional" description="finnes paranummer" id="5eb3c46c-d381-4d41-ae3e-1ad5feb82af4">
+              <part type="single" description="finnes paranummer" id="0bdd6183-4c83-4fee-a1db-25b5cefa48d6">
+                <text><![CDATA[[a-zæøåA-ZÆØÅ]]]></text>
+              </part>
+            </part>
+            <part type="optional" id="d04aaea0-a738-4465-b64a-994b49ed165d">
+              <part type="multiple" id="8de15a1a-18fe-4d75-8f6d-79789aa37bce">
+                <part type="container" id="9b3868de-5245-4567-b760-6b5c5b947899">
+                  <part type="single" description="finnes paranummer" id="97e2352c-6ec3-4308-af1b-516060def89a">
+                    <text><![CDATA[(\-)(\d+)]]></text>
+                  </part>
+                </part>
+                <part type="negative lookahead" id="c5de3e25-18a2-4c90-ac8b-5d685ace9466">
+                  <part type="single" description="finnes paranummer" id="70de256d-f30c-4e68-a3ab-ccf454eacb20">
+                    <text><![CDATA[(\.)?(\s+)?(L\.|(L|l)edd|(P|p)unktum)]]></text>
+                  </part>
+                </part>
+                <part type="optional" description="finnes paranummer" id="b04b3982-8503-4c82-bae9-d2de88201519">
+                  <part type="single" description="finnes paranummer" id="874cc287-41cf-4b45-9c22-e28ffc562149">
+                    <text><![CDATA[[a-zæøåA-ZÆØÅ]]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--<regexp type="single">
+    <id>para_nr</id>
+    <description>Henter paragraf nummer</description>
+    <expression>
+      <part type="positive lookbehind">
+        <text><![CDATA[^|\s|\.|\,|§]]></text>
+      </part>
+      <part type="negative lookbehind">
+        <part type="or">
+          <part type="single" description="finnes paranummer">
+            <text><![CDATA[\d+(\,|\.)]]></text>
+          </part>
+          <part type="single" description="finnes paranummer">
+            <text><![CDATA[(N|n)r(\.)?(\s+)?(\d+)?(\s+)?(\,|og|eller)?(\s+)?]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="regexp" name="para_nr_core"/>
+      -->
+  <!--<part type="chain">
+        <part type="regexp" name="para_nr_core"/>
+        <part type="optional">
+          <part type ="multiple">
+            <part type="named" name="pbet">
+              <part type ="single">
+                <text><![CDATA[(\s+)?(og|eller|til|\,)(\s+)?]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="para_nr_core"/>
+          </part>
+        </part>
+      </part>-->
+  <!--
+      <part type="positive lookahead">
+        <part type="single">
+          <text><![CDATA[\"|\s|\.|\,|\;|\!|$|\(\d+\)|\)]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>-->
+  <regexp type="single">
+    <id>para_nr</id>
+    <description>Henter paragraf nummer</description>
+    <expression>
+      <part type="positive lookbehind" id="d3a80f49-23b2-4e2b-852e-5af7eb99aa45">
+        <part type="single" id="b648b7b2-afba-451a-bb05-f2775341f917">
+          <text><![CDATA[^|\s|\.|\,|§]]></text>
+        </part>
+      </part>
+      <part type="negative lookbehind" id="aa5483f3-c858-4a12-a03b-908985ee57dc">
+        <part type="or" id="58b01973-833d-438f-b98d-bd5936fd3652">
+          <part type="single" description="finnes paranummer" id="be6da324-1587-4efe-9034-e174d3c5e633">
+            <text><![CDATA[\d+(\,|\.)]]></text>
+          </part>
+          <part type="single" description="finnes paranummer" id="6c77dca0-3b2c-4c2f-98e8-9adefe348f35">
+            <text><![CDATA[(\s+)(N|n)r(\.)?(\s+)?(\d+)?(\s+)?(\,|og|eller)?(\s+)?]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="chain" id="f8b3c375-ed48-4254-9d37-93ac6952f28d">
+        <part type="or">
+          <part type="container">
+            <part type="named" name="paranr">
+              <part type="single" description="finnes paranummer">
+                <text><![CDATA[(\d+)]]></text>
+              </part>
+            </part>
+            <part type="optional">
+              <part type="multiple">
+                <part type="single" description="finnes paranummer" id="39d5b1cd-f664-46f3-8f2b-38593617e158">
+                  <text><![CDATA[((\s+)?\,(\s+)?|\s+og\s+)]]></text>
+                </part>
+                <part type="named" name="paranr">
+                  <part type="single" description="finnes paranummer">
+                    <text><![CDATA[(\d+)]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="container">
+            <part type="named" name="paranr" id="35a24fc2-5086-4e5a-a2cb-b31bdda9dead">
+              <part type="container" id="8d1e05a6-f729-4f58-8e30-ebcea705b3c0">
+                <part type="single" description="finnes paranummer" id="c6928f7e-55f4-48f6-ba39-49f59aaec319">
+                  <text><![CDATA[(\d+)]]></text>
+                </part>
+                <part type="negative lookahead" id="79879c05-cd11-483c-80ae-c3a4234049a1">
+                  <part type="single" description="finnes paranummer" id="ce131494-7c7a-41e4-ba2e-055fedf1af06">
+                    <text><![CDATA[(\.)?(\s+)?(L\.|(L|l)edd|(P|p)unktum)]]></text>
+                  </part>
+                </part>
+              </part>
+              <part type="optional" description="finnes paranummer" id="9a8e1ca4-e0cc-43b7-96da-90652522b177">
+                <part type="single" description="finnes paranummer" id="30325c5b-95fa-4481-9b16-579b0aab0d9a">
+                  <text><![CDATA[[a-zæøåA-ZÆØÅ]]]></text>
+                </part>
+              </part>
+              <part type="optional" id="674ee42c-d96b-4b74-a152-b0c5298431fd">
+                <part type="multiple" id="9f9e9c3d-6d99-40f7-b4c5-a432da7d59be">
+                  <part type="container" id="286a9c55-a94d-4041-91ac-f6d1abf8976c">
+                    <part type="single" description="finnes paranummer" id="dd0c98fc-eb14-43aa-a764-448902cb5f4d">
+                      <text><![CDATA[(\-)(\d+)]]></text>
+                    </part>
+                  </part>
+                  <part type="optional" description="finnes paranummer" id="16d3a228-d9a1-495f-8962-348d2b2e7d67">
+                    <part type="single" description="finnes paranummer" id="08f4e22a-6f0f-4997-9340-bf0f33b54271">
+                      <text><![CDATA[[a-zæøåA-ZÆØÅ]]]></text>
+                    </part>
+                  </part>
+                </part>
+              </part>
+            </part>
+
+          </part>
+        </part>
+      </part>
+      <part type="positive lookahead" id="552b5596-f2df-44de-8aae-c4b3a56b7a86">
+        <part type="single" id="6d5ea104-2f5a-4f77-b872-c27a6625b301">
+          <text><![CDATA[\s|\.|\,|\;|$|\(\d+\)|\)|\(]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Single paragraf start
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--parasingle_new-->
+  <regexp type="multi">
+    <id>parasingle_01</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="or" id="be157bb2-4bf1-4d10-8537-9a8632af6fb6">
+        <part type="or" id="0eb48eb3-cb96-4294-aade-95ef24cad82c">
+          <part type="regexp" name="kap_chain_alfa" id="f8fef8bd-0e9f-4bed-b587-99a94b4b98bf" />
+          <part type="regexp" name="kap_chain_roman" id="5229fa27-9bdd-476b-a666-0a4d944b186d" />
+          <part type="regexp" name="kap_chain_decimal" id="ea33980e-71f6-409d-971e-e1c16a05257d" />
+        </part>
+        <part type="or" id="bf48322d-5fd4-4885-bcc0-5a8fe88b7608">
+          <part type="regexp" name="del_chain_alfa" id="76531c0e-1b82-4773-a002-9ca19fbd1da7" />
+          <part type="regexp" name="del_chain_roman" id="04062e18-059f-465a-a326-4f5cca03743b" />
+          <part type="regexp" name="del_chain_decimal" id="08e6b7f9-efef-4680-917f-eccfba31f0f2" />
+        </part>
+        <part type="chain" id="0226b620-6153-4e75-878e-c4d53601d3b1">
+          <part type="named" name="paratot" id="a4742374-f709-46c1-b700-7e0c0e8f1d72">
+            <part type="chain" id="5caf1de6-3900-478d-bfca-f76c31f73bca">
+              <part type="optional" id="35c92318-8de7-4fd0-9e37-20de4755980a">
+                <text><![CDATA[((P|p)aragraf|§+)(\s+)?]]></text>
+              </part>
+              <part type="regexp" name="para_nr" id="f9b7530a-94de-46d3-ad81-894e59c5a8d4" />
+              <part type="optional" id="8fa5426e-0683-4f08-98ad-df3c98a5b467">
+                <part type="multiple" id="4da128d9-c0ee-4872-9290-e630b2458412">
+                  <part type="or" id="6b9e76c3-0a5c-4fdc-9a76-5cac59372deb">
+                    <part type="regexp" name="ledd_chain_simple01" id="307a7abd-53d6-4395-8481-ea8121586bd6" />
+                    <part type="regexp" name="number_chain_simple01" id="e4bd182d-872a-414d-9803-c022b08e2560" />
+                    <part type="regexp" name="letter_chain_simple01" id="8a612cfa-5d6a-4750-aeec-7ddee7959be1" />
+                    <part type="regexp" name="punktum_chain_simple01" id="3dcf20f2-3263-46d8-81e3-e06f80b89686" />
+                    <part type="single" id="d019aa37-dd85-45b9-a426-0202faaff03a">
+                      <text><![CDATA[(?<=\s[a-zA-Z])\d+]]></text>
+                    </part>
+                    <part type="single" description="Finne kommentar i kursiv" id="d06053dc-772b-4be1-9170-132c7ed0c625">
+                      <text><![CDATA[(\s+)?«[^»]+»]]></text>
+                    </part>
+                    <part type="single" description="Finne kommentar i parantes" id="cfe893fb-cd3e-48f7-b777-232547bf3a40">
+                      <text><![CDATA[(\s+)?\([^\d\)]+\)]]></text>
+                    </part>
+                    <part type="single" description="Finne kommentar i parantes" id="b2d20234-0b2c-48f0-8477-de4670a7fda7">
+                      <text><![CDATA[(\s)?(\,)?(\s)?overskudd\ser\sskattepliktig]]></text>
+                    </part>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>parasingle_02</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="or" id="d2039046-18aa-4121-91e5-e5cdb09b86f4">
+        <part type="or" id="ee0b7813-4478-4164-a195-6e31b1878b2d">
+          <part type="regexp" name="kap_chain_alfa" id="64e31a0e-e853-457b-9728-84c03f5077e8" />
+          <part type="regexp" name="kap_chain_roman" id="2b0fe773-b96e-436d-b7f9-876ed511dcfe" />
+          <part type="regexp" name="kap_chain_decimal" id="84bd3d41-73d5-4f65-a963-5e8459916a53" />
+        </part>
+        <part type="or" id="13f33c19-5ecd-439a-8a18-b01231b23fac">
+          <part type="regexp" name="del_chain_alfa" id="0c3a8635-a6f4-45e1-88ee-ced02464b117" />
+          <part type="regexp" name="del_chain_roman" id="d6a9ce56-2b7d-47bc-a575-c490df41c773" />
+          <part type="regexp" name="del_chain_decimal" id="efefffe4-c055-4e54-88dc-20485423b5c5" />
+        </part>
+        <part type="chain" id="ea9d8ec4-471d-4843-96ca-7ac214eba9ae">
+          <part type="named" name="paratot" id="aea4666b-f3ea-426e-93fe-02988a573f5a">
+            <part type="chain" id="d1ccab0e-a0a1-48d9-96f6-a17eaed65543">
+              <part type="optional" id="e4caf33c-9f3d-45ce-95ac-9508594af940">
+                <text><![CDATA[§+(\s+)?]]></text>
+              </part>
+              <part type="regexp" name="para_nr" id="3c919099-27f3-4b56-8c4f-83d55e4200da" />
+              <part type="optional" id="fe0c0f8d-fa32-4cfa-8cc9-ce708ab1eabb">
+                <part type="multiple" id="a48ed5d7-b368-45d0-8b0f-9133d6a0b19a">
+                  <part type="or" id="365f4b48-881c-43b5-bff5-0c5f586daffc">
+                    <part type="regexp" name="ledd_chain_simple01" id="3d729fe7-3c49-4e5c-a787-54583ccdd600" />
+                    <!--<part type="regexp" name="number_chain_simple01" />-->
+                    <part type="regexp" name="letter_chain_simple01" id="540f6b9b-271f-400f-9e8d-6c49dc8df8da" />
+                    <part type="regexp" name="punktum_chain_simple01" id="c77f824b-cbcc-433d-ade2-aab0286927d7" />
+                    <part type="single" id="e163384b-7d11-4aa5-9184-29d973de26fd">
+                      <text><![CDATA[(?<=\s[a-zA-Z])\d+]]></text>
+                    </part>
+                    <part type="single" description="Finne kommentar i kursiv" id="07fd1190-9f93-422d-a384-b35c95d3760f">
+                      <text><![CDATA[(\s+)?«[^»]+»]]></text>
+                    </part>
+                    <part type="single" description="Finne kommentar i parantes" id="70183ea7-ba00-48dc-adac-6fb7a30b29f2">
+                      <text><![CDATA[(\s+)?\([^\d\)]+\)]]></text>
+                    </part>
+                    <part type="single" description="Finne kommentar i parantes" id="f959fc0e-b577-4f99-bfff-b2b0e0722f2f">
+                      <text><![CDATA[(\s)?(\,)?(\s)?overskudd\ser\sskattepliktig]]></text>
+                    </part>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>split_chain_para</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="named" name="pbet" id="3c7970fa-b8f1-476e-8e41-bcb96fa937e7">
+        <part type="or" description="Finn og, til, eller, samt og se etter uttykk med pararef" id="ef163378-5556-441c-b81a-51209282c98f">
+          <part type="single" description="or" id="3e192d68-a87e-48a2-a6ef-a28f232a3390">
+            <text><![CDATA[(\s+)?og\s+overgangsregel\s+til\s+]]></text>
+          </part>
+          <part type="single" description="or" id="4a992e02-4685-421f-ac4e-46f43115aae4">
+            <text><![CDATA[(\s+)?kombinert\s+med\s+]]></text>
+          </part>
+          <part type="single" description="or" id="33aa9b26-beb3-4a2b-a5fa-eee17d006197">
+            <text><![CDATA[(\s+)?flg\s+]]></text>
+          </part>
+          <part type="single" description="or" id="ea62c1b6-3c92-4849-9f4f-30029a3305d8">
+            <text><![CDATA[(\s+)?flg\.\s+]]></text>
+          </part>
+          <part type="single" description="or" id="fbfc9deb-c6a4-477d-b7f5-7c3d83f28e58">
+            <text><![CDATA[(\s+)?og\s+]]></text>
+          </part>
+          <part type="single" description="or" id="c35fdd18-d86a-41f6-b308-f98ffc70800e">
+            <text><![CDATA[(\s+)?(om\s+([^\s]*))?eller\s+]]></text>
+          </part>
+          <part type="single" description="or" id="d9febaa3-e21f-42e5-972a-027a76930fd3">
+            <text><![CDATA[(\s+)?og\s+i\s+enten\s+]]></text>
+          </part>
+          <part type="single" description="or" id="1b03ad59-d63b-4cb0-9b60-bba68ce0300c">
+            <text><![CDATA[(\s+)?og\s+enten\s+]]></text>
+          </part>
+          <part type="single" description="or" id="2394677a-73d9-41ba-83ef-e69131966e3b">
+            <text><![CDATA[(\s+)?til(\s+og\s+med)?\s+]]></text>
+          </part>
+          <part type="single" description="or" id="277160dd-121d-4745-b926-4f4cfd444999">
+            <text><![CDATA[(\s+)?(\,)?(\s+)?samt\s+]]></text>
+          </part>
+          <part type="single" description="or" id="d826bbdd-8926-4f05-aae0-20d92a21473b">
+            <text><![CDATA[(\s+)?se\s+]]></text>
+          </part>
+          <part type="single" description="or" id="c45a2233-b75d-481e-8366-604925ae6584">
+            <text><![CDATA[(\s+)?((\,)?(\s+)?((((J|j)f(r)?)(\.\s+|\s+)))?)(samme\s+lov(s)?)?(?!((F|L)\.\s+\d))]]></text>
+          </part>
+          <part type="single" description="or" id="67da65c1-da73-4ba9-9456-38af7b6239dd">
+            <text><![CDATA[(\s+)?\.(\s+)?(Unntak(\:)?)(\s+)?]]></text>
+          </part>
+          <part type="single" description="or" id="00fceffb-2465-40f3-b02f-553b222c0ab5">
+            <text><![CDATA[(\s+)?\/(\s+)?]]></text>
+          </part>
+          <part type="single" description="or" id="371a74d5-d455-4911-a599-2cd0db0455e3">
+            <text><![CDATA[\s+]]></text>
+          </part>
+          <part type="single" description="or" id="7116e022-4074-4609-8fbf-28ebb2c7042d">
+            <text><![CDATA[(\s+(og))(?=§)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single">
+    <id>split_chain_para_02</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="named" name="pbet" id="6fc15342-fd14-4b58-be10-955ca723fb20">
+        <part type="single" description="or" id="d8b7af0f-8e3c-4fcc-b905-d8a504059ed4">
+          <text><![CDATA[(og|til)\s+]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Multiple paragraf start
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--paratoken_2-->
+  <regexp type="multi">
+    <id>paratoken_01</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="positive lookahead" description="Sjekk om valid pararef" id="dcf5f40d-755c-46d0-bba0-9c94b8e30422">
+        <part type="or" id="efd76036-75ee-4620-867d-6cd52f1a0524">
+          <part type="single" description="or" id="634ed5b5-de6a-4789-9df4-424c299588dc">
+            <text><![CDATA[((P|p)aragraf|§+)(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="kap_chain_alfa" id="c22a7d57-54a2-4fae-afe3-57477fbac2ed" />
+          <part type="regexp" name="kap_chain_roman" id="8d9fb2ca-17bb-4eb1-bd58-fd08f0bbd2a7" />
+          <part type="regexp" name="kap_chain_decimal" id="d9f3ff16-19ff-4862-a881-e5e1dc25e568" />
+          <part type="regexp" name="del_chain_alfa" id="42b3db2d-c491-4c75-b7c5-f04ba7d2a485" />
+          <part type="regexp" name="del_chain_roman" id="a46c5848-53c8-4269-aef1-1f65d22d70f8" />
+          <part type="regexp" name="del_chain_decimal" id="d75237cc-06d0-4a9c-bd05-43c9c6e766e9" />
+        </part>
+      </part>
+      <part type="regexp" name="parasingle_01" id="4bf32cc4-d57e-4951-811b-8178fcccb9d6" />
+      <part type="optional" id="bdce93ec-fc8d-4325-8161-d8e2d49fcb7d">
+        <part type="multiple" id="6222bdcb-e13b-49e3-b79b-647250e2e94c">
+          <part type="regexp" name="split_chain_para" id="1ab399a1-c100-4a7a-b4fd-ac74a9a74c15" />
+          <part type="regexp" name="parasingle_01" id="a4f2507d-c6d8-4e0f-9127-54174184ebfb" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>paratoken_02</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <!--<part type="positive lookahead" description="Sjekk om valid pararef">
+        <part type="or">
+          <part type="single" description="or">
+            <text><![CDATA[§+(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="kap_chain_alfa" />
+          <part type="regexp" name="kap_chain_roman" />
+          <part type="regexp" name="kap_chain_decimal" />
+          <part type="regexp" name="del_chain_alfa" />
+          <part type="regexp" name="del_chain_roman" />
+          <part type="regexp" name="del_chain_decimal" />
+        </part>
+      </part>-->
+      <part type="regexp" name="parasingle_02" id="f013c511-2f13-4159-9e08-bab372781df5" />
+      <part type="optional" id="384c9d8b-7e5c-48c2-ab58-a6009cf08d38">
+        <part type="multiple" id="eba43b21-244b-4ef7-997d-2f38e8036bc5">
+          <part type="regexp" name="split_chain_para_02" id="d02ade11-6053-4665-bd15-589b81501b06" />
+          <part type="regexp" name="parasingle_02" id="cf9ab9d8-16cd-455e-af04-3636cc619349" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Multiple paragraf slutt
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <regexp type="multi">
+    <id>total</id>
+    <description>Henter token + source paragraf referanse</description>
+    <expression>
+      <part type="positive lookbehind" description="sjekker lovlige tegn foran" id="bf88b745-c2cb-4faf-8a3f-990449077a22">
+        <part type="single" description="lovlige tegn" id="621ff93c-f49a-424a-8f49-ad84cc7ae2ea">
+          <text><![CDATA[^|\s|\(|\.|\,|\:|\/|\"]]></text>
+        </part>
+      </part>
+      <part type="or" id="1d1af393-bd15-404a-8573-cc37462e64a9">
+        <part type="regexp" name="note_til_x.x" id="523edcce-f441-43f0-a628-bf0b30d6794e" />
+        <part type="regexp" name="note_til_x.x_loven" id="6f60a5e2-8425-48b9-a0d3-93c56b0c131b" />
+        <part type="named" name="source_para" level="1" id="2fb9e9e0-f1f9-4fe7-996b-809b5140058c">
+          <part type="optional" id="6c56fd04-7773-40c4-a01d-051df2699f6b">
+            <part type="named" name="lov_before" id="ab6012ed-c9eb-41b2-abb1-07b17cc5f30a">
+              <part type="or" id="3787563e-4825-4eb1-9701-032396b10e50">
+                <part type="container" id="eb589658-baa6-4e67-8e50-e934ff64ee30">
+                  <part type="named" name="source_name" id="5de0e461-5385-4c12-bda5-ccbf03372222">
+                    <part type="regexp" name="idsources" id="166fa93d-c897-41df-bd20-57c5dd1ae045" />
+                  </part>
+                  <part type="optional" id="18277d5c-1b62-4845-8301-bc191dbc3bc1">
+                    <part type="positive lookbehind" description="sjekker lovlige tegn foran" id="575dd34b-08e1-47b6-a078-38f5fb97d94f">
+                      <part type="single" description="lovlige tegn" id="0ed971b0-8c0d-4215-beb7-432bbdec84c0">
+                        <text><![CDATA[loven|forskriften|reglen(e)?]]></text>
+                      </part>
+                    </part>
+                    <part type="single" description="mellomrom" id="b5075d04-55ff-475e-9819-330609977aee">
+                      <text><![CDATA[s]]></text>
+                    </part>
+                  </part>
+                  <part type="optional" id="1c11ffc1-5165-4671-aa39-af7c72cd7c41">
+                    <part type="single" description="mellomrom" id="0369d518-b63c-4f8e-b7c7-56f2154bc623">
+                      <text><![CDATA[\s+(har\s+i|etter|i)]]></text>
+                    </part>
+                  </part>
+                </part>
+                <part type="regexp" name="mlovdate" id="c4ee5575-e5ec-4783-8224-9fda1277c049" />
+                <part type="regexp" name="mlovom" id="5c407d60-b846-4658-a88f-ebacdeb1ac45" />
+                <part type="regexp" name="nxlovname" id="21630a99-cb84-4945-8db1-de598605996d" />
+                <part type="regexp" name="nxforname" id="7641eccd-1d40-4289-bae3-38ef9543748f" />
+                <part type="regexp" name="dennesammelov" id="8327645b-a23c-422b-8b3a-a373774ef714" />
+                <part type="regexp" name="dennesammefor" id="6e2da09d-22d2-4e4a-ba4a-57cdae506209" />
+              </part>
+            </part>
+            <part type="single" description="mellomrom" id="99d0ac14-d8ac-404e-a5a8-590e7d2c6872">
+              <text><![CDATA[(\s+)?]]></text>
+            </part>
+          </part>
+          <part type="named" name="para" id="f5ec588d-c107-4157-9174-85ddd238bebf">
+            <part type="regexp" name="paratoken_01" id="1aa4725b-8f5d-4261-af89-29cb5067b6c5" />
+          </part>
+          <part type="optional" id="10e9c109-355d-4e5f-b203-679985738b39">
+            <part type="named" name="lov_after" id="17d06336-7bc2-42a9-b843-dacb979ba215">
+              <part type="single" description="mellomrom" id="6c438836-883e-43c2-86a6-41a2b38df797">
+                <text><![CDATA[\s+i\s+]]></text>
+              </part>
+              <part type="container" id="5a5b9ac3-f392-4bfb-b5fe-7d9e72e73896">
+                <part type="or" id="852356d1-9125-4d7b-a6dd-5bffa596519d">
+                  <part type="named" name="source_name" id="0936f16a-690d-450e-b863-0108cc0b7fa1">
+                    <part type="regexp" name="idsources" id="1fb989dd-0e2c-4b3f-a8db-93175430ecbf" />
+                  </part>
+                  <part type="regexp" name="mlovdate" id="97ee7fa2-214b-4e6b-be5a-85edbdaeb7ed" />
+                  <part type="regexp" name="mlovom" id="15c62b37-e4c8-4fb1-8caa-6a39444624fc" />
+                  <part type="regexp" name="nxlovname" id="e1bae10d-8298-4f14-bc3e-8a1087c8644e" />
+                  <part type="regexp" name="nxforname" id="133fb0ef-6565-4ec9-aaec-d6589317ba4c" />
+                  <part type="regexp" name="dennesammelov" id="1024f837-9f9c-4fd6-9232-33c2c0c935a0" />
+                  <part type="regexp" name="dennesammefor" id="dc55ff4d-497e-4378-be74-27d454e3c911" />
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="named" name="tag_lovname" level="1" id="3736f06a-36c5-408d-9263-ff25b0e92cb5">
+          <part type="or" id="fb6abdbd-269e-4952-a088-f8ec3db62edb">
+            <part type="named" name="source_name" id="72c6ef65-f6cc-4008-b05d-cf780ef818a1">
+              <part type="regexp" name="idsources" id="52541d06-9c99-42f2-aafc-97ef0d48d1a5" />
+            </part>
+            <part type="regexp" name="mlovdate" id="23a9768a-5b97-4d71-9372-706c03a92323" />
+            <part type="regexp" name="mlovom" id="8e1cca2d-ef5e-4254-a241-b2703d99d9e1" />
+            <part type="regexp" name="nxlovname" id="2fac8144-3de3-40e9-b74c-6526cdeee627" />
+            <part type="regexp" name="nxforname" id="478b32f0-fbb1-45cd-969f-03fdb64990d0" />
+          </part>
+        </part>
+        <part type="named" name="tag_kl" level="1" id="8e37aab3-d444-475f-aab3-461d5ec83630">
+          <part type="regexp" name="tag_kl" id="b1a49576-61f2-44cc-8520-92f2bed54921" />
+        </part>
+        <part type="named" name="tag_lonnkode" level="1" id="e5d81549-6751-4b9e-93cb-1b67d3e0f63a">
+          <part type="regexp" name="tag_lonnkode" id="49f63dd1-31bb-4913-bdd7-e7456460dbe5" />
+        </part>
+        <part type="named" name="tag_utv" level="1" id="2fbbb2d8-7813-474e-929d-a8436192ad2b">
+          <part type="regexp" name="tag_utv" id="75b14ebd-3324-4f3b-aff1-1b8ce78ea274" />
+        </part>
+        <part type="named" name="tag_bfu" level="1" id="4514bb5f-154d-4b83-b0ab-23d7828d3ad7">
+          <part type="regexp" name="tag_bfu" id="ca98f038-03b7-483d-ba29-acb8450cda99" />
+        </part>
+        <part type="regexp" name="tag_ifrs" id="b990ad42-c931-4989-b382-e835a714678c" />
+        <part type="regexp" name="tag_isa_sa_nrs" id="90e808a2-2a3f-46b4-bc90-7da2a05b6d07" />
+        <part type="regexp" name="tag_fin_skd" id="b5b81d67-db29-4725-91b0-08c6c0397ae2" />
+        <part type="regexp" name="nou" id="9fb0eb95-25e6-4afe-bfdb-5c95dad3ebf3" />
+        <part type="regexp" name="besl_innst_prop_st" id="78c22e6b-4ceb-4f1d-855b-27e0b07afd9a" />
+        <part type="regexp" name="tag_rettstidene" id="770502f2-668b-4ffe-b5ba-08d4377f9c1a" />
+        <part type="regexp" name="tag_rettens_gang" id="60947ba9-5bfc-4b33-9196-091b86c1de49" />
+        <part type="regexp" name="tag_etisk_rad" id="2bb40caf-b4e2-4b9a-bb27-a160bc4771c3" />
+        <part type="regexp" name="tag_kontoplan" id="4bc295a1-88df-47f3-b7ae-02883f343e79" />
+        <part type="regexp" name="tag_dommer" id="f2cc7aaf-5695-4108-a3c3-b2202d8c366a" />
+        <part type="regexp" name="tag_urevf" id="5a82c06c-6389-490d-b1ff-10b19c6aa1ec" />
+        <part type="regexp" name="tag_gbs" id="fb60e72e-4176-413f-8504-2aade5367446" />
+        <part type="regexp" name="tag_oslobors1" id="f24dda09-c6ce-4b03-9c42-5ee0b94387f1" />
+        <part type="regexp" name="tag_oslobors2" id="c64df220-2ee0-4204-a32a-206e2e503f0b" />
+        <part type="regexp" name="tag_jotun"></part>
+      </part>
+      <part type="positive lookahead" description="sjekker lovlige tegn foran" id="f1836eea-38c4-4e08-93bc-00e500647606">
+        <part type="single" description="lovlige tegn" id="8bbb19e3-f45f-4130-9a65-821d0817eac1">
+          <text><![CDATA[\s|\.|\,|$|\)|\(|\:|\;|\/|\"]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="multi">
+    <id>findlovref</id>
+    <description>Henter token + source paragraf referanse</description>
+    <expression>
+      <part type="positive lookbehind" description="sjekker lovlige tegn foran" id="ca0515de-106b-4dd6-8146-4b3eb6c98fc1">
+        <part type="single" description="lovlige tegn" id="73cc159e-9d54-4f1e-a736-79bcfcbd9851">
+          <text><![CDATA[^|\s]]></text>
+        </part>
+      </part>
+      <part type="named" name="tag_lovname" level="1" id="c45f7a35-6a24-4863-928f-027187cf7027">
+        <part type="or" id="5f338c41-5a0c-4faf-b0f3-b40de951bdb0">
+          <part type="regexp" name="mlovdate" id="f1f752e9-3be5-41fd-a797-9ac6d76b811d" />
+          <part type="regexp" name="mlovom" id="4ca3c24d-9b55-4b00-b8ec-476cd9753c43" />
+          <part type="regexp" name="nxlovname" id="9accf30e-e3fa-444a-825e-898bffbe7ff5" />
+          <part type="regexp" name="nxforname" id="aab4535c-aaff-4952-8b90-0d983441d8ea" />
+        </part>
+      </part>
+      <part type="positive lookahead" description="sjekker lovlige tegn foran" id="179cdfca-2557-4f2a-8b18-8cadd2a61f88">
+        <part type="single" description="lovlige tegn" id="f3b72b77-1d82-4c78-b5e4-f602293b5ad8">
+          <text><![CDATA[\s|\.|$|\"]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+</regexps>

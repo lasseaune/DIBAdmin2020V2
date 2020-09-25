@@ -13,6 +13,8 @@ using DIBAdminAPI.Data;
 using DIBAdminAPI.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace DIBAdminAPI
 {
@@ -31,9 +33,14 @@ namespace DIBAdminAPI
             services.AddDistributedMemoryCache();
             
             services.AddCors();
-            
+
             services.AddControllers()
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(o => o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore)
+                .AddMvcOptions(o => o.OutputFormatters.Add(
+                new XmlDataContractSerializerOutputFormatter()
+                ))
+                .AddJsonOptions(o => o.JsonSerializerOptions.IgnoreNullValues = true);
+
             services.AddMvc()
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ContractResolver =

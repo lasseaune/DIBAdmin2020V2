@@ -15,7 +15,6 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "ancmHostingModel": "OutOfProcess",
       "use64Bit": true
     },
     "DIBAdminAPI2020": {

@@ -68,7 +68,7 @@ namespace DIBAdminAPI.Data.Entities
         public Guid id { get;set; }
         public Guid topicId { get; set; }
         public Guid docId { get; set; }
-        public string resourcetypeId { get; set; }
+        public string resourceTypeId { get; set; }
         public string name { get; set; }
         public DateTime lastUpdate { get; set; }
         public string userName { get; set; }
@@ -98,10 +98,10 @@ namespace DIBAdminAPI.Data.Entities
 
     public class ResourceType
     {
-        public int resourcetypeId { get; set; }
+        public string resourceTypeId { get; set; }
         public string name { get; set; }
         public string dataType { get; set; }
-        public int storageId { get; set; }
+        public string storageId { get; set; }
 
     }
     //public class ResourceData

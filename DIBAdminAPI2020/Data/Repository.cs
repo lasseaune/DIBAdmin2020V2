@@ -36,6 +36,141 @@ namespace DIBAdminAPI.Data
             }
         }
 
+        public async Task<DocumentParts> GetDocumentPartDiblink(string resourceId, string segmentId, string Id)
+        {
+            var p = new
+            {
+                session_id = "apitest",//_usrsvc.CurrentUser.session_id,
+                id = Id
+            };
+            IEnumerable<DIBLinkData> dibLinkDatas = await this.GetResourceDibLinkData(p);
+
+            List<DibLinkSelect> docParts = dibLinkDatas.GroupBy(p => new { p.resourceId, p.tag2SegmentId, p.name, idx = p.tag2Idx.Min() })
+                .OrderBy(p => p.Key.idx)
+                .Select(p => new DibLinkSelect { resourceId = p.Key.resourceId, segmentId = p.Key.tag2SegmentId, regexName = p.Key.name })
+                .ToList();
+            if (docParts.Count() == 0) return null;
+            if (docParts.Count() == 1 ? "link;temaid".Contains(docParts.FirstOrDefault().regexName) : false)
+            {
+                string id = dibLinkDatas.Select(p => p.tag2).FirstOrDefault();
+                var n = new
+                {
+                    session_id = "apitest",
+                    resourceId = docParts.Select(p => p.resourceId.ToString()).FirstOrDefault(),
+                    id
+                };
+
+                ResourceNavigation rNav = await this.GetResourceByResourceIdAndId(n);
+                if (rNav == null) return null;
+
+                var d = new
+                {
+                    session_id = "apitest",
+                    id = rNav.resourceId,
+                    segment_id = rNav.segmentId,
+
+                };
+                ResourceHTML5 data = await this.GetHTML5("[dbo].[GetResourceHTML]", d, null);
+                if (data == null) return null;
+                if ((id ?? "") != "")
+                {
+                    XElement items =
+                    new XElement("items",
+                        new XElement("item", new XAttribute("id", rNav.Id))
+                    );
+
+
+                    XElement document = data.Document.GetDocumentParts(items);
+                    if (document == null) return null;
+
+                    data.Document = document;
+                }
+                DocumentParts result = new DocumentParts
+                {
+                    parts = new List<DocumentContainer>
+                    {
+                        new DocumentContainer(data)
+                    }
+                };
+                return result;
+            }
+            else
+            {
+                DocumentParts result = new DocumentParts();
+                result.parts = new List<DocumentContainer>();
+                foreach (DibLinkSelect dp in docParts)
+                {
+                    var d = new
+                    {
+                        session_id = "apitest",
+                        id = dp.resourceId,
+                        segment_id = dp.segmentId,
+
+                    };
+                    ResourceHTML5 data = await this.GetHTML5("[dbo].[GetResourceHTML]", d, null);
+                    if (data == null) return null;
+                    XElement items =
+                    new XElement("items",
+                        dibLinkDatas
+                        .Where(p => p.resourceId == dp.resourceId && p.tag2SegmentId == dp.segmentId)
+                        .Select(p => 
+                            new XElement("select", 
+                            new XAttribute("id", p.tag2Id),
+                                p.tag3Id == null ? null : new XElement("mark", p.tag3Id) 
+                            )
+                        )
+                    );
+
+                    XElement document = data.Document.GetDocumentParts(items);
+                    if (document == null) return null;
+
+                    data.Document = document;
+                    result.parts.Add(new DocumentContainer(data));
+                }
+                return result;
+            }
+        }
+        public  async Task<DocumentParts> GetDocumentPart( string resourceId, string id)
+        {
+            var p = new
+            {
+                session_id = "apitest",
+                resourceId,
+                id,
+            };
+            ResourceNavigation rNav = await this.GetResourceByResourceIdAndId(p);
+            if (rNav == null) return null;
+
+            var d = new
+            {
+                session_id = "apitest",
+                id = rNav.resourceId,
+                segment_id = rNav.segmentId,
+
+            };
+
+            ResourceHTML5 data = await this.GetHTML5("[dbo].[GetResourceHTML]", d, null);
+            if (data == null) return null;
+
+            XElement items =
+                new XElement("items",
+                    new XElement("item", new XAttribute("id", id))
+            );
+
+            XElement document = data.Document.GetDocumentParts(items);
+            if (document == null) return null;
+
+            data.Document = document;
+            DocumentParts result = new DocumentParts
+            {
+                parts = new List<DocumentContainer>
+                {
+                    new DocumentContainer(data)
+                }
+            };
+
+            return result;
+        }
         public async Task<RelatedResources> GetRelated(object p, int? timeOut = null)
         {
             
@@ -349,22 +484,40 @@ namespace DIBAdminAPI.Data
             return null;
         }
         //[dbo].[GetResourceDibLinkData]
-        public async Task<IEnumerable<DIBLink>> GetResourceDibLinkData(object p, int? timeOut = null)
+        public async Task<IEnumerable<DIBLinkData>> GetResourceDibLinkData(object p, int? timeOut = null)
         {
             string QueryName = "[dbo].[GetResourceDibLinkData]";
-            IEnumerable<DIBLink> result;
+            IEnumerable<DIBLinkData> result;
             if (!timeOut.HasValue)
                 timeOut = 60;
             try
             {
                 using (IDbConnection conn = dbConnection)
                 {
-                    using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, null, CommandType.StoredProcedure))
-                    {
-                        result = multi.Read<DIBLink>();
-                    }
+                    result = await conn.QueryAsync<DIBLinkData>(QueryName, p, null, null, CommandType.StoredProcedure);
                 }
                 return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
+            }
+            return null;
+        }
+        public async Task<ResourceNavigation> GetResourceByResourceIdAndId(object p, int? timeOut = null)
+        {
+            string QueryName = "GetResourceByResourceIdAndId";
+            IEnumerable<ResourceNavigation> result;
+            if (!timeOut.HasValue)
+                timeOut = 60;
+            try
+            {
+                using (IDbConnection conn = dbConnection)
+                {
+
+                    result = await conn.QueryAsync<ResourceNavigation>(QueryName, p, null, null, CommandType.StoredProcedure);
+                }
+                return result.FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -456,27 +609,7 @@ namespace DIBAdminAPI.Data
         //    }
         //    return null;
         //}
-        //public async Task<ResourceNavigation> GetResourceByResourceIdAndId(object p, int? timeOut = null)
-        //{
-        //    string QueryName = "GetResourceByResourceIdAndId";
-        //    IEnumerable<ResourceNavigation> result;
-        //    if (!timeOut.HasValue)
-        //        timeOut = 60;
-        //    try
-        //    {
-        //        using (IDbConnection conn = dbConnection)
-        //        {
 
-        //            result = await conn.QueryAsync<ResourceNavigation>(QueryName, p, null, null, CommandType.StoredProcedure);
-        //        }
-        //        return result.FirstOrDefault();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        _logger.LogError("<Repository/ExecQuery> Query = '{queryName}', p = '{@p}', Message = '{err}'", QueryName, p, e.Message);
-        //    }
-        //    return null;
-        //}
         //public async Task<Home> ExecHome(string QueryName, object p, int? timeOut = null)
         //{
         //    Home result = new Home();

@@ -1,0 +1,222 @@
+﻿            part.Descendants("a").Remove();
+
+            XElement newPart = new XElement("part");
+
+            bool found = true;
+            while (found)
+            {
+                found = false;
+                if (part.Descendants("sup").Count() != 0)
+                {
+                    foreach (XElement sup in part.Descendants("sup"))
+                    {
+                        string supId = sup.Value;
+
+                        if (part.Descendants("td").Where(p => p.Elements("small").Count() == 1 && p.Value.Trim() == supId).Count() != 0)
+                        {
+                            XElement tr = part.Descendants("td").Where(p => p.Elements("small").Count() == 1 && p.Value.Trim() == supId).First().Parent;
+                            string fTitle = tr.Elements("td").ElementAt(1).Value.Trim();
+
+                            XElement footnote = new XElement("footnotelov", supId);
+                            XAttribute aTitle = new XAttribute("title", fTitle);
+                            footnote.Add(aTitle);
+                            sup.ReplaceWith(footnote);
+
+                            tr.Parent.Remove();
+                            found = true;
+                            break;
+                        }
+                        else if (part.Descendants("td").Where(p => p.Elements("small").Count() == 0 && p.Value.Trim() == supId).Count() != 0)
+                        {
+                            XElement tr = part.Descendants("td").Where(p => p.Elements("small").Count() == 0 && p.Value.Trim() == supId).First().Parent;
+
+                            string fTitle = tr.Elements("td").ElementAt(1).Value.Trim();
+
+                            XElement footnote = new XElement("footnotelov", supId);
+                            XAttribute aTitle = new XAttribute("title", fTitle);
+                            footnote.Add(aTitle);
+                            sup.ReplaceWith(footnote);
+
+                            tr.Parent.Remove();
+                            found = true;
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            string sLeddRegexp = @"^\((?<nr>(\d+))\)\s";
+
+            List<XElement> ledd = part.Elements("p").Where(p => Regex.IsMatch(p.Value.TrimStart(), sLeddRegexp)).Select(p => new XElement(p)).ToList();
+
+            part.Elements().Where(p => p.Name == "p" && p.Value == "").Remove();
+
+            if (part.Elements().Count() == 0) return newPart;
+
+            XElement e = part.Elements().ElementAt(0);
+
+            //if (e.Name.ToString() == "h4") Debug.Print("xxx");
+            if (e.Elements("small").Count() != 0)
+            {
+                MessageBox.Show("Her er det feil!" + e.Value);
+                return null;
+            }
+
+            if ((e.Name.ToString() == "p" || e.Name.ToString() == "h3" || e.Name.ToString() == "h4")
+                        && e.Elements("small").Count() == 0
+                        && ledd.Where(p => p == e).Count() == 0)
+            {
+                if (e.Name.ToString() == "p" && e.Elements("b").Count() != 0 && e.Elements("i").Count() != 0)
+                {
+
+                    string sTitle = "";
+                    foreach (XElement subE in e.Elements())
+                    {
+                        sTitle = sTitle + (sTitle != "" ? " " : sTitle) + subE.Value;
+                    }
+                    newPart.Add(new XElement("title",
+                            new XElement("t", sTitle)));
+                    if (e.Nodes().OfType<XText>().Count() != 0)
+                    {
+                        newPart.Add(new XElement("p",
+                                new XElement("t", e.Nodes().OfType<XText>().Select(s => (string)s.ToString()).StringConcatenate())));
+                    }
+                    e.Remove();
+                }
+                else if (e.Name.ToString() == "p" && e.Elements("b").Count() != 0 && e.Elements("i").Count() == 0)
+                {
+                    newPart.Add(new XElement("title",
+                            new XElement("t", e.Elements("b").First().Value)));
+                    XElement newP = new XElement(e);
+                    newP.Elements("b").Remove();
+                    newPart.Add(new XElement("p", e.Attributes(), EvalNode(newP).Nodes()));
+                    e.Remove();
+                }
+                else if (e.Name.ToString() == "h3" || e.Name.ToString() == "h4")
+                {
+                    newPart.Add(new XElement("title",
+                            new XElement("t", e.Value.Trim())));
+                    e.Remove();
+                }
+                else
+                    MessageBox.Show("Her er det feil i tittel! " + e.Value);
+            }
+
+            if (ledd.Count() != 0)
+            {
+                string firstLeddIdx = ledd.ElementAt(0).Attribute("idx").Value;
+                found = true;
+                while (found)
+                {
+                    found = false;
+                    foreach (XElement bl in part.Elements()
+                        .Where(p => Convert.ToInt32(p.Attribute("idx").Value) < Convert.ToInt32(firstLeddIdx)))
+                    {
+                        XElement newBl = new XElement(bl);
+                        GetPartElement(newBl, newPart);
+                        bl.Remove();
+                        found = true;
+                        break;
+                    }
+                }
+
+                for (int l = 0; l < ledd.Count(); l++)
+                {
+                    //Henter ledd element
+                    //================================================================
+                    XElement currLedd = new XElement(ledd.ElementAt(l));
+                    XElement nextLedd = null;
+                    string leddValue = Regex.Match(currLedd.Value.TrimStart(), sLeddRegexp).Groups["nr"].Value;
+                    XElement xledd = new XElement("ledd",
+                        new XAttribute("value", leddValue));
+
+                    part.Elements().Where(p => p.Attribute("idx").Value == currLedd.Attribute("idx").Value).Remove();
+                    newPart.Add(xledd);
+
+                    XElement newLeddElement = new XElement(currLedd);
+                    if (!newLeddElement.HasElements)
+                    {
+                        newLeddElement.Value = newLeddElement.Value.TrimStart().Substring(Regex.Match(currLedd.Value.TrimStart(), sLeddRegexp).Value.Length);
+                    }
+                    else
+                    {
+                        XText f = newLeddElement.Nodes().OfType<XText>().First();
+                        string test = f.ToString().TrimStart();
+                        test = test.Substring(Regex.Match(currLedd.Value.TrimStart(), sLeddRegexp).Value.Length);
+                        if (f.ToString().TrimStart() != test)
+                        {
+                            f.ReplaceWith(new XText(test));
+                        }
+                    }
+                    //Legger til ledd element
+                    //================================================================
+                    GetPartElement(newLeddElement, xledd);
+
+
+                    //Heneter elementer etter/mellom ledd og legger til ledd element eller parent-element
+                    //================================================================
+
+                    //Hvis flere ledd
+                    if ((l + 1) < ledd.Count())
+                    {
+                        nextLedd = new XElement(ledd.ElementAt(l + 1));
+                        while (part.Elements().Where(p => Convert.ToInt32(p.Attribute("idx").Value) > Convert.ToInt32(currLedd.Attribute("idx").Value)
+                                                                        && Convert.ToInt32(p.Attribute("idx").Value) < Convert.ToInt32(nextLedd.Attribute("idx").Value))
+                                                            .Count() != 0)
+                        {
+                            e = part.Elements().Where(p => Convert.ToInt32(p.Attribute("idx").Value) > Convert.ToInt32(currLedd.Attribute("idx").Value)
+                                                                        && Convert.ToInt32(p.Attribute("idx").Value) < Convert.ToInt32(nextLedd.Attribute("idx").Value))
+                                                        .First();
+                            //GetPartElement(e, xledd.Parent);
+
+                            if (!(e.Name == "p" && e.Elements("small").Count() != 0) && !(e.Name == "table"
+                                    && e.Elements("tr").Elements("td").Count() == 2
+                                    && e.Elements("tr").First().Elements("td").First().Elements("small").Count() != 0))
+                            {
+                                GetPartElement(e, xledd);
+                                part.Elements().Where(p => p.Attribute("idx").Value == e.Attribute("idx").Value).Remove();
+                            }
+                            else
+                            {
+                                GetPartElement(e, xledd.Parent);
+                                part.Elements().Where(p => p.Attribute("idx").Value == e.Attribute("idx").Value).Remove();
+                            }
+                        }
+                    }
+                    //Hvis siste ledd
+                    else
+                    {
+                        while (part.Elements().Where(p => Convert.ToInt32(p.Attribute("idx").Value) > Convert.ToInt32(currLedd.Attribute("idx").Value))
+                                                            .Count() != 0)
+                        {
+                            e = part.Elements().Where(p => Convert.ToInt32(p.Attribute("idx").Value) > Convert.ToInt32(currLedd.Attribute("idx").Value))
+                                                    .First();
+                            if (!(e.Name == "p" && e.Elements("small").Count() != 0) && !(e.Name == "table"
+                                    && e.Elements("tr").Elements("td").Count() == 2
+                                    && e.Elements("tr").First().Elements("td").First().Elements("small").Count() != 0))
+                            {
+                                //GetPartElement(e, xledd.Parent);
+                                GetPartElement(e, xledd);
+                                part.Elements().Where(p => p.Attribute("idx").Value == e.Attribute("idx").Value).Remove();
+                            }
+                            else
+                            {
+                                GetPartElement(e, xledd.Parent);
+                                part.Elements().Where(p => p.Attribute("idx").Value == e.Attribute("idx").Value).Remove();
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+            //legg ut de siste
+            //=============================================================================
+
+            for (int i = 0; i < part.Elements().Count(); i++)
+            {
+                e = part.Elements().ElementAt(i);
+                GetPartElement(e, newPart);
+            }

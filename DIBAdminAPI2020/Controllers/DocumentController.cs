@@ -34,7 +34,7 @@ namespace DIBAdminAPI.Controllers
             _cache = cacheService;
 
         }
-        
+
         [HttpGet("{objectname}", Name = "GetResource")]
         public async Task<IActionResult> GetResource(
                 string objectname,
@@ -56,6 +56,8 @@ namespace DIBAdminAPI.Controllers
             }
             return BadRequest();
         }
+
+       
         [HttpGet]
         public async Task<IActionResult> Get(
                 [FromQuery] string resourceId,
@@ -67,11 +69,26 @@ namespace DIBAdminAPI.Controllers
         )
         {
 
-            if ((segmentId??"").Trim().ToLower() =="diblink")
+            if ((segmentId ?? "").Trim().ToLower() == "diblink")
             {
-
+                DocumentParts docParts = await _repo.GetDocumentPartDiblink(resourceId, segmentId, Id);
+                if (docParts == null)
+                {
+                    return BadRequest("Missing part");
+                }
+                return Ok(docParts);
             }
-            
+
+            if ((Id ?? "")!="")
+            {
+                DocumentParts docParts = await _repo.GetDocumentPart(resourceId, Id);
+                if (docParts == null)
+                {
+                    return BadRequest("Missing part");
+                }
+                return Ok(docParts);
+            }
+
             var p = new
             {
                 session_id = "apitest",//_usrsvc.CurrentUser.session_id,
@@ -430,7 +447,6 @@ namespace DIBAdminAPI.Controllers
 
             try
             {
-
                 var p = new
                 {
                     session_id = "apitest",//_usrsvc.CurrentUser.session_id,

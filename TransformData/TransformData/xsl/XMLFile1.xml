@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<segments>
+  <segment id="{680D501D-55F2-4791-9ECD-2B9FDE313B28}">
+    <Bok id="{680D501D-55F2-4791-9ECD-2B9FDE313B28}" autors="Magnus Aabakke, Asle Aarbakke, Gudmund Knutsen, Tone Ofstad og Jan Skåre" styleindex="kommentar_idx.xsl" stylemain="kommentar_main.xsl" stylezoom="kommentar_zoom.xsl" segment="true">
+      <Tittel id="b5da264a-82c9-4831-adc7-9e4821139450">Aksjeloven og allmennaksjeloven Kommentarutgave 3. utgave</Tittel>
+      <Hoveddel id="ce743285-ef3a-4104-a90a-e2b47f23475e" segment="true">
+        <Tittel id="b3e975a2-3226-405b-a184-443cd156186e">Forord</Tittel>
+        <Avsnitt id="5229d35e-0e3b-410b-a1c9-51b0043f06df" xml:space="preserve">Aksjerettslige problemstillinger , se 
+          <diblink refid="m21828">
+            <idlinks idlinkid="m21828">
+              <idlink topic_id="{B0B37B79-6899-4397-A8BD-F396AFDEDAF6}" title="Skatteloven" language="no" n="10919">
+                <idlink topic_id="{B0B37B79-6899-4397-A8BD-F396AFDEDAF6}" bm="P2-38" title="§ 2-38" language="no" n="10938" />
+                <idlink topic_id="{B0B37B79-6899-4397-A8BD-F396AFDEDAF6}" bm="P10-12" title="§ 10-12" language="no" n="10979" />
+                <idlink topic_id="{B0B37B79-6899-4397-A8BD-F396AFDEDAF6}" bm="P10-2" title="§ 10-2" language="no" n="11031" />
+                <idlink topic_id="{B0B37B79-6899-4397-A8BD-F396AFDEDAF6}" bm="P11-1" title="§ 11-1" language="no" n="11067" />
+              </idlink>
+          </idlinks>skatteloven § 2-38 annet ledd (a) (fritaksmetoden), § 10-12 første ledd (fradrag for skjermet utbytte), § 10-2 første ledd (konsernbidrag), § 11-1 annet ledd (skattefri fusjon og fisjon)
+          </diblink>
+            og forskrift 19.11.1999 § 11-21-6 første ledd (skattefri overføring av eiendeler mellom</Avsnitt>
+
+      </Hoveddel>
+    </Bok>
+  </segment>
+</segments>

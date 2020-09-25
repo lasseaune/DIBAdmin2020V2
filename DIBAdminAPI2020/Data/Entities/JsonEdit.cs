@@ -14,11 +14,11 @@ namespace DIBAdminAPI.Data.Entities
 {
     public static class JsonElementActions
     {
-        public static void SetOtherProps(this KeyValuePair<string, JsonElement> e, string key, string value)
+        public static void SetOtherProps(this KeyValuePair<string, JsonElement> e, string key, dynamic value)
         {
             if (e.Value.otherprops== null)
             {
-                e.Value.otherprops = new Dictionary<string, string>();
+                e.Value.otherprops = new Dictionary<string, dynamic>();
             }
             if (e.Value.otherprops.ContainsKey(key))
             {
@@ -1761,9 +1761,19 @@ namespace DIBAdminAPI.Data.Entities
             if (jsonDelete.action != "delete") return null;
             foreach (string id in jsonDelete.id)
             {
-                if (documentContainer.elements.ContainsKey(id))
+                string CurrId = id;
+                if (documentContainer.elements.ContainsKey(CurrId))
                 {
-                    JsonElement e = documentContainer.elements.Values.Where(p => p.children.Where(c => c.id == id).Count() > 0).FirstOrDefault();
+                    KeyValuePair<string,JsonElement> je = documentContainer.elements.Where(p => p.Key == id).Select(p=>p).FirstOrDefault();
+                    if (je.Value.name == "table")
+                    {
+                        je = documentContainer.elements.Where(p => p.Value.children.Select(c => c.id == je.Key).Count() != 0).FirstOrDefault();
+                        if (je.Value.name == "dib" && (je.Value.attributes.Where(p => p.Key == "class" && p.Value == "tablewrapper").Count() != 0))
+                        {
+                            CurrId = je.Key;
+                        }
+                    }
+                    JsonElement e = documentContainer.elements.Values.Where(p => p.children.Where(c => c.id == CurrId).Count() > 0).FirstOrDefault();
                     if (e != null)
                     {
                         e.RemoveChild(id);
@@ -1804,7 +1814,7 @@ namespace DIBAdminAPI.Data.Entities
         }
         public static EditDocumentContainerResult UpdateJsonElements(this DocumentContainer documentContainer, JsonUpdate jsonUpdate, string resourceId, string segmentId)
         {
-            string document_id = "document;" + resourceId + ";" + segmentId;
+            //string document_id = "document;" + resourceId + ";" + segmentId;
             if (jsonUpdate.action != "update") return null;
             bool updateToc = false;
             List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
@@ -1813,29 +1823,8 @@ namespace DIBAdminAPI.Data.Entities
                 if (documentContainer.elements.ContainsKey(pair.Key))
                 {
                     if (pair.Value.name == "section") updateToc = true;
-
-                    if (pair.Value.otherprops == null)
-                    {
-                        documentContainer.elements[pair.Key] = pair.Value;
-                    }
-                    else
-                    {
-                        if (pair.Value.otherprops.Where(p => p.Key == "accounting" && p.Value == "false").Count() > 0)
-                        {
-                            pair.Value.otherprops.Remove("accounting");
-                            updated.Add(pair);
-                            documentContainer.elements[pair.Key] = pair.Value;
-                                                    }
-                        else if (pair.Value.otherprops.Where(p => p.Key == "accounting" && p.Value == "true").Count() > 0)
-                        {
-                            updated = pair.UpdateOtherProps(documentContainer.elements, "accounting", "accref");
-                            documentContainer.elements[pair.Key] = updated.Where(p => p.Key == pair.Key).Select(p => p.Value).FirstOrDefault();
-                        }
-                        else
-                        {
-                            documentContainer.elements[pair.Key] = pair.Value;
-                        }
-                    }
+                    documentContainer.elements[pair.Key] = pair.Value;
+                    updated.Add(pair);
                 }
             }
             List<TocUpdate> tocUpdates = null;
@@ -2141,7 +2130,7 @@ namespace DIBAdminAPI.Data.Entities
             {
                 json = new JsonObject
                 {
-                    resourceid = jsonCreate.resourceid,
+                    resourceid = jsonCreate.resourceId,
                     root = jsonPaste.children,
                     elements = jsonPaste.elements,
                     toc = jsonPaste.toc
@@ -2341,7 +2330,6 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         element.Remove();
                     }
-
                 }
 
                 XElement container = new XElement("container");
@@ -2544,7 +2532,7 @@ namespace DIBAdminAPI.Data.Entities
         {
             string newId = "";
             JsonObject result = null;
-            jsonCreate.resourceid = jsonCreate.resourceid.ToLower();
+            jsonCreate.resourceId = jsonCreate.resourceId.ToLower();
             if (jsonCreate.action=="create" && jsonCreate.html!=null)
             {
                 return PasteJsonElements(documentContainer, jsonCreate);
@@ -2553,7 +2541,7 @@ namespace DIBAdminAPI.Data.Entities
             {
                 result = new JsonObject
                 {
-                    resourceid = jsonCreate.resourceid,
+                    resourceid = jsonCreate.resourceId,
                     root = new List<JsonChild>(),
                     elements = new Dictionary<string, JsonElement>()
                 };
@@ -2694,7 +2682,7 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         json = new JsonObject
                         {
-                            resourceid = jsonCreate.resourceid,
+                            resourceid = jsonCreate.resourceId,
                             root = jsonPaste.children,
                             elements = jsonPaste.elements,
                             toc = jsonPaste.toc
@@ -2756,7 +2744,7 @@ namespace DIBAdminAPI.Data.Entities
                 TableProduction tableProduction = new TableProduction(table, editObject);
                 table = tableProduction.Table;
 
-                result = new JsonObject(table, jsonCreate.resourceid);
+                result = new JsonObject(table, jsonCreate.resourceId);
 
                 documentContainer.elements = documentContainer.elements
                     .Where(x => !result.elements.ContainsKey(x.Key))
@@ -2893,8 +2881,8 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class JsonUpdate
     {
-        public string resourceid { get; set; }
-        public string segmentid { get; set; }
+        public string resourceId { get; set; }
+        public string segmentId { get; set; }
         //public string item { get; set; }
         public string action { get; set; }
         //public JsonUpdateRoot root { get; set; }
@@ -2903,8 +2891,8 @@ namespace DIBAdminAPI.Data.Entities
 
     public class JsonDelete
     {
-        public string resourceid { get; set; }
-        public string segmentid { get; set; }
+        public string resourceId { get; set; }
+        public string segmentId { get; set; }
         public string item { get; set; }
         public string action { get; set; }
         public List<string> id { get; set; }
@@ -2931,8 +2919,8 @@ namespace DIBAdminAPI.Data.Entities
 
     public class JsonCreateElements
     {
-        public string resourceid { get; set; }
-        public string segmentid { get; set; }
+        public string resourceId { get; set; }
+        public string segmentId { get; set; }
         public string item { get; set; }
         public string action { get; set; }
         public string id { get; set; }
@@ -3059,7 +3047,7 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class JsonElement
     {
-        public Dictionary<string, string> otherprops;
+        public Dictionary<string, dynamic> otherprops;
         public Dictionary<string, string> attributes = new Dictionary<string, string>();
         public List<JsonChild> children { get; set; } = new List<JsonChild>();
         public string  name { get; set; }

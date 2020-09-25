@@ -243,6 +243,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                         //case "x-acc": result.AddRange(e.XAcc()); break;
                         case "x-index": result.AddRange(e.XIndex()); break;
                         case "x-link-to": result.AddRange(e.XLinkTo()); break;
+                        case "item": result.AddRange(e.item()); break;
                         default: result.AddRange(e.Default()); break;
                     }
                 }
@@ -267,6 +268,56 @@ namespace DIBAdminAPI.Helpers.Extentions
 
         //    return result;
         //}
+        private static IEnumerable<XNode> item(this XElement e)
+        {
+
+            List<XNode> result = new List<XNode>();
+            int n = e.AncestorsAndSelf("item").Count();
+            if (n > 6)
+                n = 6;
+            result.Add(new XElement("section",
+                e.Attributes("id"),
+                e.Attributes("type").FirstOrDefault()==null ? null : new XAttribute("data-type", (string)e.Attributes("type").FirstOrDefault()),
+                new XAttribute("class", "check-item"),
+                (
+                    e.Nodes().OfType<XElement>().Where(p=>p.Name.LocalName=="ititle").Count()==1 
+                    ? new XElement("h"+ n.ToString(),
+                        e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ititle").Attributes("id").FirstOrDefault(),
+                        e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ititle").Nodes().SelectMany(p => p.Transform()))
+                    : null
+                ),
+                new XElement("section",
+                    new XAttribute("class", "check-ingress"),
+                    (
+                        e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ingress").Attributes("id").FirstOrDefault() == null
+                        ? new XAttribute("id", Guid.NewGuid().ToString())
+                        : e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ingress").Attributes("id").FirstOrDefault()
+                    ),
+                    e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ingress").Nodes().SelectMany(p => p.Transform())
+                ),
+                new XElement("section",
+                    new XAttribute("class", "check-description"),
+                    (
+                        e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "description").Attributes("id").FirstOrDefault() == null
+                        ? new XAttribute("id", Guid.NewGuid().ToString())
+                        : e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "description").Attributes("id").FirstOrDefault()
+                    ),
+                    e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "description").Nodes().SelectMany(p => p.Transform())
+                ),
+                new XElement("section",
+                    new XAttribute("class", "check-law"),
+                    (
+                        e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "law").Attributes("id").FirstOrDefault()==null
+                        ? new XAttribute("id", Guid.NewGuid().ToString())
+                        : e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "law").Attributes("id").FirstOrDefault()
+                    ),
+                    e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "law").Nodes().SelectMany(p => p.Transform())
+                ),
+                e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "item").SelectMany(p => p.Transform()))
+            );
+
+            return result;
+        }
         private static IEnumerable<XNode> XLinkTo(this XElement e)
         {
 
@@ -334,7 +385,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                 return result;
             }
 
-            return result;
+        
         }
         private static IEnumerable<XNode> XIndex(this XElement e)
         {

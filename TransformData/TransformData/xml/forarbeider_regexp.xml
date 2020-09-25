@@ -1,0 +1,515 @@
+﻿<regexps>
+  <regexp type="single">
+    <id>roman_number_named</id>
+    <description>Henter romertall</description>
+    <expression>
+      <part type="named" name="roman">
+        <part type="or">
+          <part type="named" name="rom1">
+            <part type="single">
+              <text><![CDATA[i|I]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom2">
+            <part type="single">
+              <text><![CDATA[ii|II]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom3">
+            <part type="single">
+              <text><![CDATA[iii|III]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom4">
+            <part type="single">
+              <text><![CDATA[iv|IV]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom5">
+            <part type="single">
+              <text><![CDATA[v|V]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom5">
+            <part type="single">
+              <text><![CDATA[vi|VI]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom7">
+            <part type="single">
+              <text><![CDATA[vii|VII]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom8">
+            <part type="single">
+              <text><![CDATA[viii|VIII]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom9">
+            <part type="single">
+              <text><![CDATA[ix|IX]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom10">
+            <part type="single">
+              <text><![CDATA[x|X]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom11">
+            <part type="single">
+              <text><![CDATA[xi|XI]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom12">
+            <part type="single">
+              <text><![CDATA[xii|XII]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom13">
+            <part type="single">
+              <text><![CDATA[xiii|XIII]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom14">
+            <part type="single">
+              <text><![CDATA[xiv|XIV]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom15">
+            <part type="single">
+              <text><![CDATA[xv|XV]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom16">
+            <part type="single">
+              <text><![CDATA[xvi|XVI]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom17">
+            <part type="single">
+              <text><![CDATA[xvii|XVII]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom18">
+            <part type="single">
+              <text><![CDATA[xviii|XVIII]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom19">
+            <part type="single">
+              <text><![CDATA[xix|XIX]]></text>
+            </part>
+          </part>
+          <part type="named" name="rom20">
+            <part type="single">
+              <text><![CDATA[xx|XX]]></text>
+            </part>
+          </part>
+          <part type="chain">
+            <part type="named" name="rom1">
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[[i]]]></text>
+              </part>
+            </part>
+            <part type="negative lookahead">
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[([^\s])?(\s+)?(forskrift|lov|regelen|denne|visse|inntekt)]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  
+  <regexp type="single">
+    <id>kapnumber</id>
+    <description>avsnitt IV.1.1.1</description>
+    <expression>
+      <part type="named" name="kapnum">
+        <part type="single">
+          <text><![CDATA[\d+]]></text>
+        </part>
+        <part type="optional">
+          <part type="multiple">
+            <part type="single">
+              <text><![CDATA[\.\d+]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>avsnitt</id>
+    <description>avsnitt IV.1.1.1</description>
+    <expression>
+      <part type="named" name="avsnitt">
+        <part type="single">
+          <text><![CDATA[(avsnitt|Avsnitt|AVSNITT)]]></text>
+        </part>
+        <part type="optional">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="roman_number_named" />
+          <part type="single">
+            <text><![CDATA[\.]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="kapnumber" />
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>parantesfront</id>
+    <description>(</description>
+    <expression>
+      <part type="single">
+        <text><![CDATA[(\s+)?\((\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>parantesrear</id>
+    <description>(</description>
+    <expression>
+      <part type="single">
+        <text><![CDATA[(\s+)?\)]]></text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>nr</id>
+    <description>nr.</description>
+    <expression>
+      <part type="single">
+        <text><![CDATA[(\s+)?(n|N)(r|R)(\s+)?(\.|-)?(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>vedtaktype</id>
+    <description> ls </description>
+    <expression>
+      <part type="named" name="type">
+        <part type="single">
+          <text><![CDATA[(ls|s|l|LS|S|L)]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>year</id>
+    <description>1900-01</description>
+    <expression>
+      <part type="optional">
+        <part type="optional">
+          <part type="single">
+            <text><![CDATA[for\s+]]></text>
+          </part>
+        </part>
+        <part type="named" name="year1">
+          <part type="single">
+            <text><![CDATA[\d\d(\d\d)?]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <part type="single">
+            <text><![CDATA[(\s+)?(\-|–)(\s+)?]]></text>
+          </part>
+          <part type="named" name="year2">
+            <part type="single">
+              <text><![CDATA[\d\d(\d\d)?]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <regexp type="single_multi">
+    <id>innstilling</id>
+    <description>innst. 211 l (2009-2010)</description>
+    <expression>
+      <part type="named" name="innstilling">
+        <part type="named" name="name1">
+          <part type="single">
+            <text><![CDATA[(i|I)(n|N)+(s|S)(t|T)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="nr"/>
+        </part>
+        <part type="chain">
+          <part type="negative lookahead">
+            <part type="single">
+              <text><![CDATA[0(\.|\s)]]></text>
+            </part>
+          </part>
+          <part type="named" name="number">
+            <part type="single">
+              <text><![CDATA[\d+]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="vedtaktype" />
+        </part>
+        <part type="optional">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="parantesfront"/>
+        </part>
+        <part type="regexp" name="year"/>
+        <part type="optional">
+          <part type="regexp" name="parantesrear"/>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>innstillingos</id>
+    <description>innst. 211 l (2009-2010)</description>
+    <expression>
+      <part type="named" name="innstillingos">
+        <part type="named" name="name1">
+          <part type="single">
+            <text><![CDATA[(besl|Besl|BESL|innst|Innst|INNST)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="name2">
+          <part type="single">
+            <text><![CDATA[o|O|s|S|0]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="nr"/>
+        </part>
+        <part type="named" name="number">
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="vedtaktype" />
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="parantesfront"/>
+        </part>
+        <part type="regexp" name="year"/>
+        <part type="optional">
+          <part type="regexp" name="parantesrear"/>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>otstprp</id>
+    <description>Ot. prp. 1 (1993-1994)</description>
+    <expression>
+      <part type="named" name="otstprp">
+        <part type="named" name="name1">
+          <part type="single">
+            <text><![CDATA[(o|O)(t|T)|(s|S)(t|T)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="name2">
+          <part type="single">
+            <text><![CDATA[(p|P)(r|R)(p|P)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="nr"/>
+        </part>
+        <part type="named" name="number">
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="parantesfront"/>
+        </part>
+        <part type="regexp" name="year"/>
+        <part type="optional">
+          <part type="regexp" name="parantesrear"/>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>prop</id>
+    <description>Prop. 1 l (2009-2010)</description>
+    <expression>
+      <part type="named" name="prop">
+        <part type="named" name="name1">
+          <part type="single">
+            <text><![CDATA[(p|P)(r|R)(o|O)(p|P)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="nr"/>
+        </part>
+        <part type="named" name="number">
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="vedtaktype" />
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="parantesfront"/>
+        </part>
+        <part type="regexp" name="year"/>
+        <part type="optional">
+          <part type="regexp" name="parantesrear"/>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>stmeld</id>
+    <description>St. meld. 29 (2003-2004)</description>
+    <expression>
+      <part type="named" name="stmeld">
+        <part type="named" name="name1">
+          <part type="single">
+            <text><![CDATA[(St|st|ST)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="name2">
+          <part type="single">
+            <text><![CDATA[(m|M)(e|E)(l|L)(d|D)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="nr"/>
+        </part>
+        <part type="named" name="number">
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="vedtaktype" />
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="optional">
+          <part type="regexp" name="parantesfront"/>
+        </part>
+        <part type="regexp" name="year"/>
+        <part type="optional">
+          <part type="regexp" name="parantesrear"/>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>nou</id>
+    <description>nou 1978:42</description>
+    <expression>
+      <part type="named" name="nou">
+        <part type="named" name="name1">
+          <part type="single">
+            <text><![CDATA[(nou|Nou|NOU)]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\.)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="year1">
+          <part type="single">
+            <text><![CDATA[\d\d(\d\d)?]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <text><![CDATA[(\s+)?(\:|\-|\s+)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="number">
+          <part type="single">
+            <text><![CDATA[(\d+|\dO|O\d)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="multi">
+    <id>forarbeidertot</id>
+    <description>forarbeidertot</description>
+    <expression>
+      <part type="or">
+        <part type="regexp" name="innstilling" />
+        <part type="regexp" name="innstillingos" />
+        <part type="regexp" name="otstprp" />
+        <part type="regexp" name="prop" />
+        <part type="regexp" name="stmeld" />
+        <part type="regexp" name="nou" />
+      </part>
+    </expression>
+  </regexp>
+
+</regexps>

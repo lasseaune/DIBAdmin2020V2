@@ -1,0 +1,92 @@
+﻿<actions>
+  <action name="para">
+    <foreach querytype="group" groups="paranr">
+      <get tag="tag2" groups="paranr">
+        <true>
+          <mark groups="paranr" />
+        </true>
+      </get>
+    </foreach>
+    <foreach querytype="group" groups="delnr">
+      <get tag="tag2" groups="$del$|delnr">
+        <true>
+          <mark groups="delnr" />
+        </true>
+      </get>
+    </foreach>
+    <foreach querytype="group" groups="kapnr">
+      <get tag="tag2" groups="$kap$|kapnr">
+        <true>
+          <mark groups="kapnr" />
+        </true>
+      </get>
+    </foreach>
+  </action>
+  <action name="total" query="total">
+    <match name="tag_fin_skd"/>
+    <match name="tag_kl"/>
+    <match name="tag_utv"/>
+    <match name="tag_bfu"/>
+    <match name="note_ref_para">
+      <get tag="tag1" groups="note_name|$_$|note_paragraf|$_$">
+        <foreach querytype="group" groups="note_no">
+          <internal tag="tag2" groups="note_no" prefix="" >
+            <true>
+              <mark groups="note_no" />
+            </true>
+          </internal>
+        </foreach>
+      </get>
+    </match>
+    <match name="note_ref">
+      <get tag="tag1" groups="note_name|$_$|note_lov|$_$|note_paragraf|$_$">
+        <foreach querytype="group" groups="note_no">
+          <internal tag="tag2" groups="note_no" prefix="" >
+            <true>
+              <mark groups="note_no" />
+            </true>
+          </internal>
+        </foreach>
+      </get>
+    </match>
+    <match name="tag_lonnkode">
+        <foreach querytype="group" groups="kodenr">
+          <internal tag="tag1" groups="kodenr" prefix="K" >
+            <true>
+              <mark groups="kodenr" />
+            </true>
+          </internal>
+        </foreach>
+    </match>
+    <match name="source_para">
+      <match name="lov_before|para|lov_after" />
+      <match name="lov_before|para"/>
+      <match name="lov_after|para"/>
+      <match name="para">
+          <foreach querytype="group" groups="paranr">
+            <internal tag="tag1" groups="paranr" prefix="P" >
+              <true>
+                <mark groups="paranr" />
+              </true>
+            </internal>
+          </foreach>          
+      </match>
+    </match>
+    <match name="tag_lovname"/>
+    <match name="st_ifrs"/>
+    <match name="st_isa_sa_nrs"/>
+    <match name="nou"/>
+    <match name="besl_innst_prop_st" />
+    <match name="internal_avsnitt">
+        <internal tag="tag1" groups="number" prefix="KAP" >
+          <true>
+            <foreach querytype="group" groups="number" >
+              <internal tag="tag1" groups="number" trim="1" >
+                <mark groups="number" />
+              </internal>
+            </foreach>
+          </true>
+        </internal>
+    </match>
+  </action>
+</actions>

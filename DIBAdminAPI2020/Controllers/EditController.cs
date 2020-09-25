@@ -30,8 +30,8 @@ namespace DIBAdminAPI.Controllers
         public IActionResult Create([FromBody]JsonCreateElements jc)
         {
 
-            string resourceId = jc.resourceid;
-            string segmentId = jc.segmentid ?? "";
+            string resourceId = jc.resourceId;
+            string segmentId = jc.segmentId ?? "";
 
             string rid = "rid="+ resourceId + ";sid=" + segmentId + ";_document";
             DocumentContainer result = _cache.Get<DocumentContainer>(rid);
@@ -58,8 +58,8 @@ namespace DIBAdminAPI.Controllers
         [HttpPatch("")]
         public IActionResult Patch([FromBody]JsonUpdate ju)
         {
-            string resourceId = ju.resourceid;
-            string segmentId = ju.segmentid == null ? "" : ju.segmentid;
+            string resourceId = ju.resourceId;
+            string segmentId = ju.segmentId == null ? "" : ju.segmentId;
             string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
             DocumentContainer result = _cache.Get<DocumentContainer>(rid);
             if (result == null)
@@ -80,8 +80,8 @@ namespace DIBAdminAPI.Controllers
         [HttpDelete("")]
         public IActionResult Delete([FromBody]JsonDelete jd)
         {
-            string resourceId = jd.resourceid;
-            string segmentId = jd.segmentid == null ? "" : jd.segmentid;
+            string resourceId = jd.resourceId;
+            string segmentId = jd.segmentId == null ? "" : jd.segmentId;
             string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
             DocumentContainer result = _cache.Get<DocumentContainer>(rid);
             if (result == null)

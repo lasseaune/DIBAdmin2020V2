@@ -1,0 +1,246 @@
+﻿<actions query="tokensourcepara">
+  <querys>
+    <query name ="tokensourcepara" />
+  </querys>
+  <action name="para">
+    <foreach querytype="group" groups="paranr">
+      <get tag="tag2" groups="paranr">
+        <true>
+          <mark groups="paranr" />
+        </true>
+      </get>
+    </foreach>
+    <foreach querytype="group" groups="delnr">
+      <get tag="tag2" groups="$del$|delnr">
+        <true>
+          <mark groups="delnr" />
+        </true>
+      </get>
+    </foreach>
+    <foreach querytype="group" groups="kapnr">
+      <get tag="tag2" groups="$kap$|kapnr">
+        <true>
+          <mark groups="kapnr" />
+        </true>
+      </get>
+    </foreach>
+  </action>
+  <match name="tag_fin_skd">
+    <get tag="tag1" groups="stname|stnr" >
+      <true>
+        <mark groups="tag_fin_skd" />
+      </true>      
+    </get>
+  </match>
+  <match name="tag_kl">
+    <foreach querytype="group"  groups="tag2" >
+      <get tag="tag1"  groups="$kl$|tag2" >
+        <true>
+          <mark groups="tag2" />
+        </true>
+      </get>
+    </foreach>
+  </match>
+  <match name="tag_utv">
+    <get tag="tag1" groups="tag1|tag2|$/$|tag3" >
+      <true>
+        <mark groups="tag_utv" />
+      </true>
+    </get>
+  </match>
+  <match name="tag_bfu">
+    <get tag="tag1" groups="$bfu$|tag2|$/$|tag3" >
+      <true>
+        <mark groups="tag_bfu" />
+      </true>
+    </get>
+  </match>
+  <match name="tag_lonnkode">
+    <get tag="tag1"  groups="$kode$" trim="1"  >
+      <true>
+        <foreach querytype="group" groups="kodenr">
+          <get tag="tag2" groups="kodenr">
+            <true>
+              <mark groups="kodenr" />
+            </true>
+            <false>
+              <get tag="tag2" groups="kodenr|$-A$">
+                <true>
+                  <mark groups="kodenr|kodeacent" />
+                </true>
+              </get>
+            </false>
+          </get>
+        </foreach>
+      </true>
+    </get>
+  </match>
+  <match name="source_para">
+    <match name="lov_before|para|lov_after" />
+    <match name="lov_before|para">
+      <match name="source_name">
+        <get tag="tag1" groups="source_name">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="mlovom">
+        <get tag="tag1" groups="mlovom_name">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="nxlovname">
+        <get tag="tag1" groups="nxlovname">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="nxforname">
+        <get tag="tag1" groups="nxforname">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="mlovdate">
+        <get tag="tag1" groups="mlovdate" function="GetLovDate" values="type=typelov,typefor,typeres|date=lovdate|day=day|month=month|year=year|number=number">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+    </match>
+    <match name="lov_after|para">
+      <match name="source_name">
+        <get tag="tag1" groups="source_name">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="mlovom">
+        <get tag="tag1" groups="mlovom_name">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="nxlovname">
+        <get tag="tag1" groups="nxlovname">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="nxforname">
+        <get tag="tag1" groups="nxforname">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+      <match name="mlovdate">
+        <get tag="tag1" groups="mlovdate" function="GetLovDate" values="type=typelov,typefor,typeres|date=lovdate|day=day|month=month|year=year|number=number">
+          <true>
+            <match name="para">
+              <runaction name="para" />
+            </match>
+          </true>
+        </get>
+      </match>
+    </match>
+    <match name="para">
+      <runaction name="para" />
+    </match>
+  </match>
+  <match name="tag_lovname">
+    <match name="mlovdate">
+      <get tag="tag1" groups="mlovdate" function="GetLovDate" values="type=typelov,typefor,typeres|date=lovdate|day=day|month=month|year=year|number=number">
+        <true>
+          <mark groups="mlovdate" />
+        </true>
+      </get>
+    </match>
+    <match name="mlovom">
+      <get tag="tag1" groups="mlovom_name">
+        <true>
+          <mark groups="mlovom_name" />
+        </true>
+      </get>
+    </match>
+    <match name="nxlovname">
+      <get tag="tag1" groups="nxlovname">
+        <true>
+          <mark groups="nxlovname" />
+        </true>
+      </get>
+    </match>
+    <match name="nxforname">
+      <get tag="tag1" groups="nxforname">
+        <true>
+          <mark groups="nxforname" />
+        </true>
+      </get>
+    </match>
+
+  </match>
+  <match name="st_ifrs">
+    <get tag="tag1" groups="stname|stnr" trim="1">
+      <get tag="tag2" groups="stpara" trim="1">
+        <true>
+          <foreach querytype="group" groups="stpara" >
+            <get tag="tag2"  groups="stpara" trim="1" >
+              <true>
+                <mark groups="stpara" />
+              </true>
+            </get>
+          </foreach>
+        </true>
+        <false>
+          <mark groups="stname|stnr" />
+        </false>
+      </get>
+    </get>
+  </match>
+  <match name="st_isa_sa_nrs">
+    <get tag="tag1" groups="stname|stnr">
+      <get tag="tag2" groups="stpara">
+        <true>
+          <foreach querytype="group" groups="stpara" >
+            <get tag="tag2"  groups="stpara" >
+              <true>
+                <mark groups="stpara" />
+              </true>
+            </get>
+          </foreach>
+        </true>
+        <false>
+          <mark groups="stname|stnr" />
+        </false>
+      </get>
+    </get>
+  </match>
+
+</actions>

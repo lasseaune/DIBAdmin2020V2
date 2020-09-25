@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using static DIBAdminAPI.Models.Result;
@@ -10,8 +11,395 @@ using System.IO;
 using DIBAdminAPI.Services;
 
 namespace DIBAdminAPI.Data.Entities
+{ 
+    public class DibLinkSelect
+    {
+        public Guid resourceId { get; set; }
+        public string segmentId { get; set; }
+        public string regexName { get; set; }
+    }
+    public class DIBLinkData
+    {
+        public string tag1 { get; set; }
+        public string name { get; set; }
+        public Guid resourceId { get; set; }
+        public string tag1Id { get; set; }
+        public string tag2 { get; set; }
+        public string tag2Id { get; set; }
+        public string tag2SegmentId { get; set; }
+        public string tag2Idx { get; set; }
+        public string totag2 { get; set; }
+        public string totag2Id { get; set; }
+        public string totag2SegmentId { get; set; }
+        public string totag2Idx { get; set; }
+        public string tag3 { get; set; }
+        public string tag3Id { get; set; }
+        public string tag3Idx { get; set; }
+        public string totag3 { get; set; }
+        public string totag3Id { get; set; }
+        public string totag3Idx { get; set; }
+    }
+    public class ElementMark
+    {
+        public bool mark { get; set; }
+        public ElementMark(XElement e)
+        {
+            if (e.Name.LocalName != "span")
+            {
+                mark = true;
+                e.AddAnnotation(this);
+            }
+            else
+            {
+                XElement ledd = e.Ancestors().Where(p => (string)p.Attributes("class").FirstOrDefault() == "lovdata-ledd").FirstOrDefault();
+                if (ledd != null ? ledd.Annotations<ElementMark>().FirstOrDefault() == null : false)
+                {
+                    mark = true;
+                    e.AddAnnotation(this);
+                }
+            }
+        }
+    }
+    public class SegmentSelect
+    {
+        public bool select { get; set; }
+        public bool marks { get; set; }
+        public SegmentSelect(SelectedElement e)
+        {
+            select = true;
+            e.element.AddAnnotation(this);
+            if (e.mark.Elements("mark").Where(p => ((string)p.Attributes("id").FirstOrDefault() ?? "") != "").Count() > 0)
+            {
+                marks = true;
+                List<string> ids = e.mark.Elements("mark").Where(p => ((string)p.Attributes("id").FirstOrDefault() ?? "") != "").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
+                e.element.Descendants().Where(p => ids.Contains(((string)p.Attributes("id").FirstOrDefault() ?? ""))).ToList().ForEach(p => new ElementMark(p));
+            }
+        }
+    }
+    public class SelectedElement
+    {
+        public XElement element { get; set; }
+        public XElement mark { get; set; }
+    }
+    public static class DocumentContainerExtentions
+    {
+      
 
-{
+        public static IEnumerable<XNode> GetMarkedItem(this XNode n)
+        {
+            List<XNode> result = new List<XNode>();
+            if (n.NodeType != XmlNodeType.Element)
+            {
+                result.Add(n);
+                return result;
+            }
+            XElement e = (XElement)n;
+            if (e.Name.LocalName == "li" && e.Parent.Name.LocalName == "ol")
+            {
+                int iValue = e.NodesBeforeSelf().OfType<XElement>().Where(p => p.Name.LocalName == "li").Count() + 1;
+                string value = (string)e.Attributes("value").FirstOrDefault();
+                if (value == null)
+                {
+                    e.Add(new XAttribute("value", iValue.ToString()));
+                }
+                else
+                {
+                    if (!Regex.IsMatch(value.Trim(), @"^\d+$"))
+                    {
+                        e.Attributes("value").FirstOrDefault().SetValue(iValue.ToString());
+                    }
+                }
+            }
+            ElementMark em = e.Annotations<ElementMark>().FirstOrDefault();
+            if (em != null)
+            {
+                result.Add(e);
+            }
+            else
+            {
+
+                result.Add(new XElement(e.Name.LocalName, e.Attributes(), e.GetMarkedItems()));
+
+
+            }
+            return result;
+        }
+        public static IEnumerable<XNode> GetSelectedItem(this XNode n)
+        {
+            List<XNode> result = new List<XNode>();
+            if (n.NodeType != XmlNodeType.Element)
+            {
+                result.Add(n);
+                return result;
+            }
+
+            XElement e = (XElement)n;
+            SegmentSelect se = e.Annotations<SegmentSelect>().FirstOrDefault();
+            if (se != null)
+            {
+                ElementMark em = e.DescendantsAndSelf().Where(p => p.Annotations<ElementMark>().FirstOrDefault() != null).Select(p => p.Annotations<ElementMark>().FirstOrDefault()).FirstOrDefault();
+                if (em == null)
+                {
+                    result.Add(e);
+                }
+                else
+                {
+                    XElement hx = e.Elements().Where(p => Regex.IsMatch(p.Name.LocalName, @"h\d")).FirstOrDefault();
+                    string header = "";
+                    string id = null;
+                    if (hx != null)
+                    {
+                        header =
+                        e.Name.LocalName == "section"
+                        ? hx.DescendantNodes().OfType<XText>().Where(s => s.Parent.Ancestors().Where(a => !("a".Contains(a.Name.LocalName))).Count() > 0).Select(s => s.Value).StringConcatenate(" ")
+                        : "";
+
+                        header = Regex.Replace(header, @"\s+", " ").Trim();
+                        id = (string)e.Attributes("id").FirstOrDefault();
+                        hx.Remove();
+
+                        hx = new XElement(
+                                e.Name.LocalName,
+                                e.Attributes(),
+                                new XElement("p",
+                                    new XElement("strong",
+                                        new XElement("a",
+                                            new XAttribute("class", "ifrsdeflink"),
+                                            new XAttribute("data-segment", id),
+                                            new XAttribute("data-id", id),
+                                            new XText(header)
+                                        )
+                                    )
+                                )
+                        );
+                        result.Add(new XElement(e.Name.LocalName, e.Attributes(), hx, e.GetMarkedItems()));
+                    }
+                    else
+                    {
+                        result.Add(new XElement(e.Name.LocalName, e.Attributes(), e.GetMarkedItems()));
+                    }
+                }
+
+            }
+            else
+            {
+                result.Add(new XElement(e.Name.LocalName, e.Attributes(), e.GetSelectedItems()));
+            }
+            return result;
+        }
+        public static IEnumerable<XNode> GetMarkedItems(this XNode n)
+        {
+            List<XNode> result = new List<XNode>();
+            List<XNode> done = new List<XNode>();
+            if (n.NodeType != XmlNodeType.Element)
+            {
+                result.Add(n);
+                return result;
+            }
+            XElement e = (XElement)n;
+            string name = e.Name.LocalName;
+            if (name == "ol")
+            {
+
+            }
+            XNode last = e.FirstNode;
+            while (last != null)
+            {
+                List<XNode> before =
+                    e
+                    .Nodes()
+                    .SkipWhile(p => done.Contains(p))
+                    .TakeWhile(p =>
+                            (
+                                p.NodeType == XmlNodeType.Element
+                                ? ((XElement)p).DescendantsAndSelf().Where(d => d.Annotations<ElementMark>().FirstOrDefault() != null).Count() == 0
+                                : true
+                            )
+                        )
+                        .ToList();
+                done.AddRange(before);
+
+                List<XNode> selected = e
+                    .Nodes()
+                    .SkipWhile(p => done.Contains(p))
+                    .TakeWhile(p =>
+                        (
+                            p.NodeType == XmlNodeType.Element
+                            ? ((XElement)p).DescendantsAndSelf().Where(d => d.Annotations<ElementMark>().FirstOrDefault() != null).Count() != 0
+                            : true
+                        )
+                    )
+                    .ToList();
+                done.AddRange(selected);
+
+                last = e.Nodes().SkipWhile(p => done.Contains(p)).Take(1).FirstOrDefault();
+
+                if (selected.Count() > 0)
+                {
+                    if (before.Count() > 0 && (e.Name.LocalName == "section" && (string)e.Attributes("class").FirstOrDefault() == "lovdata-ledd"))
+                    {
+                        result.AddRange(before);
+                    }
+                    else if (before.Count() > 0)
+                    {
+                        result.Add(new XElement("div", "       - - - - "));
+                    }
+
+                    if (name == "ol")
+                    {
+                        result.Add(new XElement(e.Name.LocalName, e.Attributes(), selected.SelectMany(p => p.GetMarkedItem())));
+                    }
+                    else
+                    {
+                        result.AddRange(selected.SelectMany(p => p.GetMarkedItem()));
+                    }
+                }
+
+                if (last == null && selected.Count() == 0 && before.Count() > 0)
+                {
+                    result.Add(new XElement("div", "       - - - - "));
+                }
+            }
+            return result;
+        }
+        public static IEnumerable<XNode> GetSelectedItems(this XElement e)
+        {
+            List<XNode> result = new List<XNode>();
+            List<XNode> done = new List<XNode>();
+            string name = e.Name.LocalName;
+            XElement hx = e.Elements().Where(p => Regex.IsMatch(p.Name.LocalName, @"h\d")).FirstOrDefault();
+            string header = "";
+            string id = null;
+            if (hx != null)
+            {
+                header =
+                name == "section"
+                ? hx.DescendantNodes().OfType<XText>().Where(s => s.Parent.Ancestors().Where(n => !("a".Contains(n.Name.LocalName))).Count() > 0).Select(s => s.Value).StringConcatenate(" ")
+                : "";
+
+                header = Regex.Replace(header, @"\s+", " ").Trim();
+                id = (string)e.Attributes("id").FirstOrDefault();
+                hx.Remove();
+            }
+
+            XNode last = e.FirstNode;
+            while (last != null)
+            {
+                List<XNode> before =
+                    e
+                    .Nodes()
+                    .SkipWhile(p => done.Contains(p))
+                    .TakeWhile(p =>
+                        (
+                            p.NodeType == XmlNodeType.Element
+                            ? (
+                                ((XElement)p).DescendantsAndSelf().Where(a => a.Annotations<SegmentSelect>().FirstOrDefault() != null).Count() == 0
+                                && ((XElement)p).DescendantsAndSelf().Where(a => a.Annotations<ElementMark>().FirstOrDefault() != null).Count() == 0
+                            )
+                            : true
+                        )
+                    ).ToList();
+                done.AddRange(before);
+
+                List<XNode> selected = e
+                    .Nodes()
+                    .SkipWhile(p => done.Contains(p))
+                    .TakeWhile(p =>
+                        (
+                            p.NodeType == XmlNodeType.Element
+                            ? (
+                                ((XElement)p).DescendantsAndSelf().Where(a => a.Annotations<SegmentSelect>().FirstOrDefault() != null).Count() != 0
+                                || ((XElement)p).DescendantsAndSelf().Where(a => a.Annotations<ElementMark>().FirstOrDefault() != null).Count() != 0
+                            )
+                            : true
+                        )
+                    ).ToList();
+                done.AddRange(selected);
+
+                if (selected.Count() > 0)
+                {
+                    if (before.Count() > 0 && header != "" && id != null)
+                    {
+                        result.Add(
+                            new XElement("section",
+                                new XElement("a",
+                                    new XAttribute("class", "ifrsdeflink"),
+                                    new XAttribute("data-segment", id),
+                                    new XAttribute("data-id", id),
+                                    new XText(header)
+                                ),
+                                new XElement("div", "    - - - - - - "),
+                                selected.SelectMany(p => p.GetSelectedItem())
+                            )
+                        );
+                    }
+                    else
+                    {
+                        result.AddRange(selected.SelectMany(p => p.GetSelectedItem()));
+                    }
+                }
+
+                last = e
+                    .Nodes()
+                    .SkipWhile(p => done.Contains(p))
+                    .Take(1)
+                    .FirstOrDefault();
+            }
+            return result;
+        }
+        public static XElement GetDocumentParts(this XElement document, XElement items)
+        {
+            if (items == null || document == null) return null;
+            (
+                from d in document.DescendantsAndSelf().Where(p => (string)p.Attributes("id").FirstOrDefault() != null)
+                join i in items.DescendantsAndSelf().Where(p => "item;select".Split(';').Contains(p.Name.LocalName))
+                on
+                    ((string)d.Attributes("id").FirstOrDefault() ?? "-1").Trim().ToLower()
+                    equals
+                    ((string)i.Attributes("id").FirstOrDefault() ?? "-0").Trim().ToLower()
+                select new SelectedElement { element = d, mark = i }
+            ).ToList()
+            .ForEach(p => new SegmentSelect(p));
+
+            document.Descendants("p").Where(p => (string)p.Attributes("class").FirstOrDefault() == "lovfotnote").ToList().ForEach(p => p.Remove());
+
+            XElement result = null;
+            if (items.Name.LocalName == "items")
+            {
+                List<XElement> sections =
+                    document
+                    .Descendants()
+                    .Where(p => p.Annotations<SegmentSelect>().FirstOrDefault() != null)
+                    .Select(p => p.AncestorsAndSelf("section").Where(a => a.Elements().Where(s => Regex.IsMatch(s.Name.LocalName, @"h\d")).FirstOrDefault() != null).FirstOrDefault())
+                    .Select(p =>
+                        new XElement(p.Name.LocalName,
+                            p.Attributes(),
+                            p.Elements()
+                        )
+                    )
+                    .ToList();
+                if (sections.Count() == 0) return document;
+
+                result = new XElement(document.Name.LocalName,
+                    document.Attributes(),
+                    sections
+                );
+            }
+            else
+            {
+
+                result = new XElement(document.Name.LocalName,
+                    document.Attributes(),
+                    document.GetSelectedItems()
+                );
+            }
+            if (result == null)
+            {
+                result = document;
+            }
+            return result;
+        }
+    }
     
     public class DocumentElementdata
     {
@@ -71,7 +459,7 @@ namespace DIBAdminAPI.Data.Entities
     {
         public bool Edited = false; 
         public string id { get; set; }
-        public string ResourceTypeId { get; set; }
+        public string resourceTypeId { get; set; }
         public bool access { get; set; }
         public bool companylookup { get; set; }
         public string name { get; set; }
@@ -125,7 +513,7 @@ namespace DIBAdminAPI.Data.Entities
         public DocumentContainer(ResourceHTML5 r)
         {
             id = r.id.ToLower();
-            ResourceTypeId = r.ResourceTypeId.ToString();
+            resourceTypeId = r.ResourceTypeId.ToString();
             access = r.Accsess == 1 ? true : false;
             XElement map = r.ResourceMap;
             elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);
@@ -155,6 +543,8 @@ namespace DIBAdminAPI.Data.Entities
                 {
                     r.Document.Attributes("id").FirstOrDefault().SetValue(r.resourceId);
                 }
+
+
 
                 XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links);
 
@@ -199,7 +589,7 @@ namespace DIBAdminAPI.Data.Entities
                         on e.Key.ToLower() equals a.Key.ToLower()
                         select e
                     ).ToList()
-                    .ForEach(p => p.SetOtherProps(elements, "accounting", "accref"));
+                    .ForEach(p => p.UpdateOtherProps("accounting"));
                 }
 
 
@@ -211,7 +601,7 @@ namespace DIBAdminAPI.Data.Entities
                         on e.Key.ToLower() equals t.ToLower()
                         select e
                     ).ToList()
-                    .ForEach(p => p.SetOtherProps(elements, "tags", "tagsRef"));
+                    .ForEach(p => p.SetOtherProps(elements, "tags"));
                 }
                 if (r.Related.Count()>0)
                 {
@@ -221,7 +611,7 @@ namespace DIBAdminAPI.Data.Entities
                         on e.Key.ToLower() equals t.ToLower()
                         select e
                     ).ToList()
-                    .ForEach(p => p.SetOtherProps(elements, "related", "relatedRef"));
+                    .ForEach(p => p.SetOtherProps(elements, "related"));
                 }
             }
         }

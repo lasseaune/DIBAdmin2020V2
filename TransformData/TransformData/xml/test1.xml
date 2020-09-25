@@ -1,0 +1,48 @@
+﻿<table>
+  <tr>
+    <td>
+      <p>Følgende eksempel illustrerer dette:</p>
+      <p>Et selskap kjøper et datterselskap 1. januar 2012 for MNOK 5 samt et betinget vederlag som er basert på fremtidig EBITDA. Virkelig verdi av det betingede vederlaget er beregnet å være MNOK 4 per 1. januar 2012. Per 31.12.2012 er den virkelige verdien av vederlaget beregnet å være MNOK 6. Først i 2013 skjer den endelige avregningen og betalingen av vederlaget blir på MNOK 6.</p>
+      <p>Effekter som det skal tas hensyn til i oppstillingen av kontantstrømmer:</p>
+      <table>
+        <tr>
+          <td>2012</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Kjøp av virksomhet, netto etter overtatte kontanter</td>
+          <td>MNOK 5</td>
+        </tr>
+        <tr>
+          <td>Effekt på kontantstrøm fra investeringsaktiviteter</td>
+          <td>MNOK 5</td>
+        </tr>
+        <tr>
+          <td>Ved bruk av den indirekte metode må verdiendringen av det betingede vederlaget på trekkes ut av resultatet da det ikke får kontantstrømeffekt før i 2013.</td>
+          <td> MNOK 2 </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>2013</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Det betingede vederlaget må splittes opp i opprinnelig estimert beløp og den påfølgende virkelige verdien av forpliktelsen:</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Effekt på kontantstrøm fra driftsaktiviteten</td>
+          <td>MNOK 2</td>
+        </tr>
+        <tr>
+          <td>Effekt på kontantstrøm fra investeringsaktiviteter (kjøp av datterselskap)</td>
+          <td>MNOK 4</td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>

@@ -1,0 +1,90 @@
+﻿aal. eller arveavgiftsloven
+aml. eller arbeidsmiljøloven
+apotl. eller apotekloven
+artistskatteloven
+asl. eller aksjeloven
+asal. eller allmennaksjeloven
+banksikringsloven
+bbl. eller boligbyggelagsloven eller bustadbyggjelagslova
+betalingssystemloven
+bfl. eller bokføringsloven
+brl. eller borettslagsloven eller burettslagslova
+børsloven
+dl. eller domstolloven
+deknl. eller dekningsloven
+emgll. eller eiendomsmeglingsloven
+eiendomsskatteloven eller eigedomsskattelova
+eiersl. eller eierseksjonsloven
+e-pfl. eller e-pengeforetaksloven
+fal. eller forsikringsavtaleloven
+fbl. eller forretningsbankloven
+feriel. eller ferieloven
+finansavtl. eller finansavtaleloven
+finanstll. eller finanstilsynsloven
+finansvl. eller finansieringsvirksomhetsloven
+folkeregisterloven
+forsvl. eller forsikringsvirksomhetsloven
+forvl. eller forvatningsloven
+fvl. eller forvaltningsloven
+ftpensjl. eller foretakspensjonsloven
+ftrl. eller folketrygdloven
+fregl. eller foretaksregisterloven
+frivillighetsregisterloven
+gbl. eller gjeldsbrevloven eller gjeldsbrevlova
+helseforetaksloven
+hvvl. eller hvitvaskingsloven
+inkl. eller inkassoloven
+innsamlingsregistreringsloven
+innskpensjl. eller innskuddspensjonsloven
+intkomsel. eller (Lov om interkommunale selskaper)
+Jan Mayen-skatteloven
+kkl. eller konkursloven
+koml. eller kommuneloven
+krrl. eller konkurranseloven
+lignl. eller ligningsloven
+lottl. eller lotteriloven
+lov om kompenasjons for merverdiavgift
+mval. eller merverdiavgiftsloven
+nifl. eller NIF-loven
+omstillingsloven eller omstillingslova
+OTP-loven
+pantel. eller panteloven
+petrsktl. eller petroleumsskatteloven
+popplyl. eller personopplysningsloven
+regnskapsførerloven
+revl. eller revisorloven
+rskl. eller rl. eller regnskapsloven
+skl. eller skadeerstatningsloven
+sktl. eller skatteloven
+sktbl. eller skattebetalingsloven
+SE-loven
+sel. eller selskapsloven
+stiftl. eller stiftelsesloven
+samvirkeloven eller samvirkelova
+statssel. eller statsforetaksloven
+statens finansfond-loven
+statens obligasjonsfond-loven
+stiftl. eller stiftelsesloven
+svalbsktl. eller svalbardskatteloven
+spbl. eller sparebankloven
+statssel. eller statsforetaksloven
+skl. eller skadeerstatningsloven
+toll. eller tolloven
+valutal. eller valutaloven eller valutalova
+vphl. eller verdipapirhandelloven
+vpfl. eller verdipapirfondloven
+vprl. eller verdipapirregisterloven
+bff. eller bokføringsforskriften
+børsf. eller børsforskriften
+fmva. eller merverdiavgiftsforskriften
+FSFIN eller Finansdepartements skatteforskrift eller Finansdepartementet forskrift til skatteloven
+FSSKD
+representasjonsforskriften
+sktbf. eller skattebetalingsforskriften
+takseringsreglene
+tollforskriften
+verdipapirforskriften
+
+Audit documentation
+External confirmations
+Using the work of an auditor’s expert

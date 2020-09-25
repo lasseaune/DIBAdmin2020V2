@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <UserSecretsId>81908ede-c41f-4d18-ae6b-d3091dde03cd</UserSecretsId>
     <UseGlobalApplicationHostFile>True</UseGlobalApplicationHostFile>

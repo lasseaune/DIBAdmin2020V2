@@ -1,0 +1,2245 @@
+﻿<regexps>
+  <!--ord for måned-->
+  <regexp type="single">
+    <id>month_word</id>
+    <description>Henter ord for måned</description>
+    <expression>
+      <part type="container">
+        <part type="single">
+          <text><![CDATA[(J|j)anuar|(J|j)an|(F|f)ebruar|(F|f)eb|(M|m)ars|(M|m)ar|(A|a)pril|(A|a)pr|(M|m)ai|(J|j)uni|(J|j)un|(J|j)uli|(J|j)ul|(A|a)ugust|(A|a)ug|(S|s)eptember|(S|s)ep|(O|o)ktober|(O|o)kt|(N|n)ovember|(N|n)ov|(D|d)esember|(D|d)es]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--tallord-->
+  <regexp type="single">
+    <id>tallord</id>
+    <description>Henter tallord</description>
+    <expression>
+      <part type="container">
+        <part type="single" description="tallord">
+          <text><![CDATA[fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>split_chain</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or">
+        <part type="single">
+          <text><![CDATA[\s+(og|eller|til|(J|j)f(\.)?)\s+]]></text>
+        </part>
+        <part type="single">
+          <text><![CDATA[(\s+)?\,(\s+)?]]></text>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="single">
+          <text><![CDATA[(J|j)f(\.)?\s+]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>split_chain_element</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or">
+        <part type="single">
+          <text><![CDATA[\s+(og|eller|til|(J|j)f(\.)?)\s+]]></text>
+        </part>
+        <part type="single">
+          <text><![CDATA[(\s+)?\,(\s+)?]]></text>
+        </part>
+        <part type="single">
+          <text><![CDATA[\s+]]></text>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="single">
+          <text><![CDATA[(J|j)f(\.)?\s+]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>roman_number</id>
+    <description>Henter romertall</description>
+    <expression>
+      <part type="or">
+        <part type="single">
+          <text><![CDATA[ii|iii|iv|v|vi|vii|viii|ix|x|xii|xiii|xiv|xv|xvi|xvii|xviii|xix|xx|I|II|III|IV|V|VI|VII|VIII|IX|X|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX]]></text>
+        </part>
+        <part type="chain">
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[[i]]]></text>
+          </part>
+          <part type="negative lookahead">
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[\s+]]></text>
+            </part>
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[([^\s])?(\s+)?(forskrift|lov|regelen|denne|visse)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>letter_lower</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or" description="nummer kjede">
+        <part type="chain">
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[[a-hj-zæøå]]]></text>
+          </part>
+          <part type="negative lookahead">
+            <part type="or">
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[[a-zæøå]+]]></text>
+              </part>
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[\s+påvise]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="chain">
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[[i]]]></text>
+          </part>
+          <part type="negative lookahead">
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[\s+]]></text>
+            </part>
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[([^\s])?(\s+)?(forskrift|lov|regelen|denne|visse)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+
+
+
+
+  <regexp type="single">
+    <id>del_title</id>
+    <description>Henter del kjede</description>
+    <expression>
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[(D|d)el(\.)?]]></text>
+        </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>split_chain_del</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[(\s+)?(\,|og|eller|samt)(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>del_chain_alfa</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="del">
+        <part type="regexp" name="split_chain_element" />
+        <part type="regexp" name="del_title" />
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="delnr">
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[[a-zA-Z]]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" />
+        <part type="optional">
+          <part type="positive lookahead">
+            <part type="regexp" name="split_chain_del" />
+            <part type="optional">
+              <part type="regexp" name="del_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[[a-zA-Z]]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+          <part type="multiple">
+            <part type="regexp" name="split_chain_del" />
+            <part type="optional">
+              <part type="regexp" name="del_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="delnr">
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[[a-zA-Z]]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>del_chain_roman</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="del">
+        <part type="regexp" name="split_chain_element" />
+        <part type="regexp" name="del_title" />
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="delnr">
+          <part type="regexp" name="roman_number" />
+        </part>
+        <part type="regexp" name="letter_end_check" />
+        <part type="optional">
+          <part type="positive lookahead">
+            <part type="regexp" name="split_chain_del" />
+            <part type="optional">
+              <part type="regexp" name="del_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="roman_number" />
+            <part type="regexp" name="letter_end_check" />
+          </part>
+          <part type="multiple">
+            <part type="regexp" name="split_chain_del" />
+            <part type="optional">
+              <part type="regexp" name="del_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="delnr">
+              <part type="regexp" name="roman_number" />
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>del_chain_decimal</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="del">
+        <part type="regexp" name="split_chain_element" />
+        <part type="regexp" name="del_title" />
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="delnr">
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" />
+        <part type="optional">
+          <part type="positive lookahead">
+            <part type="regexp" name="split_chain_del" />
+            <part type="optional">
+              <part type="regexp" name="del_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[\d+]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+          <part type="multiple">
+            <part type="regexp" name="split_chain_del" />
+            <part type="optional">
+              <part type="regexp" name="del_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="delnr">
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[\d+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>kap_title</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or">
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[(K|k)ap(\.)?]]></text>
+        </part>
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[(K|k)apittel]]></text>
+        </part>
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[(K|k)apitel]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>split_chain_kap</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[(\s+)?(\,|og|eller)(\s+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>kap_chain_alfa</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="kap">
+        <part type="regexp" name="split_chain_element" />
+        <part type="regexp" name="kap_title" />
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="kapnr">
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[[a-zA-Z]]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" />
+        <part type="optional">
+          <part type="positive lookahead">
+            <part type="regexp" name="split_chain_kap" />
+            <part type="optional">
+              <part type="regexp" name="kap_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[[a-zA-Z]]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+          <part type="multiple">
+            <part type="regexp" name="split_chain_kap" />
+            <part type="optional">
+              <part type="regexp" name="kap_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="kapnr">
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[[a-zA-Z]]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>kap_chain_roman</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="kap">
+        <part type="regexp" name="split_chain_element" />
+        <part type="regexp" name="kap_title" />
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="kapnr">
+          <part type="regexp" name="roman_number" />
+        </part>
+        <part type="regexp" name="letter_end_check" />
+        <part type="optional">
+          <part type="positive lookahead">
+            <part type="regexp" name="split_chain_kap" />
+            <part type="optional">
+              <part type="regexp" name="kap_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="roman_number" />
+            <part type="regexp" name="letter_end_check" />
+          </part>
+          <part type="multiple">
+            <part type="regexp" name="split_chain_kap" />
+            <part type="optional">
+              <part type="regexp" name="kap_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="kapnr">
+              <part type="regexp" name="roman_number" />
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>kap_chain_decimal</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="named" name="kap">
+        <part type="regexp" name="split_chain_element" />
+        <part type="regexp" name="kap_title" />
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="kapnr">
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[\d+([a-zA-Z])?]]></text>
+          </part>
+        </part>
+        <part type="regexp" name="letter_end_check" />
+        <part type="optional">
+          <part type="positive lookahead">
+            <part type="regexp" name="split_chain_kap" />
+            <part type="optional">
+              <part type="regexp" name="kap_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[\d+([a-zA-Z])?]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+          <part type="multiple">
+            <part type="regexp" name="split_chain_kap" />
+            <part type="optional">
+              <part type="regexp" name="kap_title" />
+              <part type="optional" description="nummer kjede">
+                <text><![CDATA[\s+]]></text>
+              </part>
+            </part>
+            <part type="named" name="kapnr">
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[\d+([a-zA-Z])?]]></text>
+              </part>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--punktum_chain start-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+  <regexp type="single_multi">
+    <id>punktum_chain_number</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[\d+(\.)?(\s+)?((P|p)unktum|pkt(\.)?)]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\d+(\.)?(\s+)?((P|p)unktum|pkt(\.)?)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\d+(\.)?(\s+)?((P|p)unktum|pkt(\.)?)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>punktum_chain_tallord</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="regexp" name="tallord" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[\s+((P|p)unktum|pkt(\.)?)]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="regexp" name="tallord" />
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[\s+((P|p)unktum|pkt(\.)?)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="regexp" name="tallord" />
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[\s+((P|p)unktum|pkt(\.)?)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>punktum_chain_total</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or">
+        <part type="regexp" name="punktum_chain_tallord" />
+        <part type="regexp" name="punktum_chain_number" />
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--punktum_chain slutt-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+
+
+  <!--letter_chain Start-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+
+  <regexp type="single">
+    <id>letter_end_check</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="negative lookahead">
+        <part type="single">
+          <text><![CDATA[[^\:\,\.\s]]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+<!--start total single number og letter-->
+  <!--number start-->
+  <regexp type="single_multi">
+    <id>number_chain_total_single</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or">
+          <part type="container" description="number_chain_simple">
+            <part type="regexp" name="split_chain_element" />
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[\d+]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+            <part type="optional">
+                <part type="regexp" name="punktum_chain_total" />
+            </part>
+            <part type="optional">
+              <part type="positive lookahead">
+                <part type="regexp" name="split_chain" />
+                <part type="single">
+                  <text><![CDATA[\d+]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+              </part>
+              <part type="multiple">
+                <part type="regexp" name="split_chain" />
+                <part type="single">
+                  <text><![CDATA[\d+]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+                <part type="optional">
+                    <part type="regexp" name="punktum_chain_total" />
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="container" description="number_chain_number">
+            <part type="regexp" name="split_chain_element" />
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[(N|n)r(\.)?(\s+)?\d+]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+            <part type="optional">
+                <part type="regexp" name="punktum_chain_total" />
+            </part>
+            <part type="optional">
+              <part type="positive lookahead">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\d+]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+              </part>
+              <part type="multiple">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[\d+]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+                <part type="optional">
+                    <part type="regexp" name="punktum_chain_total" />
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="container" description="number_chain_roman">
+            <part type="regexp" name="split_chain_element" />
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+            </part>
+            <part type="regexp" name="roman_number" />
+            <part type="regexp" name="letter_end_check" />
+            <part type="optional">
+                <part type="regexp" name="punktum_chain_total" />
+            </part>
+            <part type="optional">
+              <part type="positive lookahead">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+                </part>
+                <part type="regexp" name="roman_number" />
+                <part type="regexp" name="letter_end_check" />
+              </part>
+              <part type="multiple">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+                </part>
+                <part type="regexp" name="roman_number" />
+                <part type="regexp" name="letter_end_check" />
+                <part type="optional">
+                    <part type="regexp" name="punktum_chain_total" />
+                </part>
+              </part>
+            </part>
+          </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <!--number slutt-->
+  <regexp type="single_multi">
+    <id>letter_chain_total_single</id>
+    <description>Henter del kjede</description>
+    <expression>
+      <part type="or">
+          <part type ="container" description="letter_chain_simple_lower">
+            <part type="regexp" name="split_chain_element" />
+            <part type="regexp" name="letter_lower" />
+            <part type="regexp" name="letter_end_check" />
+            <part type="optional">
+                <part type="regexp" name="punktum_chain_total" />
+            </part>
+            <part type="optional">
+              <part type="positive lookahead">
+                <part type="regexp" name="split_chain" />
+                <part type="regexp" name="letter_lower" />
+                <part type="regexp" name="letter_end_check" />
+              </part>
+              <part type="multiple">
+                <part type="regexp" name="split_chain" />
+                <part type="regexp" name="letter_lower" />
+                <part type="regexp" name="letter_end_check" />
+                <part type="optional">
+                    <part type="regexp" name="punktum_chain_total" />
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="container" description="letter_chain_simple_upper" >
+            <part type="regexp" name="split_chain_element" />
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[[A-ZÆØÅ]]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+            <part type="optional">
+                <part type="regexp" name="punktum_chain_total" />
+            </part>
+            <part type="optional">
+              <part type="positive lookahead">
+                <part type="regexp" name="split_chain" />
+                <part type="single">
+                  <text><![CDATA[[A-ZÆØÅ]]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+              </part>
+              <part type="multiple">
+                <part type="regexp" name="split_chain" />
+                <part type="single">
+                  <text><![CDATA[[A-ZÆØÅ]]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+                <part type="optional">
+                    <part type="regexp" name="punktum_chain_total" />
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="container" description="letter_chain_bokstav_lower">
+            <part type="chain">
+              <part type="regexp" name="split_chain_element" />
+              <part type="single" description="nummer kjede">
+                <text><![CDATA[(B|b)okstav\s+]]></text>
+              </part>
+              <part type="regexp" name="letter_lower" />
+            </part>
+            <part type="regexp" name="letter_end_check" />
+            <part type="optional">
+                <part type="regexp" name="punktum_chain_total" />
+            </part>
+            <part type="optional">
+              <part type="positive lookahead">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(B|b)okstav\s+]]></text>
+                </part>
+                <part type="regexp" name="letter_lower" />
+                <part type="regexp" name="letter_end_check" />
+              </part>
+              <part type="multiple">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(B|b)okstav\s+]]></text>
+                </part>
+                <part type="regexp" name="letter_lower" />
+                <part type="regexp" name="letter_end_check" />
+                <part type="optional">
+                    <part type="regexp" name="punktum_chain_total" />
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="container" description="letter_chain_bokstav_upper">
+            <part type="regexp" name="split_chain_element" />
+            <part type="single" description="nummer kjede">
+              <text><![CDATA[(B|b)okstav\s+[A-ZÆØÅ]]]></text>
+            </part>
+            <part type="regexp" name="letter_end_check" />
+            <part type="optional">
+              <part type="or">
+                <part type="regexp" name="punktum_chain_total" />
+              </part>
+            </part>
+            <part type="optional">
+              <part type="positive lookahead">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(B|b)okstav\s+]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[[A-ZÆØÅ]]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+              </part>
+              <part type="multiple">
+                <part type="regexp" name="split_chain" />
+                <part type="optional">
+                  <text><![CDATA[(B|b)okstav\s+]]></text>
+                </part>
+                <part type="single">
+                  <text><![CDATA[[A-ZÆØÅ]]]></text>
+                </part>
+                <part type="regexp" name="letter_end_check" />
+                <part type="optional">
+                    <part type="regexp" name="punktum_chain_total" />
+                </part>
+              </part>
+            </part>
+          </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single_multi">
+    <id>letter_chain_simple_lower</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="regexp" name="letter_lower" />
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="number_chain_total_single" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="regexp" name="letter_lower" />
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="regexp" name="letter_lower" />
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="number_chain_total_single" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>letter_chain_simple_upper</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[[A-ZÆØÅ]]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="number_chain_total_single" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[[A-ZÆØÅ]]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[[A-ZÆØÅ]]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="number_chain_total_single" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>letter_chain_bokstav_lower</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="chain">
+        <part type="regexp" name="split_chain_element" />
+        <part type="single" description="nummer kjede">
+          <text><![CDATA[(B|b)okstav\s+]]></text>
+        </part>
+        <part type="regexp" name="letter_lower" />
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="number_chain_total_single" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="regexp" name="letter_lower" />
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="regexp" name="letter_lower" />
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="number_chain_total_single" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>letter_chain_bokstav_upper</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[(B|b)okstav\s+[A-ZÆØÅ]]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="number_chain_total_single" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="single">
+            <text><![CDATA[[A-ZÆØÅ]]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(B|b)okstav\s+]]></text>
+          </part>
+          <part type="single">
+            <text><![CDATA[[A-ZÆØÅ]]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="number_chain_total_single" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="multi">
+    <id>letter_chain_total</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or">
+        <part type="regexp" name="letter_chain_bokstav_upper" />
+        <part type="regexp" name="letter_chain_bokstav_lower" />
+        <part type="regexp" name="letter_chain_simple_upper" />
+        <part type="regexp" name="letter_chain_simple_lower" />
+      </part>
+    </expression>
+  </regexp>
+
+  <!--letter_chain slutt-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+
+
+
+  <!--number_chain start-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+
+
+  <regexp type="single_multi">
+    <id>number_chain_simple</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[\d+]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="letter_chain_total_single" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="letter_chain_total_single" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>number_chain_number</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[(N|n)r(\.)?(\s+)?\d+]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="letter_chain_total_single" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+          </part>
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+          </part>
+          <part type="single">
+            <text><![CDATA[\d+]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="letter_chain_total_single" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <id>number_chain_roman</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+      </part>
+      <part type="regexp" name="roman_number" />
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="letter_chain_total_single" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="roman_number" />
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="optional">
+            <text><![CDATA[(N|n)r(\.)?(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="roman_number" />
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="letter_chain_total_single" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="multi">
+    <id>number_chain_total</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or">
+        <part type="regexp" name="number_chain_number" />
+        <part type="regexp" name="number_chain_simple" />
+        <part type="regexp" name="number_chain_roman" />
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--number_chain slutt-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+
+  <!--ledd_chain slutt-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+
+  <regexp type="multi">
+    <id>ledd_chain_number</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[\(\d+\)]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="number_chain_total" />
+          <part type="regexp" name="letter_chain_total" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\(\d+\)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\(\d+\)]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="number_chain_total" />
+              <part type="regexp" name="letter_chain_total" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="multi">
+    <id>ledd_chain_ledd</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[\d+(\.)?(\s+)?(L|l)edd]]></text>
+      </part>
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="number_chain_total" />
+          <part type="regexp" name="letter_chain_total" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\d+(\.)?(\s+)?(L|l)edd]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="single">
+            <text><![CDATA[\d+(\.)?(\s+)?(L|l)edd]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="number_chain_total" />
+              <part type="regexp" name="letter_chain_total" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="multi">
+    <id>ledd_chain_ledd_tallord</id>
+    <description>Henter nummer kjede</description>
+    <expression>
+      <part type="regexp" name="split_chain_element" />
+      <part type="regexp" name="tallord" />
+      <part type="single" description="nummer kjede">
+        <text><![CDATA[\s+(L|l)edd]]></text>
+      </part>
+
+      <part type="regexp" name="letter_end_check" />
+      <part type="optional">
+        <part type="or">
+          <part type="regexp" name="punktum_chain_total" />
+          <part type="regexp" name="number_chain_total" />
+          <part type="regexp" name="letter_chain_total" />
+        </part>
+      </part>
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain" />
+          <part type="regexp" name="tallord" />
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[\s+(L|l)edd]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain" />
+          <part type="regexp" name="tallord" />
+          <part type="single" description="nummer kjede">
+            <text><![CDATA[\s+(L|l)edd]]></text>
+          </part>
+          <part type="regexp" name="letter_end_check" />
+          <part type="optional">
+            <part type="or">
+              <part type="regexp" name="punktum_chain_total" />
+              <part type="regexp" name="number_chain_total" />
+              <part type="regexp" name="letter_chain_total" />
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="multi">
+    <id>ledd_chain_total</id>
+    <description>Henter bokstav kjede</description>
+    <expression>
+      <part type="or">
+        <part type="regexp" name="ledd_chain_ledd_tallord" />
+        <part type="regexp" name="ledd_chain_ledd" />
+        <part type="regexp" name="ledd_chain_number" />
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <!--ledd_chain slutt-->
+  <!--=======================================================================================================-->
+  <!--=======================================================================================================-->
+
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  NY Lov og forskriftsreferanser start
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--nxlovname: Finner lovnavn-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>nxlovname</id>
+    <description>Finner lovnavn</description>
+    <expression>
+      <part type="named" name="nxlovname">
+        <part type="single" description="punktum">
+          <text><![CDATA[[^\(\s]+lov(en|a|ene|er)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--nxformane: Finner forskriftnavn-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>nxforname</id>
+    <description>Finner forskriftnavn</description>
+    <expression>
+      <part type="named" name="nxforname">
+        <part type="single" description="punktum">
+          <text><![CDATA[[^\s]+forskrift(en|a|ene|er)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single_multi">
+    <group>document</group>
+    <case>0</case>
+    <id>lovref_trailing_split</id>
+    <description>text etter lovref om</description>
+    <expression>
+      <part type="single">
+        <text><![CDATA[\sog\som|\s(og|eller)\slov\s|\sgjelder|\sknyttet\stil|\seller\sandre\stilsvarende\savtaler|\sopphevet|\sanses\sikke|\setter\slov|\,\s(se|jf(\.)?)\s|\seller\snår]]></text>
+      </part>
+    </expression>
+  </regexp>
+
+
+      <!--lovref_trailing delutrykk for å hente text etter lovnavn eller lovdate-->
+  <regexp type="single_multi">
+    <group>document</group>
+    <case>0</case>
+    <id>lovref_trailing</id>
+    <description>text etter lovref om</description>
+    <expression>
+      <part type ="container">
+        <part type="negative lookahead">
+          <part type="regexp" name="lovref_trailing_split" />
+        </part>
+        <part type="single">
+          <text><![CDATA[([^\.§\(])]]></text>
+        </part>
+      </part>
+      <part type="single">
+        <text><![CDATA[+]]></text>
+      </part>
+      <part type="optional">
+        <part type="positive lookbehind">
+          <part type="single">
+            <text><![CDATA[mv]]></text>
+          </part>
+        </part>
+        <part type="single">
+          <text><![CDATA[\.]]></text>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="container">
+          <part type="positive lookbehind">
+            <part type="single">
+              <text><![CDATA[pr]]></text>
+            </part>
+          </part>
+          <part type="single">
+            <text><![CDATA[\.]]></text>
+          </part>
+        </part>
+        <part type="single">
+          <text><![CDATA[\s+\d{1,2}(\.)?\s+]]></text>
+        </part>
+        <part type="regexp" name="month_word" description="mnd bokstavert" />
+        <part type="single">
+          <text><![CDATA[(\.)?\s+\d{4,4}]]></text>
+        </part>
+        <part type ="container">
+          <part type="negative lookahead">
+            <part type="regexp" name="lovref_trailing_split" />
+          </part>
+          <part type="single">
+            <text><![CDATA[([^\.§\(])]]></text>
+          </part>
+        </part>
+        <part type="single">
+          <text><![CDATA[*]]></text>
+        </part>
+
+      </part>
+
+      <part type="optional">
+        <part type="single">
+          <text><![CDATA[\.m\.|\.v\.|mv\.]]></text>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="single">
+          <text><![CDATA[(\s+)?\(([a-zæøåA_ZÆØÅ\.\-]+)\)]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--dennesammelov: denne/samme lov -->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennesammelov</id>
+    <description>Finner denne/samme lov</description>
+    <expression>
+      <part type="named" name="dennesammelov">
+        <part type="single" description="denne lov">
+          <text><![CDATA[((D|d)enne|(S|s)amme)\s+(L|l)ov(a|en|ens)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--dennesammefor: denne/samme forskrift-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennesammefor</id>
+    <description>Finner denne/samme lov</description>
+    <expression>
+      <part type="named" name="dennesammefor">
+        <part type="single" description="lov text">
+          <text><![CDATA[((D|d)enne|(S|s)amme)\s+(F|f)orskrift(a|en|ens)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--mlovom-->
+  <regexp type="multi">
+    <group>document</group>
+    <case>0</case>
+    <id>mlovom</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="named" name="mlovom">
+        <part type="single" description="lov om">
+          <text><![CDATA[lov\s+om]]></text>
+        </part>
+        <part type="named" name="mlovom_name">
+          <part type="multiple">
+            <part type="negative lookahead">
+              <part type="single" description="lov om">
+                <text><![CDATA[\s+av\s|\s+(K|k)ap(\.)?(it(t)?el)?\s|\s+(D|d)el\s]]></text>
+              </part>
+            </part>
+            <part type="single" description="lov om">
+              <text><![CDATA[\s+([a-zæøå])+]]></text>
+            </part>
+            <part type="negative lookahead">
+              <part type="single" description="lov om">
+                <text><![CDATA[\.|v\.|a\.|av\s]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="optional">
+          <part type="single" description="lov om">
+            <text><![CDATA[\s+\(([a-zæøå\.])+\)]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--mlovdate-->
+  <regexp type="multi">
+    <group>document</group>
+    <case>0</case>
+    <id>mlovdate</id>
+    <description>Finner lov av 10. juni 1988 nr. 40</description>
+    <expression>
+      <part type="named" name="mlovdate">
+        <part type="optional">
+          <part type="or">
+            <part type="named" name="typelov">
+              <part type="single" description="type">
+                <text><![CDATA[L\.|(([^\s])*)?(L|l)ov(er|ene|en)?]]></text>
+              </part>
+            </part>
+            <part type="named" name="typefor">
+              <part type="single" description="type">
+                <text><![CDATA[F\.|(([^\s])*)?(F|f)orskrift(er|ene|en)?]]></text>
+              </part>
+            </part>
+            <part type="named" name="typeres">
+              <part type="single" description="type">
+                <text><![CDATA[((K|k)ongelig\s+)?(R|r)esulusjon|(R|r)es(\.)?]]></text>
+              </part>
+            </part>
+          </part>
+          <part type="optional">
+            <part type="single" description="type">
+              <text><![CDATA[\s+om((?!\s+av|\s+\d\|\.\,).)*]]></text>
+            </part>
+          </part>
+
+          <part type="optional">
+            <part type="single" description="type">
+              <text><![CDATA[\s+av]]></text>
+            </part>
+          </part>
+          <part type="single" description="type">
+            <text><![CDATA[\s+]]></text>
+          </part>
+        </part>
+        <part type="container">
+          <part type="chain">
+            <part type="named" name="lovdate">
+              <part type="chain">
+                <part type="named" name="day">
+                  <part type="single" description="dag">
+                    <text><![CDATA[\d{1,2}]]></text>
+                  </part>
+                </part>
+                <part type="single" description="punktum">
+                  <text><![CDATA[(\.)?]]></text>
+                </part>
+              </part>
+              <part type="single" description="space">
+                <text><![CDATA[(\s+)?]]></text>
+              </part>
+              <part type="named" name="month">
+                <part type="or">
+                  <part type="regexp" name="month_word" description="mnd bokstavert" />
+                  <part type="single" description="mnd nr">
+                    <text><![CDATA[\d{1,2}]]></text>
+                  </part>
+                </part>
+              </part>
+              <part type="single" description="punktum">
+                <text><![CDATA[(\.)?]]></text>
+              </part>
+              <part type="single" description="space">
+                <text><![CDATA[(\s+)?]]></text>
+              </part>
+              <part type="named" name="year">
+                <part type="single" description="år">
+                  <text><![CDATA[\d{4,4}]]></text>
+                </part>
+              </part>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="single" description="nr.">
+              <text><![CDATA[nr(\.)?]]></text>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="named" name="number">
+              <part type="single" description="lov nr">
+                <text><![CDATA[\d{1,4}]]></text>
+              </part>
+              <part type="single" description="punktum">
+                <text><![CDATA[(\.)?]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="named" name="lovtext">
+          <part type="single" description="lov text">
+            <text><![CDATA[\s+om\s+]]></text>
+          </part>
+          <part type="regexp" name="lovref_trailing" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  NY Lov og forskriftsreferanser slutt
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <regexp type="single">
+    <id>tag_utv</id>
+    <description>Henter utv</description>
+    <expression>
+      <part type="chain">
+        <part type="named" name="tag1">
+          <part type="single" description="Finnes bfu eller utv">
+            <text><![CDATA[((U|u)(T|t)(V|v))]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1">
+          <text><![CDATA[(\.)?(\s+nr(\.)?)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="tag2">
+          <part type="single" description="1.1">
+            <text><![CDATA[(\d{1,4}|[ivxIVX]+)]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1">
+          <text><![CDATA[(\s+)?(side|\/)(\s+)?]]></text>
+        </part>
+        <part type="named" name="tag3">
+          <part type="single" description="1.1">
+            <text><![CDATA[\d{1,4}]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>tag_bfu</id>
+    <description>Henter bfu</description>
+    <expression>
+      <part type="chain">
+        <part type="named" name="bfu">
+          <part type="single" description="Finnes bfu eller utv">
+            <text><![CDATA[(((S|s)kattedirektoratets\s+bindende\s+forhåndsuttalelse)|(B|b)(F|f)(U|u))]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1">
+          <text><![CDATA[(\.)?(\s+nr(\.)?)?(\s+)?]]></text>
+        </part>
+        <part type="named" name="tag2">
+          <part type="single" description="1.1">
+            <text><![CDATA[\d{1,4}]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1">
+          <text><![CDATA[(\s+)?(\/)(\s+)?]]></text>
+        </part>
+        <part type="optional" description="1.1">
+          <text><![CDATA[(\d\d)(?=\d\d)]]></text>
+        </part>
+        <part type="named" name="tag3">
+          <part type="single" description="1.1">
+            <text><![CDATA[\d\d]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>tag_lonnkode</id>
+    <description>Henter lønnskoder</description>
+    <expression>
+      <part type="chain">
+        <part type="optional">
+          <part type="single" description="Finnes Lønnskode">
+            <text><![CDATA[(L|l)ønn(s)?]]></text>
+          </part>
+        </part>
+        <part type="named" name="tag_lonnkode">
+          <part type="named" name="kode">
+            <part type="single" description="Finnes Lønnskode">
+              <text><![CDATA[(K|k)ode]]></text>
+            </part>
+          </part>
+          <part type ="multiple">
+            <part type="single" description="Finnes mellomrom">
+              <text><![CDATA[(\s+eller\s+|\s+og\s+|(\s+)?\,(\s+)?|\s+samt\s+|\s+)((\s+)?((L|l)ønn(s)?)?(K|k)ode\s+)?]]></text>
+            </part>
+            <part type="named" name="kodenr">
+              <part type="single" description="1.1">
+                <text><![CDATA[\d\d\d]]></text>
+              </part>
+              <part type="optional" description="1.1">
+                <part type="or">
+                  <part type="single" description="Finnes mellomrom">
+                    <text><![CDATA[(\s+)?(\-)(\s+)?[A]]]></text>
+                  </part>
+                  <part type="single" description="Finnes mellomrom">
+                    <text><![CDATA[(\s+)?[A]]]></text>
+                  </part>
+                </part>
+                <part type="negative lookahead">
+                  <part type="single" description="1.1">
+                    <text><![CDATA[\d]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>tag_kl</id>
+    <description>Henter klagenemndssaker</description>
+    <expression>
+      <part type="chain">
+        <part type="named" name="tag1">
+          <part type="single" description="Finnes kl eller klagesak">
+            <text><![CDATA[((K|k)(L|l))]]></text>
+          </part>
+        </part>
+        <part type="optional">
+          <part type="or">
+            <part type="single" description="Finnes kl eller klagesak">
+              <text><![CDATA[agenem(n)?d(s)?sak]]></text>
+            </part>
+            <part type="single" description="Finnes kl eller klagesak">
+              <text><![CDATA[agesak]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="optional">
+          <part type="single" description="1.1">
+            <text><![CDATA[\.]]></text>
+          </part>
+        </part>
+        <part type="multiple">
+          <part type="single" description="1.1">
+            <text><![CDATA[(\s+\,(\s+)?|\s+og+\s+|\s+)?(nr(\.)?\s+)?]]></text>
+          </part>
+          <part type="named" name="tag2">
+            <part type="single" description="1.1">
+              <text><![CDATA[(\d\d\d\d)((\s)?[a-dA-D])?]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>tag_ifrs</id>
+    <description>Henter ifrs</description>
+    <expression>
+      <part type="named" name="st_ifrs">
+        <part type="optional" description="1.1">
+          <part type="single" description="1.1">
+            <text><![CDATA[(nr(\.)|paragraf)\s+]]></text>
+          </part>
+          <part type="named" name="stpara">
+            <part type="single" description="1.1">
+              <text><![CDATA[(B|IE|BC|BCZ|AG|D|IN|A)?\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+            </part>
+            <part type="optional" description="1.1">
+              <part type="multiple">
+                <part type="single" description="1.1">
+                  <text><![CDATA[\.\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="optional" description="1.1">
+            <part type="single" description="1.1">
+              <text><![CDATA[(\([a-z]\))]]></text>
+            </part>
+          </part>
+          <part type="optional" description="1.1">
+            <part type="or">
+              <part type="multiple">
+                <part type="single" description="1.1">
+                  <text><![CDATA[(\s+|(\s+)?(\-|\,|og)(\s+)?)(\([a-z]\))]]></text>
+                </part>
+              </part>
+              <part type="multiple">
+                <part type="single" description="1.1">
+                  <text><![CDATA[(\s+|(\s+)?(\-|\,|og)(\s+)?)([a-z])]]></text>
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="single" description="1.1">
+            <text><![CDATA[\s+i\s+]]></text>
+          </part>
+        </part>
+        <part type="named" name="stname">
+          <part type="single" description="1.1">
+            <text><![CDATA[(IFRS|IAS|IFRIC|SIC)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr">
+          <part type="single" description="1.1">
+            <text><![CDATA[\d+]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1">
+          <part type="multiple">
+            <part type="single" description="1.1">
+              <text><![CDATA[(\s+nr(\.)?\s+|\-|\s+\-\s+|\s+(og|til)(\s+nr(\.)?)?\s+|\s|\.)(?=(B|IE|BC|BCZ|AG|D|IN|A)?\d+)]]></text>
+            </part>
+            <part type="named" name="stpara">
+              <part type="single" description="1.1">
+                <text><![CDATA[(B|IE|BC|BCZ|AG|D|IN|A)?\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+              </part>
+              <part type="optional" description="1.1">
+                <part type="multiple">
+                  <part type="single" description="1.1">
+                    <text><![CDATA[\.\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+            <part type="optional" description="1.1">
+              <part type="single" description="1.1">
+                <text><![CDATA[(\([a-z]\))]]></text>
+              </part>
+            </part>
+            <part type="optional" description="1.1">
+              <part type="or">
+                <part type="multiple">
+                  <part type="single" description="1.1">
+                    <text><![CDATA[(\s+|(\s+)?(\-|\,|og)(\s+)?)(\([a-z]\))]]></text>
+                  </part>
+                </part>
+                <part type="multiple">
+                  <part type="single" description="1.1">
+                    <text><![CDATA[(\s+|(\s+)?(\-|\,|og)(\s+)?)([a-z])]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>tag_isa_sa_nrs</id>
+    <description>Henter ISA/SA/NRS</description>
+    <expression>
+      <part type="named" name="st_isa_sa_nrs">
+        <part type="named" name="stname">
+          <part type="single" description="1.1">
+            <text><![CDATA[(ISA|SA|NRS)]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr">
+          <part type="single" description="1.1">
+            <text><![CDATA[\d+([a-zæøåA-ZÆØÅ])?]]></text>
+          </part>
+        </part>
+        <part type="optional" description="1.1">
+          <part type="multiple">
+            <part type="single" description="1.1">
+              <text><![CDATA[((\s+)?(\,|\()(\s+)?|\.|\s+og\s+|\-|\s|\s(og\s)?pkt(\.)?\s)(?=(A|V)?\d+)]]></text>
+            </part>
+            <part type="named" name="stpara">
+              <part type="single" description="1.1">
+                <text><![CDATA[(A|V)?\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+              </part>
+              <part type="optional" description="1.1">
+                <part type="multiple">
+                  <part type="single" description="1.1">
+                    <text><![CDATA[\.\d+(((\s+)?[A-Z])(?![a-zæøåA-ZÆØÅ]))?]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>tag_fin_skd</id>
+    <description>Henter FIN/SKD</description>
+    <expression>
+      <part type="named" name="tag_fin_skd">
+        <part type="named" name="stname">
+          <part type="single" description="1.1">
+            <text><![CDATA[SKD|FIN]]></text>
+          </part>
+        </part>
+        <part type="single" description="1.1">
+          <text><![CDATA[\s+]]></text>
+        </part>
+        <part type="named" name="stnr">
+          <part type="single" description="1.1">
+            <text><![CDATA[\d+\/d+]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  
+  
+  <regexp type="single">
+    <id>para_nr</id>
+    <description>Henter paragraf nummer</description>
+    <expression>
+      <part type="positive lookbehind">
+        <text><![CDATA[^|\s|\.|\,|§]]></text>
+      </part>
+      <part type="negative lookbehind">
+        <part type="or">
+          <part type="single" description="finnes paranummer">
+            <text><![CDATA[\d+(\,|\.)]]></text>
+          </part>
+          <part type="single" description="finnes paranummer">
+            <text><![CDATA[(N|n)r(\.)?(\s+)?(\d+)?(\s+)?(\,|og|eller)?(\s+)?]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="chain">
+        <part type="named" name="paranr">
+          <part type="single" description="finnes paranummer">
+            <text><![CDATA[(\d+)([a-zæøåA-ZÆØÅ])?]]></text>
+          </part>
+          <part type="optional">
+            <part type="multiple">
+              <part type="single" description="finnes paranummer">
+                <text><![CDATA[(\-)(\d+)([a-zæøåA-ZÆØÅ])?]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+        <part type="negative lookahead">
+          <part type="or">
+            <part type="single" description="finnes paranummer">
+              <text><![CDATA[(\.)?(\s+)?((L|l)edd|(P|p)unktum)]]></text>
+            </part>
+            <part type="single" description="finnes paranummer">
+              <text><![CDATA[(\s)?(\,|og|eller|til)(\s+)?([a-zA-Z])(\.|\,|\s)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="positive lookahead">
+        <part type="single">
+          <text><![CDATA[\s|\.|\,|$]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Single paragraf start
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--parasingle_new-->
+  <regexp type="multi">
+    <id>parasingle_1</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="or">
+        <part type="or">
+          <part type="regexp" name="kap_chain_alfa" />
+          <part type="regexp" name="kap_chain_roman" />
+          <part type="regexp" name="kap_chain_decimal" />
+        </part>
+        <part type="or">
+          <part type="regexp" name="del_chain_alfa" />
+          <part type="regexp" name="del_chain_roman" />
+          <part type="regexp" name="del_chain_decimal" />
+        </part>
+        <part type="chain">
+          <part type="named" name="paratot">
+            <part type="chain">
+              <part type="regexp" name="para_nr" />
+              <part type="optional">
+                <part type="or">
+                  <part type="regexp" name="ledd_chain_total" />
+                  <part type="regexp" name="punktum_chain_total" />
+                  <part type="regexp" name="number_chain_total" />
+                  <part type="regexp" name="letter_chain_total" />
+                </part>
+              </part>
+              <part type="optional">
+                <part type="single">
+                  <text><![CDATA[(?<=\s[a-zA-Z])\s+\d+]]></text>
+                </part>
+              </part>
+              <part type="optional" description="finnes text i parantes">
+                <text><![CDATA[\s+\(([a-zæøåA-ZÆØÅ]+)\)]]></text>
+              </part>
+              <part type="optional" description="Finne kommentar i kursiv">
+                <text><![CDATA[\s+«[^\»]+»]]></text>
+              </part>
+              <part type="optional" description="Finne kommentar i parantes">
+                <text><![CDATA[\s+\([^\d\)]+\)]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  <!--parasingle_new-->
+  
+  <regexp type="single">
+    <id>split_chain_para</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="or" description="Finn og, til, eller, samt og se etter uttykk med pararef">
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?og\s+overgangsregel\s+til\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?kombinert\s+med\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?flg\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?flg\.\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?(\,)?(\s)?((J|j)f)(?!((\.)?(\s+)?(F|L)\.\s+\d))(\.)?(\s+)?]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?og\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?(om\s+([^\s]*))?eller\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?og\s+i\s+enten\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?og\s+enten\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?til\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?(\,)?(\s+)?samt\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?se\s+]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?\,(?!(((\s+)?(J|j)f))(\.)?(\s+)?|(\s+)?(F|L)\.\s+\d)]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?\,(\s+)?((J|j)f(\.)?)?(\s+)?]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?\.(\s+)?(Unntak(\:)?)(\s+)?]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[(\s+)?\/(\s+)?]]></text>
+        </part>
+        <part type="single" description="or">
+          <text><![CDATA[\s+]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+      
+
+      <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Multiple paragraf start
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--paratoken_2-->
+  <regexp type="multi">
+    <id>paratoken_2</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="positive lookahead" description="Sjekk om valid pararef">
+        <part type="or">
+          <part type="single" description="or">
+            <text><![CDATA[§+(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="kap_chain_alfa" />
+          <part type="regexp" name="kap_chain_roman" />
+          <part type="regexp" name="kap_chain_decimal" />
+          <part type="regexp" name="del_chain_alfa" />
+          <part type="regexp" name="del_chain_roman" />
+          <part type="regexp" name="del_chain_decimal" />
+        </part>
+      </part>
+      <part type="optional" description="or">
+        <text><![CDATA[§+(\s+)?]]></text>
+      </part>
+      <part type="regexp" name="parasingle_1" />
+      <part type="optional">
+        <part type="positive lookahead">
+          <part type="regexp" name="split_chain_para" />
+          <part type="optional" description="or">
+            <text><![CDATA[§+(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="parasingle_1" />
+        </part>
+        <part type="multiple">
+          <part type="regexp" name="split_chain_para" />
+          <part type="optional" description="or">
+            <text><![CDATA[§+(\s+)?]]></text>
+          </part>
+          <part type="regexp" name="parasingle_1" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Multiple paragraf slutt
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <regexp type="multi">
+    <id>tokensourcepara</id>
+    <description>Henter token + source paragraf referanse</description>
+    <expression>
+      <part type="positive lookbehind" description="sjekker lovlige tegn foran">
+        <part type="single" description="lovlige tegn">
+          <text><![CDATA[^|\s|\(|\.|\,|\/|\"]]></text>
+        </part>
+      </part>
+      <part type="or">
+        <part type="named" name="source_para" level="1">
+          <part type="optional">
+            <part type="named" name="lov_before">
+              <part type="or">
+                <part type="container">
+                  <part type="named" name="source_name">
+                    <part type="regexp" name="idsources"/>
+                  </part>
+                  <part type="optional">
+                    <part type="positive lookbehind" description="sjekker lovlige tegn foran">
+                      <part type="single" description="lovlige tegn">
+                        <text><![CDATA[loven|forskriften|reglen(e)?]]></text>
+                      </part>
+                    </part>
+                    <part type="single" description="mellomrom">
+                      <text><![CDATA[s]]></text>
+                    </part>
+                  </part>
+                  <part type="optional">
+                    <part type="single" description="mellomrom">
+                      <text><![CDATA[\s+(har\s+i|etter|i)]]></text>
+                    </part>
+                  </part>
+                </part>
+                <part type="regexp" name="mlovdate"/>
+                <part type="regexp" name="mlovom"/>
+                <part type="regexp" name="nxlovname"/>
+                <part type="regexp" name="nxforname"/>
+                <part type="regexp" name="dennesammelov"/>
+                <part type="regexp" name="dennesammefor"/>
+              </part>
+            </part>
+            <part type="single" description="mellomrom">
+              <text><![CDATA[\s+]]></text>
+            </part>
+          </part>
+          <part type="named" name="para">
+            <part type="regexp" name="paratoken_2"/>
+          </part>
+          <part type="optional">
+            <part type="named" name="lov_after">
+              <part type="single" description="mellomrom">
+                <text>
+                  <![CDATA[\s+i\s+]]>
+                </text>
+              </part>
+              <part type="container">
+                <part type="or">
+                  <part type="regexp" name="idsources"/>
+                  <part type="regexp" name="mlovdate"/>
+                  <part type="regexp" name="mlovom"/>
+                  <part type="regexp" name="nxlovname"/>
+                  <part type="regexp" name="nxforname"/>
+                  <part type="regexp" name="dennesammelov"/>
+                  <part type="regexp" name="dennesammefor"/>
+                </part>
+              </part>
+
+            </part>
+          </part>
+        </part>
+        <part type="named" name="tag_lovname" level="1">
+          <part type="or">
+            <part type="regexp" name="mlovdate"/>
+            <part type="regexp" name="mlovom"/>
+            <part type="regexp" name="nxlovname"/>
+            <part type="regexp" name="nxforname"/>
+          </part>
+        </part>
+        <part type="named" name="tag_kl" level="1">
+          <part type="regexp" name="tag_kl"/>
+        </part>
+        <part type="named" name="tag_lonnkode" level="1">
+          <part type="regexp" name="tag_lonnkode"/>
+        </part>
+        <part type="named" name="tag_utv" level="1">
+          <part type="regexp" name="tag_utv"/>
+        </part>
+        <part type="named" name="tag_bfu" level="1">
+          <part type="regexp" name="tag_bfu"/>
+        </part>
+        <part type="regexp" name="tag_ifrs"/>
+        <part type="regexp" name="tag_isa_sa_nrs"/>
+        <part type="regexp" name="tag_fin_skd"/>
+      </part>
+      <part type="positive lookahead" description="sjekker lovlige tegn foran">
+        <part type="single" description="lovlige tegn">
+          <text><![CDATA[\s|\.|\,|$|\)|\(|\:|\;|\/|\"]]></text>
+        </part>
+      </part>
+
+    </expression>
+  </regexp>
+
+</regexps>

@@ -1,0 +1,104 @@
+﻿/* document styles */
+
+.K-ALFA{ list-style-type:lower-alpha ;}
+.K-STREK{ list-style-type: disc ; }
+.K-BOMBE{ list-style-type:disc ; }
+.K-INGEN{ list-style-type:none ; }
+.K-NUM{ list-style-type:decimal ; }
+.K-OPPRAMS{list-style-type:none ;  }
+.K-ROM{list-style-type:lower-roman;    }
+.K-ANNET{list-style-type:square ;  }
+.no-symbol{ list-style-type:none ; }
+
+.section{margin-top:10pt; border:solid 1px black;padding:3px;}
+table.asis  {font-size:10pt;}
+.normaltd {font-size:10pt;}
+.quote {background-color:#ffdead;}
+.ledda  {margin-top:10pt;}
+.para  {font-weight:bold; text-indent: 10px; margin-top:10pt;border:solid 1px black;background-color:Aqua;}
+.lovpara  {font-weight:bold; text-indent: 10px; margin-top:10pt; background-color:#ddd;border:solid 1px black;padding:3px;}
+.artpara  {font-weight:bold; text-indent: 10px; margin-top:10pt; background-color:#ddd;border:solid 1px black;padding:3px;}
+.ledd  {font-weight:bold; text-indent: 10px; margin-top:10pt; background-color:silver;border:solid 1px black;padding:3px;}
+.comment { font-weight:bold; font-size:7pt; text-indent: 10px; margin-top:10pt; border:solid 1px black;padding:3px; background-color: #CCCCCC; }
+.footnote
+{
+	font-weight: bold;
+	font-size: 7pt;
+	text-indent: 10px;
+	margin-top: 10pt;
+	background-color: #99CCFF;
+	border: solid 1px black;
+	padding: 3px;
+}
+.footnote1 {font-size:7pt; color:Blue;}
+li { background-color:Orange;border:solid 1px black;padding:2px;}
+.normal, .enkeltsaker-1 {margin-bottom:2pt;	margin-top:10px;margin-left:0pt;}
+.enkeltsaker-2 {text-indent: 20px;	margin-bottom:2pt;	margin-top:5pt;	margin-left:0pt;}
+.enkeltsaker-tittel {	text-decoration:underline;	margin-bottom:2pt;	margin-top:5pt;	margin-left:0pt;}
+.normaltable {	border-spacing:0px;	padding:3px;}
+.normalnumber {	margin-bottom:2pt;	margin-top:2pt;}
+.anf{font-weight:700;}
+.b{font-weight:700;}
+.bold,.b{	font-weight:700;}
+.underline {text-decoration:underline;}
+.i {font-style:italic;}
+.italic {font-style:italic;}
+.buffer {font-size:7.0pt;	font-family:Times New Roman;}
+.highlight {background-color:#ffdead;}
+.raster {background-color:#e0e0e0;}
+.eksempeltekst {font-style:italic;	font-weight:bold;	margin-left:0px;}
+.sup {vertical-align: super;	color:navy;	font-size:7px;}
+.margword {	margin-bottom:5pt;	margin-top:2pt;	color:silver;	font-size:0.8em;}
+.sekid {margin-bottom:5pt;	margin-top:2pt;	color:silver;	font-size:.05em;}
+dt {font-weight:bold;}
+.changed {	background-color:#ffdead;}
+.showchange {	border-left: solid 1px black;}
+.marked{	background-color:Lime;}
+
+/* index styles */
+.selectedheader { font-size:0.9em;	font-weight:bold}
+.unselectedheader {	font-weight:bold;	color:Red;}
+.selected {	font-weight:bold}
+.normal {font-weight:normal;}
+.item {	padding-left:10pt;	text-indent:-13pt;	line-height: 16px;}
+.header {padding-left:10pt;	text-indent:-13pt;	cursor:pointer;}
+.bookmark {	text-indent:0pt;	cursor:pointer; }
+.raster {background-color:Silver;}
+.ramme {display:block;border:solid 1px black;margin:0px; padding:1px;}
+.brok {display:inline;vertical-align:middle; text-align:center;white-space:nowrap;}
+.nev { border-top: solid black 1px;vertical-align:middle; text-align:center;white-space:nowrap;}
+.kw {color:navy; margin-right:3px; margin-left:3px;border:solid 1px red;}
+
+
+.pdennefortoken {background-color:green;}
+.pdennelovtoken {background-color:green;}
+.denneforptoken {background-color:green;}
+.dennelovptoken {background-color:green;}
+.lt2ptoken
+{
+	background-color: #FFCCFF;
+}
+.lt2token
+{
+	background-color: #FFCCFF;
+}
+.ltptoken {background-color:Teal;}
+.pltoken {background-color:Maroon;}
+.pftoken {background-color:Aqua;}
+.pldtoken {background-color:Lime;}
+.plttoken {background-color:Purple;}
+.ldptoken {background-color:Orange;}
+.stoken {background-color:green;}
+.lovdate {background-color:yellow;}
+.lovname {background-color:red;}
+.forname
+{
+	background-color: #FF99FF;
+}
+.xparas {background-color:blue;color:yellow;}
+.xpara {background-color:blue;color:red;}
+.xparai
+{
+	background-color: #00FFFF;
+	color: red;
+}

@@ -21,8 +21,8 @@ namespace DIBAdminAPI.Data
         Task<XElement> SaveResourceDocument(object p, int? timeOut = null);
         Task<XElement> ExecUpdateResult(string QueryName, object p, int? timeOut = null);
         Task<XElement> ExecXElementQuery(string QueryName, object p, int? timeOut = null);
-        Task<IEnumerable<DIBLink>> GetResourceDibLinkData(object p, int? timeOut = null);
-        //Task<ResourceNavigation> GetResourceByResourceIdAndId(object p, int? timeOut = null);
+        Task<IEnumerable<DIBLinkData>> GetResourceDibLinkData(object p, int? timeOut = null);
+        Task<ResourceNavigation> GetResourceByResourceIdAndId(object p, int? timeOut = null);
         //Task<XElement> ExecDocument(string QueryName, object p, int? timeOut = null);
         //Task<ResourceDataDocument> ExecDocumentResource(string QueryName, object p, int? timeOut = null);
         //Task<IEnumerable<XElement>> ExecQuery(string QueryName, object p, int? timeOut = null);
@@ -30,6 +30,8 @@ namespace DIBAdminAPI.Data
         //Task<IEnumerable<XElement>> ExecQuery(string QueryName, object p, int? timeOut = null);
         //Task<XElement> GetTopic();
         //Task<TopicDetails> ExecTopicDetails(string QueryName, object p, int? timeOut = null);
+        Task<DocumentParts> GetDocumentPartDiblink(string resourceId, string segmentId, string Id);
+        Task<DocumentParts> GetDocumentPart(string resourceId, string id);
 
     }
 }

@@ -1,0 +1,1920 @@
+﻿<regexps>
+
+  <!--(\s|^)(lov(en)?(s)?|forskrift(en)?(s)?)\s$-->
+  <!--\d+\.\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desbember)\s+\d+\s+nr(\.)\s+\d+-->
+  <!--\d+\.\d+\.\d+\s+nr(\.)+\s+\d+-->
+  <!--(([A-ZÆØÅ]+)|[a-zA-ZæøåÆØÅ\.\/]+\.|([A-ZÆØÅ])?([a-zæøå]+)lov(en)?(e)?|([A-ZÆØÅ])?([a-zæøå]+)forskrift(en)?|([A-ZÆØÅ])?([a-zæøå]+)regulativ(et)?|([A-ZÆØÅ])?([a-zæøå]+)vedtak(e)?(t)?|([A-ZÆØÅ])?([a-zæøå]+)regle(ne|r))-->
+
+  
+  
+  <!--PARAGRAF REGLER START-->
+  <regexp type="single">
+    <group>document</group>
+    <type>spot</type>
+    <case>0</case>
+    <id>paranumber</id>
+    <description>Paragraf Number</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[((§|^)(\s)?|,(\s)?|og(\s+)|eller(\s+)|til(\s)|jf(\.)?(\s+)?)(?<pnr>((\d+)([a-z])?((\-\d+([a-z])?)+)?))(?!(\.)?(\s)(L|l)edd)]]>
+          <!--<![CDATA[(?<pnr>((\d+)((?!([a-zæøåA-Zæøå]([a-zæøåA-Zæøå]+)))([a-zæøåA-Zæøå]))?((\-\d+((?!([a-zæøåA-Zæøå]([a-zæøåA-Zæøå]+)))([a-zæøåA-ZÆØÅ]))?)+)?))]]>-->
+        </text>
+      </part>
+    </expression>
+  </regexp>
+  
+  <regexp type="single">
+    <id>paranumber1</id>
+    <description>Paragraf Number</description>
+    <expression>
+      <part type="chain">
+        <part type="single" description="1.1">
+          <text><![CDATA[((§|^)(\s)?|,(\s)?|og(\s+)|eller(\s+)|til(\s)|jf(\.)?(\s+)?)]]></text>
+        </part>
+        <part type="named" name="pnr">
+          <part type="single" description="1.1">
+            <text><![CDATA[(\d+)([a-zA-Z])?((\-\d+([a-zA-Z])?)+)?]]></text>
+          </part>
+        </part>
+      </part>
+      <part type="single" description="1.1">
+        <text><![CDATA[(\s+(L|l)edd((\s+|\s+og\s+|\s+eller\s+|(\s+)?\,(\s+)?)(ledd\s+)?\d+)+)?]]></text>
+      </part>
+      <part type="single" description="1.1">
+        <text><![CDATA[(((\s+\,(\s+)?|\s+og\s+|\s+)\(\d+\))+)?]]></text>
+      </part>
+      <part type="single" description="1.1">
+        <text><![CDATA[(\s+(N|n)r(\.)?((\s+|\s+og\s+|\s+eller\s+|(\s+)?\,(\s+)?)\d+)+)?]]></text>
+      </part>
+      <part type="single" description="1.1">
+        <text><![CDATA[(\s+(P|p)kt(\.)?((\s+|\s+og\s+|\s+eller\s+|(\s+)?\,(\s+)?)[a-zA-Z][a-zA-Z]?)+)?]]></text>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--PARAGRAF REGLER SLUTT-->
+
+  <!--SPOTREGLER START-->
+  <regexp type="single">
+    <group>document</group>
+    <type>spot</type>
+    <case>0</case>
+    <id>lov_forskrift_spot</id>
+    <description>Finner lov forskrift regulativet vedtaket</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(\s|^)(?<id>((lov(en)?(s)?|forskrift(en)?(s)?)))\s]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>document</group>
+    <type>spot</type>
+    <case>0</case>
+    <id>lov_forskrift_x.juni_xxxx_spot</id>
+    <description>Finner lov forskrift nummer</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(?<id>((?<date>(\d+\.\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desbember)\s+\d+))\s+nr(\.)\s+(?<nr>(\d+))))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <group>document</group>
+    <type>spot</type>
+    <case>0</case>
+    <id>lov_forskrift_xx.xx_xxxx_spot</id>
+    <description>Finner lov forskrift nummer</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(?<id>((?<date>(\d+\.\d+\.\d+))\s+nr(\.)+\s+(?<nr>(\d+))))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>document</group>
+    <type>spot</type>
+    <case>0</case>
+    <id>xxxxxlov_forskrift_spot</id>
+    <description>Finner xxxxxlov xxxxforskrift</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(?<id>((([A-ZÆØÅ]+)|[a-zA-ZæøåÆØÅ\.\/]+\.|(([A-ZÆØÅ])?([a-zæøå\-]+))(lov(en)?(e)?|forskrift(en)?|regulativ(et)?|vedtak(e)?(t)?|regle(ne|r)))))]]>
+          <!--
+          <![CDATA[(([A-ZÆØÅ][A-ZÆØÅ]+)|[a-zA-ZæøåÆØÅ\.\/]+\.|([A-ZÆØÅ])?([a-zæøå]+)lov(en)?(e)?|([A-ZÆØÅ])?([a-zæøå]+)forskrift(en)?|([A-ZÆØÅ])?([a-zæøå]+)regulativ(et)?|([A-ZÆØÅ])?([a-zæøå]+)vedtak(e)?(t)?|([A-ZÆØÅ])?([a-zæøå]+)regle(ne|r))]]>
+          -->
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--SPOTREGLER SLUTT-->
+
+  <regexp type="single">
+    <group>document</group>
+    <type>front</type>
+    <case>0</case>
+    <id>static_front</id>
+    <description>Finner statiske referanser foran</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(\s|^)(asl\.\/)?(?<id>((SSV\s\(d+\)|asal|Rl\.|Rl|rl\.)))(\s+)?$]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <group>document</group>
+    <type>front</type>
+    <case>0</case>
+    <id>lov_forskrift_short</id>
+    <description>Finner lov forskrift regulativet vedtaket foran</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(\s|^)(?<id>((lov(en)?(e)?(s)?|forskrift(en)?(e)?(s)?)))(\s+)?$]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>document</group>
+    <type>front</type>
+    <case>0</case>
+    <id>lov_forskrift_retningslinje_vedtak</id>
+    <description>Finner lov forskrift regulativet vedtaket foran</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(\s|^|\/|\()(?<id>((([A-ZÆØÅ]+)|[a-zA-ZæøåÆØÅ\.\/]+\.|(([A-ZÆØÅ]+)?([a-zæøå\-]+))(lov(a)?(en)?(e)?|forskrift(en)?(s)?|regulativ(et)?|vedtak(e)?(t)?|regle(ne|r)(s)?))))(\))?(\s+)?$]]>
+
+          <!--
+          <![CDATA[(\s|^)(([A-ZÆØÅ]+)|[a-zA-ZæøåÆØÅ\.\/]+\.|([A-ZÆØÅ])?([a-zæøå\-]+)lov(en)?(e)?|([A-ZÆØÅ])?([a-zæøå\-]+)forskrift(en)?|([A-ZÆØÅ])?([a-zæøå\-]+)regulativ(et)?|([A-ZÆØÅ])?([a-zæøå\-]+)vedtak(e)?(t)?|([A-ZÆØÅ])?([a-zæøå\-]+)regle(ne|r))\s(\s+)?$]]>
+          -->
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>document</group>
+    <type>after</type>
+    <case>0</case>
+    <id>lov_forskrift_retningslinje_vedtak_after</id>
+    <description>Finner lov forskrift regulativet vedtaket foran</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(^)(\s+)?i\s+(?<id>((([A-ZÆØÅ]+)|[a-zA-ZæøåÆØÅ\.\/]+([lf])\.|(([A-ZÆØÅ])?([a-zæøå\-]+))(lov(en)?(e)?(a)?|forskrift(en)?|regulativ(et)?|vedtak(e)?(t)?|regle(ne|r)))))]]>
+          <!--
+          <![CDATA[(\s|^)i\s+(([A-ZÆØÅ]+)|[a-zA-ZæøåÆØÅ\.\/]+\.|([A-ZÆØÅ])?([a-zæøå\-]+)lov(en)?(e)?(a)?|([A-ZÆØÅ])?([a-zæøå\-]+)forskrift(en)?|([A-ZÆØÅ])?([a-zæøå\-]+)regulativ(et)?|([A-ZÆØÅ])?([a-zæøå\-]+)vedtak(e)?(t)?|([A-ZÆØÅ])?([a-zæøå\-]+)regle(ne|r))]]>
+          -->
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <group>document</group>
+    <type>after</type>
+    <case>0</case>
+    <id>lovref_xx.xx.xxxx_after</id>
+    <description>Finner setninger som starter med lovref</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(^)(\s+)?i\s+([a-zæøåA-ZÆØÅ\-])?(lov(en)?(e)?(a)?|forskrift(en)?|regulativ(et)?|regel(en)?(e)?|F(\.)?|(L\.)?)(\s+av)?(\s+)?(?<id>((?<date>(\d+\.\d+\.\d+))\s+nr(\.)+\s+(?<nr>(\d+))))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>document</group>
+    <type>front</type>
+    <case>0</case>
+    <id>lovref_xx.xx.xxxx_front</id>
+    <description>Finner setninger som starter med lovref</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[([a-zæøåA-ZÆØÅ]+)?(lov(en)?(e)?(a)?|forskrift(en)?|F(\.)?|L(\.)?)?(\s+av)?(\s+)?(?<id>((?<date>(\d+\.\d+\.\d+))\s+nr(\.)?\s+(?<nr>(\d+))))(((\s+)(m(\.)?m(\.)?|m(\.)?v(\.)?|([a-zæøåÆØÅ]+[^\.\s]|[a-zæøåÆØÅ])))+)?(\s\(([a-zæøåÆØÅ\.]+)\))?(\))?(\s+)$]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <group>document</group>
+    <type>after</type>
+    <case>0</case>
+    <id>lovref_xx._juni_xxxx_after</id>
+    <description>Finner setninger som starter med lovref i lov av 10. juni 1988 nr. 40 etter</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[(^)(\s+)?i\s+([a-zæøåA-ZÆØÅ]+)?(lov(en)?(e)?(a)?|forskrift(en)?)(\s+av)?\s+(?<id>((?<date>(\d+(\.)?\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember)\s+\d+))\s+nr(\.)?\s+(?<nr>(\d+))))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <group>document</group>
+    <type>front</type>
+    <case>0</case>
+    <id>lovref_xx._juni_xxxx_front</id>
+    <description>Finner setninger som starter med lovref i lov av 10. juni 1988 nr. 40 foran</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[([a-zæøåA-ZÆØÅ]+)?(lov(en)?(e)?(a)?|forskrift(en)?)?(\s+av)?(\s+)?(?<id>((?<date>(\d+(\.)?\s+(januar|februar|mars|april|mai|juni|juli|august|september|oktober|november|desember)\s+\d+))\s+nr(\.)?\s+(?<nr>(\d+))))(((\s+)(m(\.)?m(\.)?|m(\.)?v(\.)?|([a-zæøåÆØÅ]+[^\.\s]|[a-zæøåÆØÅ])))+)?(\s\(([a-zæøåÆØÅ\.]+)\))?(\))?(\s+)$]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <group>document</group>
+    <type>numpunkt</type>
+    <case>0</case>
+    <id>numpunkt</id>
+    <description>Finner alle setninger som starter med 1.1.1</description>
+    <expression>
+      <part type="single" description="1.1">
+        <text>
+          <![CDATA[^(?<num>(((\d+((\.\d+)+)?))))\s]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>del</type>
+    <case>0</case>
+    <id>delno</id>
+    <description>Finner alle setninger som starter med Del</description>
+    <expression>
+      <part type="single" description="Del 1">
+        <text>
+          <![CDATA[(^del\s)(?<num>((([0-9]+)|([ivx]+))))(\.)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>kap</type>
+    <case>0</case>
+    <id>alfakap</id>
+    <description>Finner alle setninger som starter med Første kapittel</description>
+    <expression>
+      <part type="single" description="første kapittel">
+        <text>
+          <![CDATA[^(?<num>(([0-9]+\.)|fyrste|første|andre|annet|tredje|fjerde|femte|sjette|sjuande|sjuende|åttende|åttande|niende|niande|tiende|tiande))\skapit(t)?el(\.|\s)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>kap</type>
+    <case>0</case>
+    <id>kapnumber</id>
+    <description>Finner alle setninger som starter med kapittel 1.</description>
+    <expression>
+      <part type="single" description="kapittel 1">
+        <text>
+          <![CDATA[^(kapittel\s)(?<num>(\d+(\s)?([a-z])?))(\.|\s)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>kap</type>
+    <case>0</case>
+    <id>kapittelroman</id>
+    <description>Finner alle setninger som starter med kapittel iv.</description>
+    <expression>
+      <part type="single" description="kapittel iv.">
+        <text>
+          <![CDATA[^(kapittel\s)(?<num>([ivx]+))(\.|\s)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>kap</type>
+    <case>0</case>
+    <id>kaproman</id>
+    <description>Finner alle setninger som starter med kap iv.</description>
+    <expression>
+      <part type="single" description="kap iv.">
+        <text>
+          <![CDATA[^(kap\s)(?<num>([ivx]+))(\.|\s)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>vedlegg</type>
+    <case>0</case>
+    <id>namevedlnum</id>
+    <description>Finner alle setninger som starter med xxx-xxx vedlegg iv elle 1.</description>
+    <expression>
+      <part type="single" description="xxx-xxx vedlegg iv elle 1">
+        <text>
+          <![CDATA[^((?<name>([a-zæøåA-ZÆØÅ\-\s])+)(\svedlegg)\s)(?<num>(\d+|([ivx]+)(\snr(\.)?(\s\d+([a-z])))))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>vedlegg</type>
+    <case>0</case>
+    <id>vedlnum</id>
+    <description>Finner alle setninger som starter vedlegg iv elle 1.</description>
+    <expression>
+      <part type="single" description="vedlegg iv elle 1">
+        <text>
+          <![CDATA[^(vedlegg\s)(?<num>(\d+|([ivx]+)))\.]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>romer</type>
+    <case>1</case>
+    <id>uromertall</id>
+    <description>Finner alle setninger som inneholder bare romertall.</description>
+    <expression>
+      <part type="single" description="ivx">
+        <text>
+          <![CDATA[^(?<num>([IXV]+))($|\.)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>romer</type>
+    <case>1</case>
+    <id>lromertall</id>
+    <description>Finner alle setninger som inneholder bare romertall.</description>
+    <expression>
+      <part type="single" description="ivx">
+        <text>
+          <![CDATA[^(?<num>([ivx]+))($|\.)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>metric</type>
+    <case>0</case>
+    <id>metric</id>
+    <description>Finner alle setninger som inneholder bare romertall.</description>
+    <expression>
+      <part type="single" description="ivx">
+        <text>
+          <![CDATA[^(?<num>([0-9]+))($|\.)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>para</type>
+    <case>0</case>
+    <id>para</id>
+    <description>Finner alle setninger som inneholder § xx-xx.</description>
+    <expression>
+      <part type="single" description="ivx">
+        <text>
+          <![CDATA[^\§+(\s)?(?<num>(([0-9]+)([a-zæøåA-ZÆØÅ])?(((\-)([0-9]+)([a-z])?)+)?)((\s)?til(\s)?(([0-9]+))?)?)($|\.|\s)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>textpara</type>
+    <case>0</case>
+    <id>textpara</id>
+    <description>Finner alle setninger som inneholder text text text § xx-xx.</description>
+    <expression>
+      <part type="single" description="ivx">
+        <text>
+          <![CDATA[^([a-zæøåÆØÅ\s]+)\s\§+(\s)?(?<num>(([0-9]+)([a-zæøåA-ZÆØÅ])?(((\-)([0-9]+)([a-z])?)+)?)((\s)?til(\s)?(([0-9]+))?)?)($|\.)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <group>lov</group>
+    <type>art</type>
+    <case>0</case>
+    <id>art</id>
+    <description>Finner alle setninger som inneholder Art.</description>
+    <expression>
+      <part type="single" description="ivx">
+        <text>
+          <![CDATA[^art(\s)(?<num>(([0-9]+)))($|\.)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>ilovav</id>
+    <description>paragraf i lov av</description>
+    <expression>
+      <part type="single" description="paragraf i lov av">
+        <text>
+          <![CDATA[(\s+i\s+([a-zæøåA-ZÆØÅ]+)(l|L)ov([a-zæøåA-ZÆØÅ]+)?)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>iforskriftavxxdato</id>
+    <description>paragraf i lov av dato</description>
+    <expression>
+      <part type="single" description="paragraf i lov av dato">
+        <text>
+          <![CDATA[(\s+i\s+(((L|l)ov)|((F|f)orskrift))(\s+(\()(.*?)(\)))?((\s+om(\s+([a-zæøå]+)){1,5}?)?\s+av)?\s+\d+(\.)?\s+([a-zæøå]+)\s+\d+(\s+nr(\.)?\s+\d+)?)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>iLovavom</id>
+    <description>paragraf i lov av om</description>
+    <expression>
+      <part type="single" description="paragraf i lov av om">
+        <text>
+          <![CDATA[(\s+i\s+([a-zæøåA-ZÆØÅ]+)?(l|L)ov(\s+om(\s+([a-zæøå]+)){1,5}?)?\s+av\s+\d+(\.)?\s+([a-zæøå]+)\s+\d+\s+nr(\.)?\s+\d+(.+?)(\s+om)((.|\s)+?)(m\.m\.|mv\.|\)|\.|(?=\,\s+se\s+)|(?=\,\s+(J|j)f(\.)?\s+)))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <id>ForskriftLovRetning</id>
+    <description>Forskrift lov og retningslinjer foran paragraf</description>
+    <expression>
+      <part type="single" description="Forskrift lov og retningslinjer foran paragraf">
+        <text>
+          <![CDATA[(?<=\s|^)((M|m)ed\s+hjemmel\s+i\s+)?(((F|f)orskrift|(L|l)ov|(R|r)etningslinjer)(\s+av)?\s+\d+(\.)?\s+([a-zæøå]+)\s+\d+\s+nr(\.)?\s+\d+)(.*?)(?=\.\s+[\(A-ZÆØÅ]|\,\s+jf|\,\s+kan\s+|\s+(§|(K|k)ap(\.)?|(K|k)apittel))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+
+  <regexp type="single">
+    <id>dommer</id>
+    <description>Henter rettsavgjørelser</description>
+    <expression>
+      <part type="single" description="Henter rettsavgjørelser">
+        <text>
+          <![CDATA[(URD|FIN|FIN\s+i\s+brev|HRD|LRD|Riksskattestyrets\s+kjennelse|Lagmannsrettens\s+kjennelse|\w+\s+lagmannsretts\s+dom|(H|h)øyesteretts\s+dom)((\s+)(\([0-9a-zæøåA-ZÆØÅ\s+\.\/]+\)))?((\s+)(av))((\s+)(\d+)(\.)?(\s+)([a-zæøåA-ZÆØÅ]+)(\s+)(\d+))?((\s+\()(.)+?(\)))?((((\s)(\([0-9a-zæøåA-ZÆØÅ\s\.\/]+\)(\s+i\s+))|\s+i\s+))?((U|u)tv)(\.)?(\s+)(\d+|[IVX]+)(\/|\-)(\d+)(\sbind\s+([IVX]+|\d+))?(\s+side\s+(\d+))?(((\s+)(\()([0-9a-zæøåA-ZÆØÅ\s\.\/]+)(\)))+)?)?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <id>otprop</id>
+    <description>Henter otprop</description>
+    <expression>
+      <part type="single" description="Henter otprop">
+        <text>
+          <![CDATA[((St|Ot)\.(prp|meld)\.\s+nr\.\s+\d+)((\s+\(\d+)(\W\d+)?(\)))?(((\s+)(kap|pkt)(\.)?(\s+)(\d)(((\.)(\d+))+)?)?)?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>prop</id>
+    <description>Henter prop</description>
+    <expression>
+      <part type="single" description="Henter prop">
+        <text>
+          <![CDATA[(Prop|Innst)\.(\s+(\d+))?((\s+)(O|S|L)(\.)?)?((\s+)[IVX]+)?((\s+)(nr\.)(\s+)(\d+))?(\s+\(\d+\-\d+\))?((\s+)(\()([0-9a-zæøåA-ZÆØÅ\s\.\/\-])+(\)))?((\s+)(punkt|pkt\.|s\.)(\s+)(\d+)(((\.)(\d+))+)?)?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <id>rundskriv</id>
+    <description>Henter rundskriv</description>
+    <expression>
+      <part type="single" description="Henter rundskriv">
+        <text>
+          <![CDATA[(((J|j)f(\.)\s+?)?(([a-zæøåA-ZÆØÅ]+))?((?<!se)(\s+(R|r)undskriv))|((?<=se\s)((R|r)undskriv)))(\s+(nr(\.)))?\s+([0-9]+)(\/)?([0-9]+)?((\s+)?(a|A)vd(\.)?\s+([IVX]+))?((\,)?(\s+i)?\s+(\()?(U|u)tv.\s+([0-9]+)(\/)([0-9]+)(\))?)?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>toTest</id>
+    <description>test</description>
+    <expression>
+      <part type="single" description="test">
+        <text>
+          <![CDATA[(?<=(^|\s))NOU\s+\d+\:\d+]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>nou</id>
+    <description>NOU</description>
+    <expression>
+      <part type="single" description="NOU">
+        <text>
+          <![CDATA[(?<=(^|\s))NOU\s+\d+\:\d+]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <id>skattdoc</id>
+    <description>Skattedirektoratest meldinger sirkulær</description>
+    <expression>
+      <part type="single" description="Skattedirektoratest meldinger sirkulær">
+        <text>
+          <![CDATA[(?<=(^|\s))(SKD|F|S|T|R|U|A(V|v)|K(O|o))\s+\d+(\.)?(\/\d+)?(\s+av\s+\d+(\.)?\s+([a-zæøå]+)\s+\d+(\s+\nr(\.)?\s+\d+)?)?((\,\s+\d+(\/\d+)?(\s+av\s+\d+(\.)?\s+([a-zæøå]+)\s+\d+(\s+\nr(\.)?\s+\d+)?)?)+)?((\s+og\s+\d+(\/\d+)?(\s+av\s+\d+(\.)?\s+([a-zæøå]+)\s+\d+(\s+\nr(\.)?\s+\d+)?)?)+)?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <regexp type="single">
+    <id>klagenemndssak</id>
+    <description>klagenemndssak</description>
+    <expression>
+      <part type="single" description="klagenemndssak">
+        <text>
+          <![CDATA[Klagenemndssak\s+nr(\.)?\s+\d+(\s+av\s\d+(\.)?\s+([a-zæøå]+)\s+\d+)?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <id>utv</id>
+    <description>utv</description>
+    <expression>
+      <part type="single" description="utv">
+        <text>
+          <![CDATA[(Utv)(\.)?\s+\d+\s+(side|s\.)\s+\d+]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="single">
+    <id>skd</id>
+    <description>SKD</description>
+    <expression>
+      <part type="single" description="SKD">
+        <text>
+          <![CDATA[(SKD\s+\d+\/\d+)(\s+punkt\s+\d+(\.\d+))?((\s+og\s+\d+\/\d+)+)?((\,\s+\d+\/\d+)+)?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>bfu</id>
+    <description>Henter bindene forhåndsuttalelse</description>
+    <expression>
+      <part type="single" description="Henter bindene forhåndsuttalelse">
+        <text>
+          <![CDATA[(BFU)((\s+)(nr\.))?(\s+)(\d+)(\/)(\d+)]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="single">
+    <id>emk</id>
+    <description>Henter emk</description>
+    <expression>
+      <part type="single" description="Henter emk">
+        <text>
+          <![CDATA[(EMK)(\s+)((tilleggsprotokoll)(\s+)(\d+))?(art\.|artikkel)(\s+)(\d+)((\s+)(\()(\d+)(\)))?]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Single paragraf start
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--parasingle-->
+  <regexp type="single">
+    <id>parasingle</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="named" name="parasingle">
+        <part type="chain">
+          <part type="chain">
+            <part type="or">
+              <part type="named" name="parasinglekapname">
+                <part type="or">
+                  <part type="single" description="Finnes kap">
+                    <text><![CDATA[(?<=(^|\s+|\.|\,))((D|d)el(\.)?\s+(\d+|[ivxIVX]+|[a-zæøåA-ZÆØÅ]))]]></text>
+                  </part>
+                  <part type="single" description="Finnes kap">
+                    <text><![CDATA[(?<=^|\s|\.|\,)((K|k)ap(\.)?(ittel)?)\s+(\d+|[ivxIVX]+)]]></text>
+                  </part>
+                </part>
+              </part>
+              <part type="named" name="parasingleparanr">
+                <part type="chain">
+                  <part type="chain">
+                    <part type="single" description="finnes paranummer">
+                      <text><![CDATA[(?<=^|\s|\.|\,|§)(?<!(N|n)r(\.)(\s)+|(N|n)r(\.)(\s)+og(\s)+|(N|n)r(\.)(\s)+eller(\s)+)(((\d+)([a-zæøåA-ZÆØÅ])?)(((\-\d+)([a-zæøåA-ZÆØÅ])?)+)?)]]></text>
+                    </part>
+                    <part type="optional" description="bokstav">
+                      <text><![CDATA[((\s+([a-hA-H]))(?![a-zæøåA-ZÆØÅ]+))]]></text>
+                    </part>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+          </part>
+          <part type="optional" description="finnes tall i parantes">
+            <text><![CDATA[(\s+)?\(\d+\)]]></text>
+          </part>
+          <part type="optional" description="finnes ledd">
+            <text><![CDATA[\s+\d+(\.)?(\s+)?(L|l)edd]]></text>
+          </part>
+          <part type="optional" description="finnes ledd bokstavert">
+            <text><![CDATA[\s+(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+eller\s+|\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+(L|l)edd]]></text>
+          </part>
+          <part type="optional" description="finnes punktum">
+            <text><![CDATA[\s+\d+(\.)?(\s+)?(P|p)unktum]]></text>
+          </part>
+          <part type="optional" description="finnes punktum bokstavert">
+            <text><![CDATA[\s+(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+((P|p)unktum|pkt(\.)?)]]></text>
+          </part>
+          <part type="optional" description="finnes nr">
+            <!--<text><![CDATA[\s+(N|n)r(\.)?(\s+)?(\d+|[ivxIVX]+)]]></text>-->
+            <text><![CDATA[\s+(N|n)r(\.)?(((\s+)?(og|eller|samt|\,))?((\s+)((N|n)r(\.)?)?)?((\s+)?(\d+|[ivxIVX]+)))+(?!\-|\()]]></text>
+          </part>
+          <part type="optional" description="finnes bokstav">
+            <text><![CDATA[(\s+)?(((?<=bokstav\s[a-zA-Z])(\s+og\s+))?(Bokstav|bokstav|litra(\.)?|pkt(\.)?|Pkt(\.)?)((\s+|\,(\s+)?|\s+(og|eller|til|\-)\s+|\-)(?![a-zæøåA-ZÆØÅ]([a-zæøåA-ZÆØÅ]+))([a-zæøåA-ZÆØÅ]))+)+]]></text>
+          </part>
+          <part type="optional" description="finnes text i parantes">
+            <text><![CDATA[\s+\(([a-zæøåA-ZÆØÅ]+)\)]]></text>
+          </part>
+          <part type="optional" description="Finne kommentar i kursiv">
+            <text><![CDATA[\s+«[^\»]+»]]></text>
+          </part>
+        </part>
+    </expression>
+  </regexp>
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Single paragraf slutt
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Multiple paragraf start
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--paratoken-->
+  <regexp type="single">
+    <id>paratoken</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="named" name="para">
+        <part type="chain">
+          <part type="chain">
+            <part type="or">
+              <part type="single" description="Finnes kap">
+                <text><![CDATA[(?<=(^|\s+|\.|\,))((D|d)el(\.)?\s+(\d+|[ivxIVX]+|[a-zæøåA-ZÆØÅ]))(?=\s|\.|\,|$)]]></text>
+              </part>
+              <part type="single" description="Finnes kap">
+                <text><![CDATA[(?<=(^|\s+|\.|\,))((K|k)ap(\.)?(it(t)?el)?)\s+(\d+|[ivxIVX]+)]]></text>
+              </part>
+              <part type="chain">
+                <part type="single" description="Finnes para/kap">
+                  <text><![CDATA[§+(\s+§)?]]></text>
+                </part>
+                <part type="single" description="finnes paranummer">
+                  <text><![CDATA[(\s+)?((\d+)([a-zæøåA-ZÆØÅ])?)(((\-\d+)([a-zæøåA-ZÆØÅ])?)+)?]]></text>
+                </part>
+              </part>
+            </part>
+          </part>
+          <part type="optional" description="finnes en bokstav">
+            <!--<text><![CDATA[\s+(([a-hA-H])(?![a-zæøåA-ZÆØÅ]+))]]></text>-->
+            <text><![CDATA[(((\s+)([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$|\-))(((((\s+)?(\-|\,)(\s+)?)|(\s+(og|eller|til)\s+))((([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$)))+)?]]></text>
+          </part>
+          <part type="optional" description="finnes tall i parantes">
+            <text><![CDATA[(\s+)?\(\d+\)]]></text>
+          </part>
+          <part type="optional" description="finnes ledd">
+            <text><![CDATA[\s+\d+(\.)?(\s+)?(L|l)edd((((\s+)([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$|\-))(((((\s+)?(\-|\,)(\s+)?)|(\s+(og|eller|til)\s+))((([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$)))+)?)?]]></text>
+          </part>
+          <part type="optional" description="finnes ledd bokstavert">
+            <text><![CDATA[\s+(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+eller\s+|\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+(L|l)edd((((\s+)([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$|\-))(((((\s+)?(\-|\,)(\s+)?)|(\s+(og|eller|til)\s+))((([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$)))+)?)?]]></text>
+          </part>
+          <part type="optional" description="finnes punktum">
+            <text><![CDATA[\s+\d+(\.)?(\s+)?(P|p)unktum]]></text>
+          </part>
+          <part type="optional" description="finnes punktum bokstavert">
+            <text><![CDATA[\s+(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+((P|p)unktum|pkt(\.)?)]]></text>
+          </part>
+          <part type="optional" description="finnes nr">
+            <!--<text><![CDATA[\s+(N|n)r(\.)?(\s+)?(\d+|[ivxIVX]+)]]></text>-->
+            <text><![CDATA[\s+(N|n)r(\.)?(((\s+)?(og|eller|samt|\,))?((\s+)((N|n)r(\.)?)?)?((\s+)?(\d+|[ivxIVX]+)))+(?!\-|\()]]></text>
+          </part>
+          <part type="optional" description="finnes bokstav">
+            <text><![CDATA[(\s+)?(((?<=bokstav\s[a-zA-Z])(\s+og\s+))?(Bokstav|bokstav|litra(\.)?|pkt(\.)?|Pkt(\.)?)((\s+|\,(\s+)?|\s+(og|eller|til|\-)\s+|\-)(?![a-zæøåA-ZÆØÅ]([a-zæøåA-ZÆØÅ]+))([a-zæøåA-ZÆØÅ]))+)+]]></text>
+          </part>
+          <part type="optional" description="finnes text i parantes">
+            <text><![CDATA[\s+\(([a-zæøåA-ZÆØÅ]+)\)]]></text>
+          </part>
+          <part type="optional" description="Finne kommentar i kursiv">
+            <text><![CDATA[\s+«[^\»]+»]]></text>
+          </part>
+          <part type="optional" description="Påfølgende referanser">
+            <part type="multiple" description="Påfølgende referanser">
+              <part type="container" description="Finn og, til, eller, samt og se etter uttykk med pararef">
+                <part type="or" description="Finn og, til, eller, samt og se etter uttykk med pararef">
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+og\s+overgangsregel\s+til\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+kombinert\s+med\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+flg\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+flg\.\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[(\s+)?\,(\s+)?jf\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[(\s+)?\,(\s+)?jf\.\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+jf\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+jf\.\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+og\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+eller\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+og\s+i\s+enten\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+og\s+enten\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+til\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+samt\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+se\s+]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[(\s+)?\,(\s+)?]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[(\s+)?\/(\s+)?]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\,]]></text>
+                  </part>
+                  <part type="single" description="or">
+                    <text><![CDATA[\s+]]></text>
+                  </part>
+                </part>
+                <part type="positive lookahead" description="Sjekk om valid pararef">
+                  <part type="container" description="Sekk om jf finnes først">
+                    <part type="or">
+                      <part type="single" description="Finnes del">
+                        <text><![CDATA[((D|d)el(\.)?\s+(\d+|[ivxIVX]+|[a-zæøåA-ZÆØÅ])(\.)?)(?=\s|\.|\,|$)]]></text>
+                      </part>
+                      <part type="single" description="Finnes kap">
+                        <text><![CDATA[(K|k)ap(it(t)?el)?(\.)?\s+(\d+|[ivxIVX]+)(\.)?]]></text>
+                      </part>
+                      <part type="single" description="Finnes para/kap">
+                        <text><![CDATA[§+]]></text>
+                      </part>
+                      <part type="chain">
+                        <part type="single" description="finnes paranummer">
+                          <text><![CDATA[((\d+)([a-zæøåA-ZÆØÅ])?)(((\-\d+)([a-zæøåA-ZÆØÅ])?)+)?]]></text>
+                        </part>
+                        <part type="optional" description="finnes nummer i parantes">
+                          <text><![CDATA[(\s+)?\(([0-9]+)\)]]></text>
+                        </part>
+                      </part>
+                      <part type="single" description="finnes tall i parantes">
+                        <text><![CDATA[\(\d+\)]]></text>
+                      </part>
+                      <part type="single" description="finnes ledd">
+                        <text><![CDATA[\d+(\.)?(\s+)?(L|l)edd((((\s+)([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$|\-))(((((\s+)?(\-|\,)(\s+)?)|(\s+(og|eller|til)\s+))((([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$)))+)?)?]]></text>
+                      </part>
+                      <part type="single" description="finnes ledd bokstavert">
+                        <text><![CDATA[(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+eller\s+|\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+(L|l)edd((((\s+)([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$|\-))(((((\s+)?(\-|\,)(\s+)?)|(\s+(og|eller|til)\s+))((([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$)))+)?)?]]></text>
+                      </part>
+                      <part type="single" description="finnes punktum">
+                        <text><![CDATA[\d+(\.)?(\s+)?(P|p)unktum]]></text>
+                      </part>
+                      <part type="single" description="finnes punktum bokstavert">
+                        <text><![CDATA[(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+((P|p)unktum|pkt(\.)?)]]></text>
+                      </part>
+                      <part type="single" description="finnes nr">
+                        <!--<text><![CDATA[((N|n)r(\.)?(\s+)?(\d+|[ivxIVX]+))]]></text>-->
+                        <text><![CDATA[(N|n)r(\.)?(((\s+)?(og|eller|samt|\,))?((\s+)((N|n)r(\.)?)?)?((\s+)?(\d+|[ivxIVX]+)))+(?!\-|\()]]></text>
+                      </part>
+                      <part type="single" description="finnes bokstav">
+                        <text><![CDATA[(Bokstav|bokstav|litra(\.)?|pkt(\.)?|Pkt(\.)?)\s+(?![a-zæøåA-ZÆØÅ]([a-zæøåA-ZÆØÅ]+))([a-zæøåA-ZÆØÅ])(((\s+|\sog|\-)((?![a-zæøåA-ZÆØÅ]([a-zæøåA-ZÆØÅ]+))([a-zæøåA-ZÆØÅ])))+)?]]></text>
+                      </part>
+                      <part type="single" description="finnes text i parantes">
+                        <text><![CDATA[\(([a-zæøåA-ZÆØÅ]+)\)]]></text>
+                      </part>
+                      <part type="single" description="Finne kommentar i kursiv">
+                        <text><![CDATA[«[^\»]+»]]></text>
+                      </part>
+                    </part>
+                  </part>
+                </part>
+                <part type="optional" description="en eller flere gyldige pararef">
+                  <part type="optional" description="finnes jf">
+                    <text><![CDATA[(J|j)f(\.)]]></text>
+                  </part>
+                  <part type="optional" description="Finnes del">
+                    <text><![CDATA[((D|d)el(\.)?\s+(\d+|[ivxIVX]+|[a-zæøåA-ZÆØÅ])(\.)?)(?=\s|\.|\,|$)]]></text>
+                  </part>
+                  <part type="optional" description="Finnes kap">
+                    <text><![CDATA[(K|k)ap(ittel)?(\.)?\s+(\d+|[ivxIVX]+)(\.)?]]></text>
+                  </part>
+                  <part type="optional" description="Finnes para/kap">
+                    <text><![CDATA[§+]]></text>
+                  </part>
+                  <part type="optional" description="finnes paranummer">
+                    <text><![CDATA[((\d+)([a-zæøåA-ZÆØÅ])?)(((\-\d+)([a-zæøåA-ZÆØÅ])?)+)?]]></text>
+                  </part>
+                  <part type="optional" description="finnes tall i parantes">
+                    <text><![CDATA[(\s+)?\(\d+\)]]></text>
+                  </part>
+                  <part type="optional" description="finnes ledd">
+                    <text><![CDATA[\d+(\.)?(\s+)?(L|l)edd((((\s+)([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$|\-))(((((\s+)?(\-|\,)(\s+)?)|(\s+(og|eller|til)\s+))((([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$)))+)?)?]]></text>
+                  </part>
+                  <part type="optional" description="finnes ledd bokstavert">
+                    <text><![CDATA[(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+eller\s+|\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+(L|l)edd((((\s+)([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$|\-))(((((\s+)?(\-|\,)(\s+)?)|(\s+(og|eller|til)\s+))((([a-hj-zA-Z]|(i))(?!\s+([^\s]+)?(lov|forskrift|reglen|res)))(?=\s|\.|\,|$)))+)?)?]]></text>
+                  </part>
+                  <part type="optional" description="finnes punktum">
+                    <text><![CDATA[\d+(\.)?(\s+)?(P|p)unktum]]></text>
+                  </part>
+                  <part type="optional" description="finnes punktum bokstavert">
+                    <text><![CDATA[(((?<=fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste)(\s+til\s+|\s+og\s+|\,\s+))?(fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste))+\s+((P|p)unktum|pkt(\.)?)]]></text>
+                  </part>
+                  <part type="optional" description="finnes nr">
+                    <!--<text><![CDATA[((N|n)r(\.)?(\s+)?(\d+|[ivxIVX]+))]]></text>-->
+                    <text><![CDATA[(N|n)r(\.)?(((\s+)?(og|eller|samt|\,))?((\s+)((N|n)r(\.)?)?)?((\s+)?(\d+|[ivxIVX]+)))+(?!\-|\()]]></text>
+                  </part>
+                  <part type="optional" description="finnes bokstav">
+                    <text><![CDATA[(((?<=bokstav\s[a-zA-Z])(\s+og\s+))?(Bokstav|bokstav|litra(\.)?|pkt(\.)?|Pkt(\.)?)((\s+|\,(\s+)?|\s+(og|eller|til|\-)\s+|\-)(?![a-zæøåA-ZÆØÅ]([a-zæøåA-ZÆØÅ]+))([a-zæøåA-ZÆØÅ]))+)+]]></text>
+                  </part>
+                  <part type="optional" description="finnes text i parantes">
+                    <text><![CDATA[\(([a-zæøåA-ZÆØÅ]+)\)]]></text>
+                  </part>
+                  <part type="optional" description="Finne kommentar i kursiv">
+                    <text><![CDATA[«[^\»]+»]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  Multiple paragraf slutt
+  /////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  Lov og forskriftsreferanser start
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--lovname-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>lovname</id>
+    <description>Finner lovnavn</description>
+    <expression>
+      <part type="positive lookbehind" description="lovlig foran">
+        <part type="single" description="punktum">
+          <text><![CDATA[^|\s|\(|\.|\,]]></text>
+        </part>
+      </part>
+      <part type="named" name="lovname">
+        <part type="single" description="punktum">
+          <text><![CDATA[[^\(\s]+lov(en|a|ene|er)?]]></text>
+        </part>
+      </part>
+      <part type="positive lookahead" description="lovlig etter">
+        <part type="single" description="punktum">
+          <text><![CDATA[$|\s|\)|\.|\,|\;|\:]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  
+  <!--forname-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>forname</id>
+    <description>Finner forskriftnavn</description>
+    <expression>
+      <part type="positive lookbehind" description="lovlig foran">
+        <part type="single" description="punktum">
+          <text><![CDATA[^|\s|\(|\.|\,]]></text>
+        </part>
+      </part>
+      <part type="named" name="forname">
+        <part type="single" description="punktum">
+          <text><![CDATA[[^\s]+forskrift(en|a|ene|er)?]]></text>
+        </part>
+      </part>
+      <part type="positive lookahead" description="lovlig etter">
+        <part type="single" description="punktum">
+          <text><![CDATA[$|\s|\)|\.|\,|\;|\:]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  
+  <!--ilovom-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>ilovom</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="positive lookbehind" description="lovlig foran">
+        <part type="single" description="punktum">
+          <text><![CDATA[^|\s|\(|\.|\,]]></text>
+        </part>
+      </part>
+      <part type="container">
+        <part type="single" description="i">
+          <text><![CDATA[i\s+]]></text>
+        </part>
+        <part type="named" name="lovtext">
+          <part type="single" description="lov text">
+            <text><![CDATA[lov\s+om\s+[^\.§\,]*(((\.)?m(\.)?|(\.)?v(\.)?)+)?((\s+)\([a-zæøåA-ZÆØÅ]+\))?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--lovom-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>lovom</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="container">
+        <part type="single" description="tegn foran">
+          <text><![CDATA[(?<=^|\s|\(|\.|\,)]]></text>
+        </part>
+        <part type="named" name="lovtext">
+          <part type="single" description="lov text">
+            <text><![CDATA[(L|l)ov\s+om\s+[^\.§]*(((\.)?m(\.)?|(\.)?v(\.)?)+)?((\s+)\([a-zæøåA-ZÆØÅ]+\))?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--lovom2-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>lovom2</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="container">
+        <part type="single" description="i">
+          <text><![CDATA[(?<=^|\s|\(|\.|\,)]]></text>
+        </part>
+        <part type="named" name="lovtext2">
+          <part type="single" description="lov text">
+            <!--<text><![CDATA[(((L|l)ov\s+om\s+[^\.§\,]*)(?=\s(gjelder|knyttet\til))|(L|l)ov\s+om\s+[^\.§\,]+(\.m\.|\.v\.|v\.)?(\s+\(([a-zæøåA_ZÆØÅ]+)\))?)]]></text>-->
+            <text><![CDATA[lov\som((?!\sog\som|\s(og|eller)\slov\som|\sgjelder|\sknyttet\stil)([^\.§\,]))*((?<=mv)(\.))?(\.m\.|\.v\.|mv\.)?(\s+\(([a-zæøåA_ZÆØÅ]+)\))?|((L|l)ov\s+om\s+[^\.§\,]*)(?=\s(og\som|og\slov\som|gjelder|knyttet\stil))]]></text>
+            <!--<text><![CDATA[lov\som((?!gjelder|knyttet\stil)([^\.§\,]))*(\.|§|\,)|((L|l)ov\s+om\s+[^\.§\,]*)(?=\s(gjelder|knyttet\stil))]]></text>-->
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--dennelov-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennelov</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="container">
+        <part type="single" description="tegn foran">
+          <text><![CDATA[(?<=^|\s|\(|\.|\,)]]></text>
+        </part>
+        <part type="named" name="dlov">
+          <part type="single" description="denne lov">
+            <text><![CDATA[((D|d)enne|(S|s)amme)\s+(L|l)ov(a|en|ens)?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--dennefor-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennefor</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="container">
+        <part type="single" description="tegn foran">
+          <text><![CDATA[(?<=^|\s|\(|\.|\,)]]></text>
+        </part>
+        <part type="named" name="dfor">
+          <part type="single" description="lov text">
+            <text><![CDATA[((D|d)enne|(S|s)amme)\s+(F|f)orskrift(a|en|ens)?]]></text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--lovdate-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>lovdate</id>
+    <description>Finner lov av 10. juni 1988 nr. 40</description>
+    <expression>
+      <part type="named" name="lovdate">
+        <part type="optional">
+          <part type="named" name="lovtype">
+            <part type="single" description="type">
+              <text><![CDATA[((L|l)ov(er|ene|en)?|(F|f)orskrift(er|ene|en)?|((K|k)ongelig\s+)?(resulusjon|(R|r)es(\.)?))]]></text>
+            </part>
+          </part>
+          <part type="optional">
+            <part type="single" description="type">
+              <text><![CDATA[\s+av]]></text>
+            </part>
+          </part>
+          <part type="single" description="type">
+            <text><![CDATA[\s+]]></text>
+          </part>
+        </part>
+        <part type="container">
+          <part type="chain">
+            <part type="chain">
+              <part type="named" name="lovdateday">
+                <part type="single" description="dag">
+                  <text><![CDATA[\d{1,2}]]></text>
+                </part>
+              </part>
+              <part type="single" description="punktum">
+                <text><![CDATA[(\.)?]]></text>
+              </part>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="named" name="lovdatemnd">
+              <part type="or">
+                <part type="single" description="mnd bokstavert">
+                  <text><![CDATA[januar|jan|februar|feb|mars|mar|april|apr|mai|juni|jun|juli|jul|august|aug|september|sep|oktober|okt|november|nov|desember|des]]></text>
+                </part>
+                <part type="chain">
+                  <part type="single" description="mnd nr">
+                    <text><![CDATA[\d{1,2}]]></text>
+                  </part>
+                </part>
+              </part>
+            </part>
+            <part type="single" description="punktum">
+              <text><![CDATA[(\.)?]]></text>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="named" name="lovdateyear">
+              <part type="single" description="år">
+                <text><![CDATA[\d{4,4}]]></text>
+              </part>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="single" description="nr.">
+              <text><![CDATA[nr(\.)?]]></text>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="named" name="lovdatenr">
+              <part type="single" description="lov nr">
+                <text><![CDATA[\d{1,4}]]></text>
+              </part>
+              <part type="single" description="punktum">
+                <text><![CDATA[(\.)?]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="named" name="lovtext">
+          <part type="or" description="">
+            <part type="single" description="lov text">
+              <text><![CDATA[\s+om\s+[^\.§\,]*((\.m(\.|\,)|\.v(\.|\,))+)?((\s+)\([a-zæøåA-ZÆØÅ\-]+\))?]]></text>
+            </part>
+            <part type="single" description="lov text">
+              <text><![CDATA[(\s+\([a-zæøåA-ZÆØÅ\-]+loven\))(?=\s+§)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  Lov og forskriftsreferanser slutt
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  NY Lov og forskriftsreferanser start
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <!--nxlovname: Finner lovnavn-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>nxlovname</id>
+    <description>Finner lovnavn</description>
+    <expression>
+      <part type="named" name="nxlovname">
+        <part type="single" description="punktum">
+          <text><![CDATA[[^\(\s]+lov(en|a|ene|er)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--nxformane: Finner forskriftnavn-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>nxforname</id>
+    <description>Finner forskriftnavn</description>
+    <expression>
+      <part type="named" name="nxforname">
+        <part type="single" description="punktum">
+          <text><![CDATA[[^\s]+forskrift(en|a|ene|er)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  
+  <!--lovref_trailing delutrykk for å hente text etter lovnavn eller lovdate-->
+  <regexp type="single_multi">
+    <group>document</group>
+    <case>0</case>
+    <id>lovref_trailing</id>
+    <description>text etter lovref om</description>
+    <expression>
+      <part type ="container">
+        <part type="negative lookahead">
+          <part type="single">
+            <text><![CDATA[\sog\som|\s(og|eller)\slov\som|\sgjelder|\sknyttet\stil|\seller\sandre\stilsvarende\savtaler|\sopphevet]]></text>
+          </part>
+        </part>
+        <part type="single">
+          <text><![CDATA[([^\.§\,])]]></text>
+        </part>
+      </part>
+      <part type="single">
+        <text><![CDATA[+]]></text>
+      </part>
+      <part type="optional">
+        <part type="positive lookbehind">
+          <part type="single">
+            <text><![CDATA[mv]]></text>
+          </part>
+        </part>
+        <part type="single">
+          <text><![CDATA[\.]]></text>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="container">
+          <part type="positive lookbehind">
+            <part type="single">
+              <text><![CDATA[pr]]></text>
+            </part>
+          </part>
+          <part type="single">
+            <text><![CDATA[\.]]></text>
+          </part>
+        </part>
+        <part type="single">
+          <text><![CDATA[\s+\d{1,2}(\.)?\s+]]></text>
+        </part>
+        <part type="regexp" name="month_word" description="mnd bokstavert" />
+        <part type="single">
+          <text><![CDATA[(\.)?\s+\d{4,4}]]></text>
+        </part>
+        <part type ="container">
+          <part type="negative lookahead">
+            <part type="single">
+              <text><![CDATA[\sog\som|\s(og|eller)\slov\som|\sgjelder|\sknyttet\stil|\seller\sandre\stilsvarende\savtaler|\sopphevet]]></text>
+            </part>
+          </part>
+          <part type="single">
+            <text><![CDATA[([^\.§\,])]]></text>
+          </part>
+        </part>
+        <part type="single">
+          <text><![CDATA[*]]></text>
+        </part>
+
+      </part>
+
+      <part type="optional">
+        <part type="single">
+          <text><![CDATA[\.m\.|\.v\.|mv\.]]></text>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="single">
+          <text><![CDATA[\s+\(([a-zæøåA_ZÆØÅ]+)\)]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--dennesammelov: denne/samme lov -->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennesammelov</id>
+    <description>Finner denne/samme lov</description>
+    <expression>
+      <part type="named" name="dennesammelov">
+        <part type="single" description="denne lov">
+          <text><![CDATA[((D|d)enne|(S|s)amme)\s+(L|l)ov(a|en|ens)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--dennesammefor: denne/samme forskrift-->
+  <regexp type="single">
+    <group>document</group>
+    <case>0</case>
+    <id>dennesammefor</id>
+    <description>Finner denne/samme lov</description>
+    <expression>
+      <part type="named" name="dennesammefor">
+        <part type="single" description="lov text">
+          <text><![CDATA[((D|d)enne|(S|s)amme)\s+(F|f)orskrift(a|en|ens)?]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--mlovom-->
+  <regexp type="multi">
+    <group>document</group>
+    <case>0</case>
+    <id>mlovom</id>
+    <description>Finner i lov om </description>
+    <expression>
+      <part type="named" name="mlovom">
+        <part type="single" description="lov om">
+          <text><![CDATA[lov\s+om]]></text>
+        </part>
+        <part type="regexp" name="lovref_trailing" />
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <!--mlovdate-->
+  <regexp type="multi">
+    <group>document</group>
+    <case>0</case>
+    <id>mlovdate</id>
+    <description>Finner lov av 10. juni 1988 nr. 40</description>
+    <expression>
+      <part type="named" name="mlovdate">
+        <part type="optional">
+          <part type="named" name="lovtype">
+            <part type="single" description="type">
+              <text><![CDATA[L\.|((L|l)ov(er|ene|en)?|F\.|(F|f)orskrift(er|ene|en)?|((K|k)ongelig\s+)?(resulusjon|(R|r)es(\.)?))]]></text>
+            </part>
+          </part>
+          <part type="optional">
+            <part type="single" description="type">
+              <text><![CDATA[\s+av]]></text>
+            </part>
+          </part>
+          <part type="single" description="type">
+            <text><![CDATA[\s+]]></text>
+          </part>
+        </part>
+        <part type="container">
+          <part type="chain">
+            <part type="chain">
+              <part type="named" name="lovdateday">
+                <part type="single" description="dag">
+                  <text><![CDATA[\d{1,2}]]></text>
+                </part>
+              </part>
+              <part type="single" description="punktum">
+                <text><![CDATA[(\.)?]]></text>
+              </part>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="named" name="lovdatemnd">
+              <part type="or">
+                <part type="regexp" name="month_word" description="mnd bokstavert" />
+                <part type="single" description="mnd nr">
+                  <text><![CDATA[\d{1,2}]]></text>
+                </part>
+              </part>
+            </part>
+            <part type="single" description="punktum">
+              <text><![CDATA[(\.)?]]></text>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="named" name="lovdateyear">
+              <part type="single" description="år">
+                <text><![CDATA[\d{4,4}]]></text>
+              </part>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="single" description="nr.">
+              <text><![CDATA[nr(\.)?]]></text>
+            </part>
+            <part type="single" description="space">
+              <text><![CDATA[(\s+)]]></text>
+            </part>
+            <part type="named" name="lovdatenr">
+              <part type="single" description="lov nr">
+                <text><![CDATA[\d{1,4}]]></text>
+              </part>
+              <part type="single" description="punktum">
+                <text><![CDATA[(\.)?]]></text>
+              </part>
+            </part>
+          </part>
+        </part>
+      </part>
+      <part type="optional">
+        <part type="named" name="lovtext">
+          <part type="single" description="lov text">
+            <text><![CDATA[\s+om\s+]]></text>
+          </part>
+          <part type="regexp" name="lovref_trailing" />
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  NY Lov og forskriftsreferanser slutt
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--ord for måne-->
+  <regexp type="single">
+    <id>month_word</id>
+    <description>Henter ord for måned</description>
+    <expression>
+      <part type="container">
+        <part type="single">
+          <text><![CDATA[(J|j)anuar|(J|j)an|(F|f)ebruar|(F|f)eb|(M|n)ars|(M|n)ar|(A|a)pril|(A|a)pr|(M|n)ai|(J|j)uni|(J|j)un|(J|j)uli|(J|j)ul|(A|a)ugust|(A|a)ug|(S|s)eptember|(S|s)ep|(O|o)ktober|(O|o)kt|(N|n)ovember|(N|n)ov|(D|d)esember|(D|d)es]]></text>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+  <!--tallord-->
+  <regexp type="single">
+    <id>tallord</id>
+    <description>Henter fullstendig paragraf referanse</description>
+    <expression>
+      <part type="singel" description="tallord">
+        <text>
+          <![CDATA[fyrste|første|andre|annet|tredje|treje|fjerde|femte|sjette|sjuande|sjuende|syvende|åttende|åttande|niende|niande|tiende|tiande|siste]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+
+
+  
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  Tekst foran og bak start
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--start_text-->
+  <regexp type="single">
+    <id>start_text</id>
+    <expression>
+      <part type="named" name="start_text">
+        <part type="or">
+          <part type="single">
+            <text>
+              <![CDATA[^(\s+)?$]]>
+            </text>
+          </part>
+          <part type="single">
+            <text>
+              <![CDATA[([^\s]+\s)?\($]]>
+            </text>
+          </part>
+          <part type="single">
+            <text>
+              <![CDATA[[^\s]+\s$]]>
+            </text>
+          </part>
+          <part type="single">
+            <text>
+              <![CDATA[(\s+(jf(\.)?|se|unntak|unntatt|strid)+\s)?[^\s]+\s$]]>
+            </text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+  
+  
+  <!--trail_text-->
+  <regexp type="single">
+    <id>trail_text</id>
+    <expression>
+      <part type="named" name="trail_text">
+        <part type="or">
+          <part type="single">
+            <text>
+              <![CDATA[^(\s+)?(\.|\,|\:)?$]]>
+            </text>
+          </part>
+          <part type="single">
+            <text>
+              <![CDATA[^\s+i\s+[^\s]+]]>
+            </text>
+          </part>
+          <part type="single">
+            <text>
+              <![CDATA[^\s+om\s+[^\.\,\)]+(\.(v|m)(\.)?)?]]>
+            </text>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+   Tekst foran og bak slutt
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+   Multiple regexp start
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+  <regexp type="multi">
+    <id>lovforpara</id>
+    <description>Henter fullstendig lov - forskrift paragraf referanse</description>
+    <expression>
+      <part type="or">
+        <!--idsource paragraf
+        Identifisert ord foran paragraf f.eks asl. § 1-1
+        -->
+        <part type="named" name="source_para" level="1">
+          <actions>
+            <action type="create" object="element" name="xsource">
+              <action type="create" object="attribute" name="type">
+                <action type="add" object="text" value="sptoken"/>
+              </action>
+              <action type="get_text" object="group" name="sourcename"/>
+              <action type="get_text" object="between" group1="sourcename" group2="para" />
+              <action type="add" object="xparas" name="para"/>
+            </action>
+          </actions>
+          <part type="positive lookbehind" description="sjekker lovlige tegn foran">
+            <part type="single" description="lovlige tegn">
+              <text>
+                <![CDATA[^|\s|\(|\.|\,]]>
+              </text>
+            </part>
+          </part>
+          <part type="named" name="sourcename">
+            <part type="regexp" name="idsources"/>
+          </part>
+          <part type="single" description="mellomrom">
+            <text>
+              <![CDATA[\s+]]>
+            </text>
+          </part>
+          <part type="regexp" name="paratoken"/>
+        </part>
+        <!--paragraf i idsource-->
+        <part type="named" name="para_namelov" level="1">
+          <actions>
+            <action type="add" object="element" name="xsource">
+              <action type="create" object="attribute" name="type">
+                <action type="add" object="text" value="sptoken"/>
+              </action>
+              <action type="add" object="xparas" name="para"/>
+              <action type="get_text" object="between" group1="para" group2="sourcename" />
+              <action type="get_text" object="group" name="sourcename"/>
+            </action>
+          </actions>
+          <part type="regexp" name="paratoken"/>
+          <part type="single" description="mellomrom">
+            <text>
+              <![CDATA[\s+i\s+]]>
+            </text>
+          </part>
+          <part type="named" name="sourcename">
+            <part type="regexp" name="idsources"/>
+          </part>
+        </part>
+
+      </part>
+    </expression>
+  </regexp>
+
+  <regexp type="multi">
+    <id>front_para_itrail</id>
+    <description>Henter fullstendig lov - forskrift paragraf referanse</description>
+    <expression>
+      <part type="positive lookbehind" description="sjekker lovlige tegn foran">
+        <part type="single" description="lovlige tegn">
+          <text>
+            <![CDATA[^|\s|\(|\.|\,]]>
+          </text>
+        </part>
+      </part>
+      <part type="or" level="1" description="henter ?lov-para-?lov eller lov referanse">
+        <actions>
+          <actions type="if" object="named" name="lov_para_lov" />
+          <actions type="if" object="named" name="para" />
+          <actions type="if" object="named" name="lov" />
+        </actions>
+        <part type="named" name="lov_para_lov" level="2" description="henter lov-para referanse">
+          <!--tekst foran paragraf-->
+          <part type="optional">
+            <!--lovbefore start-->
+            <part type="named" name="lov_before">
+              <part type="container">
+                <part type="or">
+                  <part type="regexp" name="idsources"/>
+                  <part type="regexp" name="mlovdate"/>
+                  <part type="regexp" name="mlovom"/>
+                  <part type="regexp" name="nxlovname"/>
+                  <part type="regexp" name="nxforname"/>
+                  <part type="regexp" name="dennesammelov"/>
+                  <part type="regexp" name="dennesammefor"/>
+                </part>
+              </part>
+            </part>
+            <part type="single" description="mellomrom">
+              <text>
+                <![CDATA[\s+]]>
+              </text>
+            </part>
+            <!--lovbefore slutt-->
+          </part>
+          <!--paragraf del-->
+          <part type="regexp" name="paratoken"/>
+          <!--tekst etter paragraf-->
+          <part type="optional">
+            <part type="named" name="lov_after">
+              <part type="single" description="mellomrom">
+                <text>
+                  <![CDATA[\s+i\s+]]>
+                </text>
+              </part>
+              <part type="container">
+                <part type="or">
+                  <part type="regexp" name="idsources"/>
+                  <part type="regexp" name="mlovdate"/>
+                  <part type="regexp" name="mlovom"/>
+                  <part type="regexp" name="nxlovname"/>
+                  <part type="regexp" name="nxforname"/>
+                  <part type="regexp" name="dennesammelov"/>
+                  <part type="regexp" name="dennesammefor"/>
+                </part>
+              </part>
+
+            </part>
+          </part>
+        </part>
+        <part type="named" name="lovtoken"  level="2" description="lov referanse">
+          <part type="or">
+            <part type="regexp" name="idsources"/>
+            <part type="regexp" name="mlovdate"/>
+            <part type="regexp" name="mlovom"/>
+            <part type="regexp" name="nxlovname"/>
+            <part type="regexp" name="nxforname"/>
+          </part>
+        </part>
+      </part>
+      
+    </expression>
+  </regexp>
+
+
+  <!--Satt inn av Lasse Aune for å hente-->
+  <!--utv_bfu_kl-->
+  <regexp type="single">
+    <id>new_utv_bfu_kl</id>
+    <description>Henter utv , bfu og klagenemd</description>
+    <expression>
+      <part type="or">
+        <part type="chain">
+          <part type="named" name="qtextname">
+            <part type="single" description="Finnes bfu eller utv">
+              <text><![CDATA[((U|u)(T|t)(V|v)|(B|b)(F|f)(U|u))]]></text>
+            </part>
+          </part>
+          <part type="single" description="1.1">
+            <text><![CDATA[(\.)?(\s+)?]]></text>
+          </part>
+          <part type="named" name="qtextnr">
+            <part type="single" description="1.1">
+              <text><![CDATA[\d{1,4}\/\d{1,4}]]></text>
+            </part>
+          </part>
+        </part>
+        <part type="chain">
+          <part type="named" name="qtextname">
+            <part type="single" description="Finnes kl eller klagesak">
+              <text><![CDATA[((K|k)lagenem(n)?d(s)?sak|(K|k)lagesak|(K|k)(L|l))]]></text>
+            </part>
+          </part>
+          <part type="single" description="1.1">
+            <text><![CDATA[(\.)?(\s+)?(nr(\.)?)?(\s+)?]]></text>
+          </part>
+          <part type="named" name="qtextnr">
+            <part type="single" description="1.1">
+              <text><![CDATA[(\d{1,4}(\s)?([a-dA-D])?)]]></text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+
+
+  <regexp type="multi">
+    <id>tokensourcepara</id>
+    <description>Henter token + source paragraf referanse</description>
+    <expression>
+      <part type="or">
+        <!--idsource paragraf
+        Identifisert ord foran paragraf f.eks asl. § 1-1
+        -->
+        <part type="named" name="source_para" level="1">
+          <part type="positive lookbehind" description="sjekker lovlige tegn foran">
+            <part type="single" description="lovlige tegn">
+              <text>
+                <![CDATA[^|\s|\(|\.|\,]]>
+              </text>
+            </part>
+          </part>
+          <part type="named" name="sourcename">
+            <part type="regexp" name="idsources"/>
+          </part>
+          <part type="single" description="mellomrom">
+            <text>
+              <![CDATA[\s+]]>
+            </text>
+          </part>
+          <part type="regexp" name="paratoken"/>
+        </part>
+        <!--paragraf i idsource-->
+        <part type="named" name="qtext" level="1">
+          <part type="positive lookbehind" description="sjekker lovlige tegn foran">
+            <part type="single" description="lovlige tegn">
+              <text>
+                <![CDATA[^|\s|\(|\.|\,]]>
+              </text>
+            </part>
+          </part>
+          <part type="container">
+            <part type="regexp" name="new_utv_bfu_kl"/>
+          </part>
+          <part type="positive lookahead" description="sjekker lovlige tegn foran">
+            <part type="single" description="lovlige tegn">
+              <text>
+                <![CDATA[\s|\.|\,|$]]>
+              </text>
+            </part>
+          </part>
+        </part>
+      </part>
+    </expression>
+  </regexp>
+
+  <!--
+MODEL
+  <part type="named" name="">
+    <part type="single" description="tallord">
+      <text>
+        <![CDATA[]]>
+      </text>
+    </part>
+  </part>
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  Multiple regexp slutt
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+
+
+
+
+
+
+
+
+
+
+
+
+  <!--
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+   Source-token eksempel
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <regexp type="multi">
+    <id>sourcetokens</id>
+    <description>Alle ord foran paragraf</description>
+    <expression>
+      <part type="named" name="sourcename">
+        <part type="regexp" name="idsources"/>        
+      </part>
+    </expression>
+  </regexp>
+
+          <!--
+  <regexp type="single">
+    <id>preparatoken</id>
+    <description>Alle ord foran paragraf</description>
+    <expression>
+      <part type="single" description="Alle signalord foran paragraf">
+        <text>
+          <![CDATA[(?<token>((O|o)mstillingslønnsforskriften|(S|s)kattebetalingsforskriften|(S|s)kattebetalingsforskriften|(E|e)nhetsregisterforskriften|(F|f)olkeregisterforskriften|(S|s)kadeserstatningsloven|(I|i)nnskuddspensjonsloven|(F|f)orsikringsavtaleloven|(P|p)asientrettighetsloven|(T|t)annhelsetjenesteloven|(P|p)etroleumsskatteloven|(S|s)kadeerstatningsloven|(V|v)erdipapirhandelloven|(S|s)ivilombudsmannsloven|(F|f)oretakspensjonsloven|(B|b)okføringsforskriften|(B|b)okføringsforskriften|(S|s)kattebetalingsloven|(F|f)oretakspensjonloven|(S|s)elskapsskatteloven|(E|e)nhetsregisterloven|(E|e)iendomsskatteloven|(S|s)osialtjenesteloven|(T|t)akseringsreglenes|(E|e)ierseksjonslovens|(K|k)redittilsynsloven|(T|t)akseringsreglene|(F|f)orvaltningsloven|(F|f)inansavtaleloven|(M|m)ayen\-skatteloven|(T|t)arifforskriftens|(A|a)llmennaksjeloven|(A|a)rbeidsmiljøloven|(A|a)rtistskatteloven|(A|a)rveavgiftsloven|(A|a)vgiftsvedtakets|(T|t)arifforskriften|(F|f)orsikringsloven|(T|t)akseringsregler|(A|a)kvakulturloven|(F|f)olketrygdloven|(A|a)vgiftsvedtaket|(B|b)okføringsloven|(A|a)vgiftsvedtaket|(T|t)omtefesteloven|(B|b)okføringsloven|(R|r)eindriftsloven|(A|a)rveavgiftloven|(R|r)egnskapslovens|(E|e)kteskapsloven|(V|v)ergemålsloven|(R|r)egnskapsloven|(O|o)pplæringslova|(S|s)parebankloven|(Å|å)ndsverksloven|(S|s)elskapsloven|(L|l)igningsloven|(D|d)eltakerloven|(D|d)omstolsloven|(O|o)ffentleglova|(S|s)kogbrukslova|(A|a)ksjelovenes|(S|s)amvirkelova|(K|k)ommuneloven|(F|f)orskriftens|(S|s)amvirkelova|(K|k)onkursloven|(R|r)evisorloven|(S|s)kattevedtak|(A|a)ksjelovene|(S|s)katteloven|(R|r)egnskapsl\.|(F|f)orskriften|(A|a)vtaleloven|(F|f)orskriften|(A|a)ksjelovens|(S|s)katteloven|(T|t)visteloven|(S|s)kifteloven|(A|a)sl\.\/asal\.|(S|s)elskapsl\.|(S|s)æravtalen|(A|a)ksjeloven|(A|a)rveloven|(E|e)ØS\-loven|(A|a)sl\/asal\.|(S|s)vblsktl\.|(O|o)TP\-loven|(F|f)orskrift|(S|s)CE\-loven|(S|s)E\-loven|(S|s)vbsktl\.|(S|s)jøloven|(A|a)vtalens|(K|k)jøpsl\.|(A|a)vtalen|(L|l)ignl\.|(\/|\/)asal\.|(S|s)ktbl\.|(L|l)ovens|(E|e)sktl\.|(E|e)sktl\.|(L|l)ignl\.|(S|s)kbtl\.|(S|s)ktl\.|(F|f)SFIN|(A|a)sal\.|(S|s)ktl\.|(L|l)oven|(F|f)trl\.|(F|f)SSKD|(L|l)ign\.|(M|m)val\.|(A|a)sl\.|(A|a)sl\.|(R|r)l\.|(S|s)SV))]]>
+        </text>
+      </part>
+    </expression>
+  </regexp>
+  -->
+
+
+</regexps>

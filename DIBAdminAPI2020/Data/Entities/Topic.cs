@@ -242,6 +242,8 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class TopicPartsAPI
     {
+        public Dictionary<string, AccountingElementApi> elementdata { get; set; }
+        public Dictionary<string, JsonElement> elements { get; set; }
         public Dictionary<string, ObjectApi> objects { get; set; }
         public List<string> root { get; set; }
     }
