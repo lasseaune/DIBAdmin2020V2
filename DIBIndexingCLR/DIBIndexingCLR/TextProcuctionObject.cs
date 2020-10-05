@@ -2093,44 +2093,27 @@ namespace DIBIndexingCLR
 
             //EvaluateXTexts(e.DescendantNodes().Where(p => p.Ancestors("document").FirstOrDefault() != null).OfType<XText>(), firstAfterBr);
             EvaluateXTexts(e.DescendantNodes().OfType<XText>(), firstAfterBr);
-
+            int n = 0;
             foreach (XTextRanges r in Ranges)
             {
                 MatchCollection mc = RX.Matches(r.Text.ToString());
                 EvaluateMatches(r, mc);
+                //n++;
+                //Debug.Print(n.ToString());
             }
             Links = GetLinks();
             XIndex = new XElement("x-indexs",
                     e
                     .Descendants("x-index")
-                    .Select(p => new
-                    {
-                        id = (string)p.Attributes("id").FirstOrDefault(),
-                        rid = (string)p.Attributes("rid").FirstOrDefault(),
-                        text = p.DescendantNodes().OfType<XText>().Select(s => s.Value).StringConcatenate(),
-                        matches = (string)p.Attributes("matches").FirstOrDefault(),
-                        att = p.Attributes().Where(a=>!"id;rid;matches".Split(';').Contains(a.Name.LocalName))
-                    })
-                    .GroupBy(p => p.rid)
-                    .Select(p => new {
-                        id = p.Select(i => i.id).FirstOrDefault(),
-                        matches = p.Select(i => i.matches).FirstOrDefault(),
-                        text = p.Select(i => i.text).StringConcatenate(),
-                        att = p.Select(i=>i.att).GroupBy(i=>i).Select(i=>i.Key),
-                        n = p.Count()
-                    }
-                    )
-                    .GroupBy(p => p.text)
-                    .Select(p => new XElement("x-item",
-                                new XAttribute("text", p.Key),
-                                p.Select(i => new XElement("x-match",
-                                    new XAttribute("matches", i.matches),
-                                    new XAttribute("id", i.id),
-                                    i.att.Select(a=>a)
-                                    )
-                                )
-                        )
-                    )
+                    //.GroupBy(p => new { att = p.Attributes().Where(a => !"rid;id".Split(';').Contains(a.Name.LocalName)) })
+                    //.Select(p => new XElement("x-item",
+                    //            p.Key.att,
+                    //            p.Select(i => new XElement("x-match",
+                    //                new XAttribute("id", (string)i.Attributes("id").FirstOrDefault())
+                    //                )
+                    //            )
+                    //    )
+                    //)
                 );
         }
 
@@ -2284,7 +2267,7 @@ namespace DIBIndexingCLR
                             range.Add(
                                     new XElement("x-index",
                                         new XAttribute("id", mark.id),
-                                        new XAttribute("rid", mark.parentId),
+                                        new XAttribute("pid", (string)xr.Text.Parent.Attributes("id").FirstOrDefault()),
                                         new XAttribute("matches", mark.matches),
                                         mark.matches
                                         .Split(';').Skip(1)
@@ -2303,7 +2286,7 @@ namespace DIBIndexingCLR
                                         range.Add(
                                             new XElement("x-index",
                                                 new XAttribute("id", mark.id),
-                                                new XAttribute("rid", mark.parentId),
+                                                new XAttribute("pid", (string)xr.Text.Parent.Attributes("id").FirstOrDefault()),
                                                 new XAttribute("matches", mark.matches),
                                                 mark.matches.Split(';').Skip(1)
                                                 .Select(p=> m.match.Groups[p].Success ? new XAttribute(p, m.match.Groups[p].Value) : null),
@@ -2318,7 +2301,7 @@ namespace DIBIndexingCLR
                                         range.Add(
                                             new XElement("x-link-to",
                                                 new XAttribute("id", mark.id),
-                                                new XAttribute("rid", mark.parentId),
+                                                new XAttribute("pid", (string)xr.Text.Parent.Attributes("id").FirstOrDefault()),
                                                 linkText
                                             )
                                         );

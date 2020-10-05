@@ -103,109 +103,109 @@ namespace DIBAdminAPI.Helpers.Extentions
 
             return new XElement("document", document.Transform());
         }
-        public static XElement ConvertXMLtoHTML5(this XElement document, XElement links)
-        {
-            document.DescendantsAndSelf().Attributes("idx").Remove();
-            (
-                from e in document.Descendants()
-                join l in links.Elements()
-                on ((string)e.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower() equals ((string)l.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower()
-                select new { e, l }
-            )
-            .ToList()
-            .ForEach(p=> p.e.AddAnnotation(new LinkInfo(p.l)));
+        //public static XElement ConvertXMLtoHTML5(this XElement document, XElement links)
+        //{
+        //    document.DescendantsAndSelf().Attributes("idx").Remove();
+        //    (
+        //        from e in document.Descendants()
+        //        join l in links.Elements()
+        //        on ((string)e.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower() equals ((string)l.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower()
+        //        select new { e, l }
+        //    )
+        //    .ToList()
+        //    .ForEach(p=> p.e.AddAnnotation(new LinkInfo(p.l)));
 
 
-            return new XElement("document", document.Transform());
-        }
-        public static XElement ConvertXMLtoHTML(this XElement document, List<string> aobjects = null, XElement moreinfo = null, XElement topics = null, XElement xlinkgroup = null, XElement comments = null, XElement mirrors = null)
-        {
-            document.DescendantsAndSelf().Attributes("idx").Remove();
-            if (mirrors != null)
-            {
-                (
-                    from i in document.Descendants("section")
-                    join m in mirrors.Elements("x-mirror")
-                    on (string)i.Attributes("id").FirstOrDefault() equals (string)m.Attributes("id").FirstOrDefault()
-                    select new { item = i, mirror = m }
-                )
-                .ToList()
-                .ForEach(p => p.item.AddAnnotation(new MirrorItem(p.mirror)));
-            }
+        //    return new XElement("document", document.Transform());
+        //}
+        //public static XElement ConvertXMLtoHTML(this XElement document, List<string> aobjects = null, XElement moreinfo = null, XElement topics = null, XElement xlinkgroup = null, XElement comments = null, XElement mirrors = null)
+        //{
+        //    document.DescendantsAndSelf().Attributes("idx").Remove();
+        //    if (mirrors != null)
+        //    {
+        //        (
+        //            from i in document.Descendants("section")
+        //            join m in mirrors.Elements("x-mirror")
+        //            on (string)i.Attributes("id").FirstOrDefault() equals (string)m.Attributes("id").FirstOrDefault()
+        //            select new { item = i, mirror = m }
+        //        )
+        //        .ToList()
+        //        .ForEach(p => p.item.AddAnnotation(new MirrorItem(p.mirror)));
+        //    }
 
-            if (comments != null)
-            {
-                (
-                    from i in document.DescendantsAndSelf().Where(p => p.Attributes("id").FirstOrDefault() != null)
-                    join cm in comments.Elements("x-c")
-                    on (string)i.Attributes("id").FirstOrDefault() equals (string)cm.Attributes("id").FirstOrDefault()
-                    select new { item = i, Comment = cm }
-                ).ToList()
-                .GroupBy(p => p.item)
-                .ToList()
-                .ForEach(p => p.Key.AddComment(new XElement("x-cs", p.Select(s => s.Comment))));
-            }
-            document.Descendants().Where(p => (string)p.Attributes("data-comment").FirstOrDefault() == "0").ToList().ForEach(p => p.AddComment(null));
+        //    if (comments != null)
+        //    {
+        //        (
+        //            from i in document.DescendantsAndSelf().Where(p => p.Attributes("id").FirstOrDefault() != null)
+        //            join cm in comments.Elements("x-c")
+        //            on (string)i.Attributes("id").FirstOrDefault() equals (string)cm.Attributes("id").FirstOrDefault()
+        //            select new { item = i, Comment = cm }
+        //        ).ToList()
+        //        .GroupBy(p => p.item)
+        //        .ToList()
+        //        .ForEach(p => p.Key.AddComment(new XElement("x-cs", p.Select(s => s.Comment))));
+        //    }
+        //    document.Descendants().Where(p => (string)p.Attributes("data-comment").FirstOrDefault() == "0").ToList().ForEach(p => p.AddComment(null));
 
-            if (xlinkgroup != null)
-            {
-                document.AddLinkInfo(xlinkgroup);
-            }
-            //if (AccRoot != null)
-            //{
-            //    (
-            //        from a in AccRoot
-            //        join e in document.Descendants()
-            //        on a.Key.ToLower() equals ((string)e.Attributes("id").FirstOrDefault() ?? "").ToLower()
-            //        select new { a, e }
-            //    )
-            //    .ToList()
-            //    .ForEach(p => p.e.AddAnnotation(new Accounting(p.a.Key)));
+        //    if (xlinkgroup != null)
+        //    {
+        //        document.AddLinkInfo(xlinkgroup);
+        //    }
+        //    //if (AccRoot != null)
+        //    //{
+        //    //    (
+        //    //        from a in AccRoot
+        //    //        join e in document.Descendants()
+        //    //        on a.Key.ToLower() equals ((string)e.Attributes("id").FirstOrDefault() ?? "").ToLower()
+        //    //        select new { a, e }
+        //    //    )
+        //    //    .ToList()
+        //    //    .ForEach(p => p.e.AddAnnotation(new Accounting(p.a.Key)));
 
-            //}
-            //if (accounting != null )
-            //{
-            //    (
-            //        from t in accounting.Elements("topics").Elements("topic")
-            //        join a in accounting.Elements("x-accounting").Descendants().Where(p => p.Attributes("data-tid").FirstOrDefault() != null)
-            //        on (string)t.Attributes("topic_id").FirstOrDefault() equals (string)a.Attributes("data-tid").FirstOrDefault()
-            //        select new { topic = t, xa = a }
-            //    )
-            //    .ToList()
-            //    .ForEach(p => p.xa.Add(new XAttribute("data-tname", (string)p.topic.Attributes("name").FirstOrDefault()), new XAttribute("data-view", (string)p.topic.Attributes("view").FirstOrDefault()), new XAttribute("data-ttype", (string)p.topic.Attributes("tid").FirstOrDefault())));
+        //    //}
+        //    //if (accounting != null )
+        //    //{
+        //    //    (
+        //    //        from t in accounting.Elements("topics").Elements("topic")
+        //    //        join a in accounting.Elements("x-accounting").Descendants().Where(p => p.Attributes("data-tid").FirstOrDefault() != null)
+        //    //        on (string)t.Attributes("topic_id").FirstOrDefault() equals (string)a.Attributes("data-tid").FirstOrDefault()
+        //    //        select new { topic = t, xa = a }
+        //    //    )
+        //    //    .ToList()
+        //    //    .ForEach(p => p.xa.Add(new XAttribute("data-tname", (string)p.topic.Attributes("name").FirstOrDefault()), new XAttribute("data-view", (string)p.topic.Attributes("view").FirstOrDefault()), new XAttribute("data-ttype", (string)p.topic.Attributes("tid").FirstOrDefault())));
 
-            //    (
-            //        from ai in accounting.Elements("x-accounting")
-            //        join i in document.Descendants("section")
-            //        on (string)ai.Attributes("id").FirstOrDefault() equals (string)i.Attributes("id").FirstOrDefault()
-            //        select new { acc = ai, item = i }
-            //    )
-            //    .ToList()
-            //    .ForEach(p => p.item.AddAnnotation(new AccountingItem(p.acc)));
-            //}
+        //    //    (
+        //    //        from ai in accounting.Elements("x-accounting")
+        //    //        join i in document.Descendants("section")
+        //    //        on (string)ai.Attributes("id").FirstOrDefault() equals (string)i.Attributes("id").FirstOrDefault()
+        //    //        select new { acc = ai, item = i }
+        //    //    )
+        //    //    .ToList()
+        //    //    .ForEach(p => p.item.AddAnnotation(new AccountingItem(p.acc)));
+        //    //}
 
-            if (moreinfo != null)
-            {
-                (
-                    from ai in moreinfo.Elements("item")
-                    join i in document.Descendants().Where(p => p.Name.LocalName == "section")
-                    on ((string)ai.Attributes("id").FirstOrDefault() ?? "-1").ToLower() equals ((string)i.Attributes("id").FirstOrDefault() ?? "1").ToLower()
-                    select new { acc = ai, item = i }
-                )
-                .ToList()
-                .ForEach(p => p.item.AddAnnotation(new MoreinfoItem { hasRelations = true }));
-            }
-            return new XElement("document", document.Transform());
+        //    if (moreinfo != null)
+        //    {
+        //        (
+        //            from ai in moreinfo.Elements("item")
+        //            join i in document.Descendants().Where(p => p.Name.LocalName == "section")
+        //            on ((string)ai.Attributes("id").FirstOrDefault() ?? "-1").ToLower() equals ((string)i.Attributes("id").FirstOrDefault() ?? "1").ToLower()
+        //            select new { acc = ai, item = i }
+        //        )
+        //        .ToList()
+        //        .ForEach(p => p.item.AddAnnotation(new MoreinfoItem { hasRelations = true }));
+        //    }
+        //    return new XElement("document", document.Transform());
             
-        }
-        public static string ConvertHTML(this XElement document, List<string> aobjects = null, XElement moreinfo = null, XElement topics = null, XElement xlinkgroup = null, XElement comments = null, XElement mirrors = null)
-        {
-            XElement documentHTML = document.ConvertXMLtoHTML(aobjects, moreinfo, topics, xlinkgroup, comments, mirrors);
-            XElement c = new XElement("container", documentHTML.Nodes());
-            XmlReader r = c.CreateReader();
-            r.MoveToContent();
-            return r.ReadInnerXml();
-        }
+        //}
+        //public static string ConvertHTML(this XElement document, List<string> aobjects = null, XElement moreinfo = null, XElement topics = null, XElement xlinkgroup = null, XElement comments = null, XElement mirrors = null)
+        //{
+        //    XElement documentHTML = document.ConvertXMLtoHTML(aobjects, moreinfo, topics, xlinkgroup, comments, mirrors);
+        //    XElement c = new XElement("container", documentHTML.Nodes());
+        //    XmlReader r = c.CreateReader();
+        //    r.MoveToContent();
+        //    return r.ReadInnerXml();
+        //}
         private static IEnumerable<XNode> Transform(this XNode n)
         {
             List<XNode> result = new List<XNode>();
@@ -333,12 +333,12 @@ namespace DIBAdminAPI.Helpers.Extentions
                     Id = li.rText.Split(';').ElementAt(2)??"";
                     result.Add(new XElement("a",
                         e.Attributes("id"),
-                        new XAttribute("class", "diblink topic"),
-                        new XAttribute("data-resourceid", li.dId),
-                        li.Id == "" ? null : new XAttribute("data-id", li.Id),
+                        (li.rTag2 ?? "") == "" ? new XAttribute("class", "diblink-nav") : new XAttribute("class", "diblink-preview"),
+                        new XAttribute("data-resource-id", li.dId),
+                        (li.rTag2 ?? "") == "" ? null : new XAttribute("data-id", li.rTag2),
                         new XText(Value)
                         )
-                    );
+                    );  ;
                     return result;
                 }
                 else if (li.rName == "dibid")
@@ -346,8 +346,8 @@ namespace DIBAdminAPI.Helpers.Extentions
                     Value = li.dName;
                     result.Add(new XElement("a",
                         e.Attributes("id"),
-                        new XAttribute("class", "diblink topic"),
-                        new XAttribute("data-resourceid", li.dId),
+                        new XAttribute("class", "diblink-nav"),
+                        new XAttribute("data-resource-id", li.dId),
                         new XText(Value)
                         )
                     );
@@ -358,8 +358,8 @@ namespace DIBAdminAPI.Helpers.Extentions
                     Value = li.dName;
                     result.Add(new XElement("a",
                         e.Attributes("id"),
-                        new XAttribute("class", "diblink topic"),
-                        new XAttribute("data-resourceid", li.dId),
+                        new XAttribute("class", "diblink-nav"),
+                        new XAttribute("data-resource-id", li.dId),
                         e.Nodes()
                         )
                     );
@@ -369,9 +369,9 @@ namespace DIBAdminAPI.Helpers.Extentions
                 {
                     result.Add(new XElement("a",
                         e.Attributes("id"),
-                        new XAttribute("class", "diblink"),
-                        new XAttribute("data-resourceid", li.dId),
-                        new XAttribute("data-segment", "diblink"),
+                        new XAttribute("class", "diblink-preview"),
+                        new XAttribute("data-resource-id", li.dId),
+                        new XAttribute("data-segment-id", "diblink"),
                         new XAttribute("data-id", li.Id),
                         e.Nodes()
                         )

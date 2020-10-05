@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using DIBAdminAPI.Helpers.Extentions;
 using System.IO;
 using HtmlAgilityPack;
+using System.Runtime.CompilerServices;
 
 namespace DIBAdminAPI.Data.Entities
 {
@@ -1383,6 +1384,58 @@ namespace DIBAdminAPI.Data.Entities
     
     public static class Extentions
     {
+        public static void SetHrefValue(this IEnumerable<XAttribute> xAttributes)
+        {
+            foreach (XAttribute a in xAttributes)
+            {
+                if (a.Parent.Attributes("href").FirstOrDefault()==null)
+                {
+                    a.Parent.Add(new XAttribute("href", a.Value));
+                }
+                else
+                {
+                    a.Parent.Attributes("href").First().SetValue(a.Value);
+                }
+            }
+        }
+        public static void SetDataClassValue(this IEnumerable<XAttribute> xAttributes)
+        {
+            foreach (XAttribute a in xAttributes)
+            {
+                a.Parent.Add(new XAttribute("class", a.Value));
+            }
+        }
+        public static void SetClassValue(this IEnumerable<XAttribute> xAttributes)
+        {
+            foreach (XAttribute a in xAttributes)
+            {
+                string dataClassName = (string)a.Parent.Attributes("data-class-name").FirstOrDefault() ?? "";
+                if (dataClassName != "")
+                {
+                    a.SetValue(dataClassName);
+                }
+                else
+                {
+                    string value = "";
+                    List<string> sValues = a.Value.Split(' ').ToList();
+                    foreach (string s in sValues)
+                    {
+                        if (s.StartsWith("table-wrapper") || s.StartsWith("diblink-"))
+                        {
+                            value = (value == "" ? "" : " ") + s;
+                        }
+                    }
+                    if (value == "")
+                    {
+                        a.Remove();
+                    }
+                    else
+                    {
+                        a.SetValue(value);
+                    }
+                }
+            }
+        }
         public static IEnumerable<XElement> GetTocSegment(this IEnumerable<XElement> map, string segment_id, XElement document)
         {
             List<XElement> result = new List<XElement>();
@@ -2259,7 +2312,7 @@ namespace DIBAdminAPI.Data.Entities
             }
             return headings;
         }
-        public static XElement GetAgilityXML(string inputHtml)
+        public static XElement GetAgilityXML(string inputHtml, string action)
         {
 
             HtmlDocument htmlDoc = new HtmlDocument();
@@ -2370,8 +2423,24 @@ namespace DIBAdminAPI.Data.Entities
                         break;
                     }
                 }
-                container.DescendantsAndSelf().ToList().ForEach(p => p.SetAttributeValueEx("id", Guid.NewGuid().ToString()));
-                container.Descendants().Attributes("class").Where(p => p.Value.Trim().ToLower().StartsWith("sc-")).ToList().ForEach(p => p.Remove());
+                if (action == "create")
+                {
+                    container.DescendantsAndSelf().ToList().ForEach(p => p.SetAttributeValueEx("id", Guid.NewGuid().ToString()));
+                }
+                else
+                {
+                    container.DescendantsAndSelf().ToList().ForEach(p => p.SetAttributeValueEx("id", Guid.NewGuid().ToString()));
+                }
+                
+
+                //container.Descendants().Attributes("class").Where(p => p.Value.Trim().ToLower().StartsWith("sc-")).ToList().ForEach(p => p.Remove());
+                container.Descendants().Attributes("title").Remove();
+                container.Descendants().Attributes("class").SetClassValue();
+                container.Descendants().Attributes("data-class-name").Where(p=>p.Parent.Attributes("class").FirstOrDefault()==null).SetDataClassValue();
+                container.Descendants().Attributes("data-href").SetHrefValue();
+                container.Descendants().Attributes("rel").Remove();
+                container.Descendants().Attributes("target").Remove();
+
                 container
                     .Descendants("table")
                     .Where(p => p.Parent.Name.LocalName + ((string)p.Parent.Attributes("class").FirstOrDefault() ?? "") != "divtable-wrapper")
@@ -2416,7 +2485,7 @@ namespace DIBAdminAPI.Data.Entities
             try
             {
                 string inputHtml = WebUtility.HtmlDecode(jsonCreate.html);
-                XElement container = GetAgilityXML(inputHtml);
+                XElement container = GetAgilityXML(inputHtml, jsonCreate.action);
                 if (container == null) return null;
 
                 return container;
@@ -2533,6 +2602,7 @@ namespace DIBAdminAPI.Data.Entities
             string newId = "";
             JsonObject result = null;
             jsonCreate.resourceId = jsonCreate.resourceId.ToLower();
+            
             if (jsonCreate.action=="create" && jsonCreate.html!=null)
             {
                 return PasteJsonElements(documentContainer, jsonCreate);

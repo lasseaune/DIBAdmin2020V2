@@ -84,6 +84,7 @@ namespace DIBAdminAPI.Data
                     if (document == null) return null;
 
                     data.Document = document;
+                    data.selectId = rNav.Id;
                 }
                 DocumentParts result = new DocumentParts
                 {
@@ -156,6 +157,7 @@ namespace DIBAdminAPI.Data
                 new XElement("items",
                     new XElement("item", new XAttribute("id", id))
             );
+            data.selectId = id;
 
             XElement document = data.Document.GetDocumentParts(items);
             if (document == null) return null;
@@ -225,7 +227,7 @@ namespace DIBAdminAPI.Data
             {
                 using (IDbConnection conn = dbConnection)
                 {
-                    using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, null, CommandType.StoredProcedure))
+                    using (var multi = await conn.QueryMultipleAsync(QueryName, p, null, timeOut, CommandType.StoredProcedure))
                     {
                         result = multi.Read<ResourceHTML5>().FirstOrDefault();
                         result.ResourceMap = multi.Read<XElement>().FirstOrDefault();

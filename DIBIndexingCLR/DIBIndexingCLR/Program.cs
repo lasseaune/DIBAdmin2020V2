@@ -17,7 +17,11 @@ namespace DIBIndexingCLR
 
 
             XElement document = XElement.Load(@"D:\_DIBIndexingCLR\segments.xml");
-            XElement regexps = XElement.Load(@"D:\_DIBIndexingCLR\100_total_no_20200925.xml");
+            document.Descendants("searchitems").ToList().ForEach(p => p.Remove());
+            document.Descendants("index").ToList().ForEach(p => p.Remove());
+            document.Descendants("diblink").ToList().ForEach(p => p.Remove());
+            document.Descendants().Where(p => p.Attributes("id").FirstOrDefault() == null).ToList().ForEach(p => p.Add(new XAttribute("id", Guid.NewGuid().ToString())));
+            XElement regexps = XElement.Load(@"D:\_DIBIndexingCLR\100_total_no_20200930_new.xml");
             string regex = regexps.DescendantsAndSelf("root").Select(p => p.Value).FirstOrDefault();
             Regex rx = null;
             rx = new Regex(regex);
@@ -58,7 +62,7 @@ namespace DIBIndexingCLR
                 return;
             }
 
-            XElement iddoc = XElement.Load(@"D:\_DIBIndexingCLR\iddoc.xml");
+            XElement iddoc = XElement.Load(@"D:\_DIBIndexingCLR\iddoc_20200930.xml");
             if (iddoc == null)
             {
                 return;
@@ -87,6 +91,7 @@ namespace DIBIndexingCLR
                 diblinks,
                 tpo.XIndex
             );
+            document.Save(@"D:\_DIBIndexingCLR\document.xml");
             tpo.XIndex.Save(@"D:\_DIBIndexingCLR\XIndex.xml");
         }
         static void Main0(string[] args)

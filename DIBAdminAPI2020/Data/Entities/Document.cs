@@ -458,6 +458,9 @@ namespace DIBAdminAPI.Data.Entities
     public class DocumentContainer
     {
         public bool Edited = false; 
+        public string topicId { get; set; }
+        public string selectId { get; set; }
+        public string segmentId { get; set; }
         public string id { get; set; }
         public string resourceTypeId { get; set; }
         public bool access { get; set; }
@@ -512,7 +515,11 @@ namespace DIBAdminAPI.Data.Entities
         }
         public DocumentContainer(ResourceHTML5 r)
         {
+            name = r.Name;
+            topicId = r.topicId.ToLower();
             id = r.id.ToLower();
+            selectId = r.selectId??"";
+            segmentId = r.segmentId??"";
             resourceTypeId = r.ResourceTypeId.ToString();
             access = r.Accsess == 1 ? true : false;
             XElement map = r.ResourceMap;

@@ -26,6 +26,7 @@ namespace DIBAdminAPI.Data.Entities
         public string id { get; set; }
         public string resourceId { get; set; }
         public string segmentId { get; set; }
+        public string selectId { get; set; }
         public string Name { get; set; }
         public int Accsess { get; set; }
         public int ResourceTypeId { get; set; }

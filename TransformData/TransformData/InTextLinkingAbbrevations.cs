@@ -16,7 +16,8 @@ namespace DIB.InTextLinking
         public string Tag1()
         {
             //New tag1
-            XElement e = XElement.Load(@"D:\DIBProduction\idParts.xml");
+            //XElement e = XElement.Load(@"D:\DIBProduction\idParts.xml");
+            XElement e = XElement.Load(@"D:\_RegexEditor\idpart_new.xml");
 
             string s = e.Value;
             //string s = File.ReadAllText(@"D:\DIBProduction\test.txt");
