@@ -64,8 +64,9 @@ namespace DIBAdminAPI.Controllers
                 [FromQuery] string segmentId,
                 [FromQuery] string Id,
                 [FromQuery] string collectionId,
-                [FromQuery] string Search
-               
+                [FromQuery] string Search,
+                [FromQuery] IEnumerable<string> labeld
+
         )
         {
 
@@ -103,6 +104,19 @@ namespace DIBAdminAPI.Controllers
             DocumentContainer result = null;
             result = _cache.Get<DocumentContainer>(rid);
 
+            //if ((labeld.Count() > 0 )  && result != null)
+            //{
+            //    XElement xDocument = result.GetDocumentContainerXML();
+            //    (
+            //        from de in xDocument.Descendants()
+            //        join iD in result.itemData
+            //        on (string)de.Attributes("id").FirstOrDefault() equals iD.id
+            //        group iD.labelId by de into g
+            //        select g
+            //    ).ToList().ForEach(p => p.Key.AddAnnotation(new Labels {labelIds = p.Select(s => s).ToList() }));
+
+            //    xDocument = xDocument.GetChecklistElements(labels);
+            //}
             if ((Id == null ? "" : Id) == "" && result != null)
             {
                     return Ok(result);
@@ -149,6 +163,7 @@ namespace DIBAdminAPI.Controllers
             {
                 _cache.Set<DocumentContainer>(rid, result);
             }
+            result.itemData = null;
             return Ok(result);
         }
         [HttpPost("create")]

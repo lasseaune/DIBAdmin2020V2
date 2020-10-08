@@ -241,6 +241,10 @@ namespace DIBAdminAPI.Data
                         result.Collections = multi.Read<XElement>().FirstOrDefault();
                         result.XObjects = multi.Read<XElement>().FirstOrDefault();
                         result.DgVariables = multi.Read<XElement>().FirstOrDefault();
+                        result.labelGroups = multi.Read<ChecklistLabelGroup>();
+                        result.labelGlobal = multi.Read<ChecklistLabel>();
+                        result.labelShow = multi.Read<ChecklistLabel>();
+                        result.itemData = multi.Read<ChecklistItemData>();
                         return result;
                     }
                 }

@@ -10,6 +10,7 @@ using DIBAdminAPI.Helpers.Extentions;
 using System.IO;
 using HtmlAgilityPack;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace DIBAdminAPI.Data.Entities
 {
@@ -3142,6 +3143,55 @@ namespace DIBAdminAPI.Data.Entities
         public string text { get; set; }
         public string id { get; set; }
         public JsonElementHierarcy build { set; get; }
+    }
+    
+    public class ViewElement
+    {
+        public string name { get; set; }
+        public string ob { get; set; }
+        public string id { get; set; }
+        public List<string> children { get; set; }
+    }
+    public class ViewJson
+    {
+        public List<string> root { get; set; }
+        public Dictionary<string, ViewElement> toc { get; set; }
+        public ViewJson(string labelType, IEnumerable<ChecklistLabelGroup> gr, IEnumerable<ChecklistLabel> lb)
+        {
+            if (gr.Select(p => p.name).FirstOrDefault() == null)
+            {
+                return;
+            }
+            root = gr.Where(p => p.type == labelType).OrderBy(p => p.name).Select(p => p.labelGroupId.ToString()).ToList();
+            toc = new Dictionary<string, ViewElement>();
+            toc.AddRange(
+                gr
+                .Where(p => p.type == labelType)
+                .ToDictionary(p=>
+                    p.labelGroupId.ToString(), 
+                    p=> new ViewElement { 
+                        name = p.name,
+                        ob = "group" + labelType,
+                        id = p.labelGroupId.ToString(),
+                        children = lb
+                                    .Where(l=>l.labelGroupId == p.labelGroupId )
+                                    .OrderBy(l=>l.name)
+                                    .Select(l => l.labelId).ToList()
+                    }
+                )
+            );
+            toc.AddRange(
+                lb
+                .ToDictionary(p => p.labelId.ToString(), p => new ViewElement { 
+                    name = p.name, 
+                    ob="label"+ labelType,
+                    id = p.labelId,
+                    }
+                )
+            );
+
+
+        }
     }
     public class TocJson
     {

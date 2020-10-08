@@ -475,12 +475,18 @@ namespace DIBAdminAPI.Data.Entities
 
         public IEnumerable<XVariable> variables { get; set; }
         public IEnumerable<XObj> xobjects { get; set; }
-        
+
+        public List<string> viewroot { get; set; }
+        public Dictionary<string, ViewElement> viewtoc { get; set; }
+        public List<string> showroot { get; set; }
+        public Dictionary<string, ViewElement> showtoc { get; set; }
+        public IEnumerable<ChecklistItemData> itemData { get; set; }  
+
         //public DocumentContainer(string Name, XElement Document, string resourceId)
         //{
         //    id = resourceId.ToLower();
         //    name = Name;
-        
+
         //    TocJson tocJson = new TocJson(null, Document, resourceId, "");
         //    tocroot = tocJson.tocroot;
         //    toc = tocJson.toc;
@@ -554,6 +560,16 @@ namespace DIBAdminAPI.Data.Entities
 
 
                 XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links);
+
+                ViewJson vj = new ViewJson("1", r.labelGroups, r.labelGlobal);
+                viewroot = vj.root;
+                viewtoc = vj.toc;
+
+                vj = new ViewJson("2", r.labelGroups,r.labelShow);
+                showroot = vj.root;
+                showtoc = vj.toc;
+
+                itemData = r.itemData;
 
                 TocJson tocJson = new TocJson(map, docparthtml, r.resourceId, r.segmentId);
                 tocroot = tocJson.tocroot;
