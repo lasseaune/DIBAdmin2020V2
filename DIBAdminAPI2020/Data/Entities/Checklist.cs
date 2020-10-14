@@ -7,7 +7,8 @@ namespace DIBAdminAPI.Data.Entities
 {
     public class Labels
     {
-        public List<string> labelIds { get; set; }
+        public bool Global = false;
+        public bool View = false;
     }
     public class ChecklistLabelGroup
     {

@@ -3156,6 +3156,69 @@ namespace DIBAdminAPI.Data.Entities
     {
         public List<string> root { get; set; }
         public Dictionary<string, ViewElement> toc { get; set; }
+        public ViewJson(string labelType, IEnumerable<ChecklistLabelGroup> gr, IEnumerable<ChecklistLabel> lb, IEnumerable<ChecklistItemData> iD)
+        {
+            if (iD.Select(p => p.id).FirstOrDefault() == null)
+            {
+                return;
+            }
+            
+            List<ChecklistLabelGroup> tgr =
+            (
+                     from i in iD
+                     join l in lb
+                     on i.labelId equals l.labelId
+                     join g in gr
+                     on l.labelGroupId equals g.labelGroupId
+                     where g.type == labelType
+                     group g by g into c
+                     select c.Key
+            ).ToList();
+
+            List<ChecklistLabel> tlb =
+            (
+                     from i in iD
+                     join l in lb
+                     on i.labelId equals l.labelId
+                     join g in tgr
+                     on l.labelGroupId equals g.labelGroupId
+                     group l by l into c
+                     select c.Key
+            ).ToList();
+
+
+            root = tgr.Where(p => p.type == labelType).OrderBy(p => p.name).Select(p => p.labelGroupId.ToString()).ToList();
+            toc = new Dictionary<string, ViewElement>();
+            toc.AddRange(
+                tgr
+                .Where(p => p.type == labelType)
+                .ToDictionary(p =>
+                    p.labelGroupId.ToString(),
+                    p => new ViewElement
+                    {
+                        name = p.name,
+                        ob = "group" + labelType,
+                        id = p.labelGroupId.ToString(),
+                        children =tlb
+                                    .Where(l => l.labelGroupId == p.labelGroupId)
+                                    .OrderBy(l => l.name)
+                                    .Select(l => l.labelId).ToList()
+                    }
+                )
+            );
+            toc.AddRange(
+                tlb
+                .ToDictionary(p => p.labelId.ToString(), p => new ViewElement
+                {
+                    name = p.name,
+                    ob = "label" + labelType,
+                    id = p.labelId,
+                }
+                )
+            );
+
+
+        }
         public ViewJson(string labelType, IEnumerable<ChecklistLabelGroup> gr, IEnumerable<ChecklistLabel> lb)
         {
             if (gr.Select(p => p.name).FirstOrDefault() == null)

@@ -454,10 +454,11 @@ namespace DIBAdminAPI.Data.Entities
             dType = (string)idLink.Attributes("dname").FirstOrDefault();
         }
     }
-   
+
     public class DocumentContainer
     {
-        public bool Edited = false; 
+        public int eCount { get; set; }
+        public bool Edited = false;
         public string topicId { get; set; }
         public string selectId { get; set; }
         public string segmentId { get; set; }
@@ -480,8 +481,27 @@ namespace DIBAdminAPI.Data.Entities
         public Dictionary<string, ViewElement> viewtoc { get; set; }
         public List<string> showroot { get; set; }
         public Dictionary<string, ViewElement> showtoc { get; set; }
-        public IEnumerable<ChecklistItemData> itemData { get; set; }  
 
+        public List<string> allviewroot { get; set; }
+        public Dictionary<string, ViewElement> allviewtoc { get; set; }
+        public List<string> allshowroot { get; set; }
+        public Dictionary<string, ViewElement> allshowtoc { get; set; }
+        private IEnumerable<ChecklistItemData> ItemData { get; set; }
+        private IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
+        private IEnumerable<ChecklistLabel> Labels { get; set; }
+
+        public IEnumerable<ChecklistLabel> GetLabels()
+        {
+            return Labels;
+        }
+        public IEnumerable<ChecklistLabelGroup> GetLabelGroups()
+        {
+            return LabelGroups;
+        }
+        public IEnumerable<ChecklistItemData> GetItemData()
+        {
+            return ItemData;
+        }
         //public DocumentContainer(string Name, XElement Document, string resourceId)
         //{
         //    id = resourceId.ToLower();
@@ -513,6 +533,34 @@ namespace DIBAdminAPI.Data.Entities
 
         //}
 
+        public DocumentContainer(DocumentContainer dc)
+        {
+
+            Edited = dc.Edited;
+            topicId = dc.topicId;
+            selectId = dc.selectId;
+            segmentId = dc.segmentId;
+            id = dc.id;
+            resourceTypeId = dc.resourceTypeId;
+            access = dc.access;
+            companylookup = dc.companylookup;
+            name = dc.name;
+            root = dc.root;
+            elements = dc.elements;
+            tocroot = dc.tocroot;
+            toc = dc.toc;
+            elementdata = dc.elementdata;
+            objects = dc.objects;
+            variables = dc.variables;
+            xobjects = dc.xobjects;
+            viewroot = dc.viewroot;
+            viewtoc = dc.viewtoc;
+            showroot = dc.showroot;
+            showtoc = dc.showtoc;
+            ItemData = dc.ItemData;
+            LabelGroups = dc.LabelGroups;
+            Labels = dc.Labels;
+        }
         public DocumentContainer(ResourceHTML5Element r)
         {
             elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);
@@ -561,21 +609,31 @@ namespace DIBAdminAPI.Data.Entities
 
                 XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links);
 
-                ViewJson vj = new ViewJson("1", r.labelGroups, r.labelGlobal);
+                ViewJson vj = new ViewJson("1", r.labelGroups, r.labelGlobal, r.itemData);
                 viewroot = vj.root;
                 viewtoc = vj.toc;
 
-                vj = new ViewJson("2", r.labelGroups,r.labelShow);
+                vj = new ViewJson("2", r.labelGroups,r.labelGlobal, r.itemData);
                 showroot = vj.root;
                 showtoc = vj.toc;
 
-                itemData = r.itemData;
+                vj = new ViewJson("1", r.labelGroups, r.labelGlobal);
+                allviewroot = vj.root;
+                allviewtoc = vj.toc;
 
-                TocJson tocJson = new TocJson(map, docparthtml, r.resourceId, r.segmentId);
+                vj = new ViewJson("2", r.labelGroups, r.labelGlobal);
+                allshowroot = vj.root;
+                allshowtoc = vj.toc;
+
+                ItemData = r.itemData;
+                Labels = r.labelGlobal;
+                LabelGroups = r.labelGroups;
+                
+                TocJson tocJson = new TocJson(map, docparthtml, r.id, r.segmentId);
                 tocroot = tocJson.tocroot;
                 toc = tocJson.toc;
 
-                string document_id = "document;" + r.resourceId + ";" + r.segmentId;
+                string document_id = "document;" + r.id + ";" + r.segmentId;
                 root = new List<JsonChild>
                 {
                     new JsonChild { id = document_id }
@@ -603,7 +661,7 @@ namespace DIBAdminAPI.Data.Entities
                     .Select(p => p)
                     .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
                 );
-
+                eCount = elements.Count();
                 if (elementdata.Count()>0)
                 {
                     (

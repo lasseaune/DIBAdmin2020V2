@@ -65,7 +65,7 @@ namespace DIBAdminAPI.Controllers
                 [FromQuery] string Id,
                 [FromQuery] string collectionId,
                 [FromQuery] string Search,
-                [FromQuery] IEnumerable<string> labeld
+                [FromQuery] IEnumerable<string> labelId
 
         )
         {
@@ -104,19 +104,44 @@ namespace DIBAdminAPI.Controllers
             DocumentContainer result = null;
             result = _cache.Get<DocumentContainer>(rid);
 
-            //if ((labeld.Count() > 0 )  && result != null)
-            //{
-            //    XElement xDocument = result.GetDocumentContainerXML();
-            //    (
-            //        from de in xDocument.Descendants()
-            //        join iD in result.itemData
-            //        on (string)de.Attributes("id").FirstOrDefault() equals iD.id
-            //        group iD.labelId by de into g
-            //        select g
-            //    ).ToList().ForEach(p => p.Key.AddAnnotation(new Labels {labelIds = p.Select(s => s).ToList() }));
+            if ((labelId.Count() > 0) && result != null)
+            {
+                DocumentContainer select =  new DocumentContainer(result);
 
-            //    xDocument = xDocument.GetChecklistElements(labels);
-            //}
+                XElement xDocument = select.GetDocumentContainerXML();
+                xDocument = xDocument.GetChecklistElements(labelId, select.GetItemData(), select.GetLabels(), select.GetLabelGroups());
+                TocJson tocJson = new TocJson(null, xDocument, result.id, "");
+                select.tocroot = tocJson.tocroot;
+                select.toc = tocJson.toc;
+
+                string document_id = "document;" + result.id + ";" + "";
+                xDocument.SetAttributeValueEx("id", document_id);
+                select.root = new List<JsonChild>
+                {
+                    new JsonChild { id = document_id }
+                };
+                select.elements = new Dictionary<string, JsonElement>
+                {
+                    {
+                        document_id,
+                        new JsonElement
+                        {
+                            name = "div",
+                            attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
+                            children = xDocument.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
+                        }
+                    }
+                };
+                select.elements.AddRange(
+                    xDocument
+                    .Descendants()
+                    .Select(p => p)
+                    .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
+                );
+                select.eCount = select.elements.Count();
+                return Ok(select);
+
+            }
             if ((Id == null ? "" : Id) == "" && result != null)
             {
                     return Ok(result);
@@ -163,7 +188,7 @@ namespace DIBAdminAPI.Controllers
             {
                 _cache.Set<DocumentContainer>(rid, result);
             }
-            result.itemData = null;
+            //result.itemData = null;
             return Ok(result);
         }
         [HttpPost("create")]

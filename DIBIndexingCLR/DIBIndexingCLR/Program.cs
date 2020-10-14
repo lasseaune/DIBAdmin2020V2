@@ -16,7 +16,8 @@ namespace DIBIndexingCLR
         {
 
 
-            XElement document = XElement.Load(@"D:\_DIBIndexingCLR\segments.xml");
+            //XElement document = XElement.Load(@"D:\_DIBIndexingCLR\segments.xml");
+            XElement document = XElement.Load(@"D:\_DIBIndexingCLR\document5.xml");
             document.Descendants("searchitems").ToList().ForEach(p => p.Remove());
             document.Descendants("index").ToList().ForEach(p => p.Remove());
             document.Descendants("diblink").ToList().ForEach(p => p.Remove());

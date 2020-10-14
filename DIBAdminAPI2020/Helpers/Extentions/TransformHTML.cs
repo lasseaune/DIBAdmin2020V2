@@ -283,8 +283,13 @@ namespace DIBAdminAPI.Helpers.Extentions
                     e.Nodes().OfType<XElement>().Where(p=>p.Name.LocalName=="ititle").Count()==1 
                     ? new XElement("h"+ n.ToString(),
                         e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ititle").Attributes("id").FirstOrDefault(),
+                        new XAttribute("class", "check-title"),
                         e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ititle").Nodes().SelectMany(p => p.Transform()))
-                    : null
+                    : new XElement("h" + n.ToString(),
+                            new XAttribute("id", Guid.NewGuid().ToString()),
+                            new XAttribute("class", "check-title"),
+                            new XText("[Infopunkt]")
+                      )
                 ),
                 new XElement("section",
                     new XAttribute("class", "check-ingress"),
@@ -313,7 +318,12 @@ namespace DIBAdminAPI.Helpers.Extentions
                     ),
                     e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "law").Nodes().SelectMany(p => p.Transform())
                 ),
-                e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "item").SelectMany(p => p.Transform()))
+                new XElement("section",
+                    new XAttribute("id", Guid.NewGuid().ToString()),
+                    new XAttribute("class", "check-children"),
+                    e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "item").SelectMany(p => p.Transform())
+                    )
+                )
             );
 
             return result;
