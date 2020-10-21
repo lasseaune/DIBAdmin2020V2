@@ -132,7 +132,7 @@ namespace DIBAdminAPI.Data.Entities
                 join l in labels
                 on lg.labelGroupId equals l.labelGroupId
                 join li in labelId
-                on l.labelId equals li
+                on l.labelId.ToString() equals li
                 where lg.type == "1"
                 select li
             ).ToList();
@@ -142,7 +142,7 @@ namespace DIBAdminAPI.Data.Entities
                 join l in labels
                 on lg.labelGroupId equals l.labelGroupId
                 join li in labelId
-                on l.labelId equals li
+                on l.labelId.ToString() equals li
                 where lg.type == "2"
                 select li
             ).ToList();
@@ -152,7 +152,7 @@ namespace DIBAdminAPI.Data.Entities
                
                from iD in itemdata
                join g in GLabel
-               on iD.labelId equals g
+               on iD.labelId.ToString() equals g
                group iD by iD.id into q 
                where q.Count() == GLabel.Count()
                select q
@@ -162,7 +162,7 @@ namespace DIBAdminAPI.Data.Entities
                
                 from iD in itemdata
                 join g in LLabel
-                on iD.labelId equals g
+                on iD.labelId.ToString() equals g
                 group iD by iD.id into q
                 select q
             );

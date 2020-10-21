@@ -106,6 +106,10 @@ namespace DIBAdminAPI.Controllers
 
             if ((labelId.Count() > 0) && result != null)
             {
+                if (labelId.Where(p=>p==null ? true :("all;reset;null".Split(';').Contains(p.ToLower()))).Count()>0)
+                {
+                    return Ok(result);
+                }
                 DocumentContainer select =  new DocumentContainer(result);
 
                 XElement xDocument = select.GetDocumentContainerXML();
@@ -127,7 +131,10 @@ namespace DIBAdminAPI.Controllers
                         new JsonElement
                         {
                             name = "div",
-                            attributes = new Dictionary<string, string>() { { "class", "doccontainer" } },
+                            attributes = new Dictionary<string, string>() {
+                                { "class", "doccontainer" },
+                                { "id", document_id },
+                            },
                             children = xDocument.Elements().Select(p => new JsonChild { id = (string)p.Attributes("id").FirstOrDefault() }).ToList()
                         }
                     }

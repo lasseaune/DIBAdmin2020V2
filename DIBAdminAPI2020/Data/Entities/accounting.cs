@@ -14,7 +14,122 @@ namespace DIBAdminAPI.Data.Entities
 {
     public static class ElementData
     {
-        public static Dictionary<string, AccountingElementApi> GetElementData(IEnumerable<AccountLine> AccountLines, IEnumerable<TaxLine> TaxLines)
+        public static Dictionary<string, Dictionary<string, List<string>>> EDChecklistShow(this IEnumerable<ChecklistItemData> itemData, IEnumerable<ChecklistLabel> labels, IEnumerable<ChecklistLabelGroup> groups, string type)
+        {
+            if (itemData.Select(p=>p.id).FirstOrDefault()==null)
+            {
+                return new Dictionary<string, Dictionary<string, List<string>>>();
+            }
+            if (!"1;2".Split(';').Contains(type))
+            {
+                return new Dictionary<string, Dictionary<string, List<string>>>();
+            }
+            string showgroup = "showgroup";
+            string showtag = "showtag";
+            if (type=="2")
+            {
+                showgroup = "viewgroup";
+                showtag = "viewtag";
+            }
+            
+            var x =
+            from i in itemData
+            join l in labels
+            on i.labelId equals l.labelId
+            join g in groups
+            on l.labelGroupId equals g.labelGroupId
+            where g.type == type
+            group new { l, g } by i.id into q
+            select q;
+
+            return x.ToDictionary(
+                p => p.Key,
+                p=> new Dictionary<string, List<string>>()
+                {
+                    {showgroup, p.Select(s=>s.g.labelGroupId.ToString()).ToList() },
+                    {showtag, p.Select(s=>s.l.labelId.ToString()).ToList() }
+                }
+
+            );
+        }
+        public static Dictionary<string, Dictionary<string, List<string>>> EDAccountLines(this IEnumerable<AccountLine> AccountLines)
+        {
+            if (AccountLines.Select(p=>p.id).FirstOrDefault()==null)
+            {
+                return new Dictionary<string, Dictionary<string, List<string>>>();
+            }
+
+            return AccountLines
+                .Select(p => p.id)
+                .GroupBy(p => p)
+                .ToDictionary(
+                    p => p.Key,
+                    p => new Dictionary<string, List<string>>()
+                    {
+                        { "accounting", AccountLines
+                                    .Where(a => a.id == p.Key)
+                                    .OrderBy(a => a.guiorder)
+                                    .ThenBy(a => a.idx)
+                                    .Select(a => a.lineId.ToString())
+                                    .ToList()
+                        }
+                    }
+                );
+        }
+        public static Dictionary<string, Dictionary<string, List<string>>> EDTaxLines(this IEnumerable<TaxLine> TaxLines)
+        {
+            if (TaxLines.Select(p => p.id).FirstOrDefault() == null)
+            {
+                return new Dictionary<string, Dictionary<string, List<string>>>();
+            }
+            return TaxLines
+                .Select(p => p.id)
+                .GroupBy(p => p)
+                .ToDictionary(
+                    p => p.Key,
+                    p => new Dictionary<string, List<string>>()
+                    {
+                        { "tax", TaxLines
+                                    .Where(a => a.id == p.Key)
+                                    .OrderBy(a => a.guiorder)
+                                    .ThenBy(a => a.idx)
+                                    .Select(a => a.lineId.ToString())
+                                    .ToList()
+                        }
+                    }
+                );
+        }
+
+        public static Dictionary<string, Dictionary<string, List<string>>> GetElementData(IEnumerable<AccountLine> AccountLines, IEnumerable<TaxLine> TaxLines)
+        {
+            return AccountLines
+                .Select(p => p.id)
+                .Union(
+                    TaxLines
+                    .Select(p => p.id)
+                )
+                .GroupBy(p => p)
+                .ToDictionary(
+                    p => p.Key,
+                    p => new Dictionary<string, List<string>>()
+                    {
+                        { "accounting", AccountLines
+                                    .Where(a => a.id == p.Key)
+                                    .OrderBy(a => a.guiorder)
+                                    .ThenBy(a => a.idx)
+                                    .Select(a => a.lineId.ToString())
+                                    .ToList() },
+                        { "tax",TaxLines
+                                    .Where(a => a.id == p.Key)
+                                    .OrderBy(a => a.idx)
+                                    .Select(a => a.lineId.ToString())
+                                    .ToList() }
+
+                    }
+                ); ;
+
+        }
+        public static Dictionary<string, AccountingElementApi> GetElementDataX(IEnumerable<AccountLine> AccountLines, IEnumerable<TaxLine> TaxLines)
         {
             return AccountLines
                 .Select(p => p.id)

@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 
 namespace DIBIndexingCLR
 {
@@ -41,6 +42,7 @@ namespace DIBIndexingCLR
     }
     public class Markup
     {
+        public bool Dropped = false;
         public string id { get; set; }
         public int start { get; set; }
         public int length { get; set; }
@@ -2073,7 +2075,7 @@ namespace DIBIndexingCLR
         {
             RX = rx;
             Actions = new RegexMatchActions(rx, actions, GetNumberWords());
-            TextElements = new Regex(@"^(footnote|footnotes|section|p|x\-box|x\-box\-title|li|td|tr|th|div|sup|h1|h2|h3|h4|h5|h6|h7|table|ol|ul|blockquote|sup|sub)$");
+            TextElements = new Regex(@"^(footnote|footnotes|section|ititle|item|law|ingress|description|p|x\-box|x\-box\-title|li|td|tr|th|div|sup|h1|h2|h3|h4|h5|h6|h7|table|ol|ul|blockquote|sup|sub)$");
         }
         public void ExecuteTextProcuction(XElement e, string language, bool internalreference = false)
         {
@@ -2084,37 +2086,19 @@ namespace DIBIndexingCLR
             e.DescendantNodes().OfType<XText>().ToList().ForEach(p => p.ReplaceWith(new XText(replace160.Replace(p.Value, @" "))));
             e.DescendantNodes().OfType<XText>().ToList().ForEach(p => p.ReplaceWith(new XText(Regex.Replace(p.Value, @"\s+", @" "))));
             List<XElement> br = e.Descendants().Where(p => "br;hr".Split(';').Contains(p.Name.LocalName)).ToList();
-            //List<XElement> br = e.Descendants().Where(p => p.Ancestors("document").FirstOrDefault() != null && "br;hr".Split(';').Contains(p.Name.LocalName)).ToList();
             List<XText> firstAfterBr = new List<XText>();
             foreach (XElement b in br)
             {
                 firstAfterBr.Add(e.DescendantNodes().SkipWhile(p => p != b).Skip(1).OfType<XText>().FirstOrDefault());
             }
-
-            //EvaluateXTexts(e.DescendantNodes().Where(p => p.Ancestors("document").FirstOrDefault() != null).OfType<XText>(), firstAfterBr);
             EvaluateXTexts(e.DescendantNodes().OfType<XText>(), firstAfterBr);
             int n = 0;
             foreach (XTextRanges r in Ranges)
             {
                 MatchCollection mc = RX.Matches(r.Text.ToString());
                 EvaluateMatches(r, mc);
-                //n++;
-                //Debug.Print(n.ToString());
             }
             Links = GetLinks();
-            XIndex = new XElement("x-indexs",
-                    e
-                    .Descendants("x-index")
-                    //.GroupBy(p => new { att = p.Attributes().Where(a => !"rid;id".Split(';').Contains(a.Name.LocalName)) })
-                    //.Select(p => new XElement("x-item",
-                    //            p.Key.att,
-                    //            p.Select(i => new XElement("x-match",
-                    //                new XAttribute("id", (string)i.Attributes("id").FirstOrDefault())
-                    //                )
-                    //            )
-                    //    )
-                    //)
-                );
         }
 
         private class IdentyfiedLinkGroups
@@ -2131,6 +2115,33 @@ namespace DIBIndexingCLR
 
         public XElement GetLinks()
         {
+            
+            (
+            from mlink in Ranges.SelectMany(p => p.xrange.SelectMany(m => m.marks))
+            join ilink in Ranges.SelectMany(p => p.idLinks).Where(p => p.type == IdLinkType.Index) on mlink.parentId equals ilink.parent
+            select new { m = mlink, id = ilink }
+            )
+            .GroupBy(p => p.m.value)
+            .Select(p =>  p.Key)
+            .ToList().ForEach(p=> Debug.Print(p));
+
+            XElement index = new XElement("index",
+                (
+                    from mlink in Ranges.SelectMany(p => p.xrange.SelectMany(m => m.marks))
+                    join ilink in Ranges.SelectMany(p => p.idLinks).Where(p => p.type == IdLinkType.Index) on mlink.parentId equals ilink.parent
+                    select new { m = mlink, id = ilink }
+                )
+                .GroupBy(p => p.m.value)
+                .Select(p => new XElement("item",
+                    new XElement("value" , p.Key),
+                    p.Select(s=>s.m.matches).GroupBy(s=>s).Select(s=>new XElement("matches", s.Key))
+                
+                    )
+                )
+            );    
+              
+
+
             XElement result = new XElement("diblink",
                 new XAttribute("version", "2.0"),
                 new XAttribute("id", "diblink"),
@@ -2172,7 +2183,7 @@ namespace DIBIndexingCLR
                         ).Where(p => p.Attributes().Count() > 0)
                     )
                 )
-            );
+            ); 
             return result;
         }
         private void EvaluateMatches(XTextRanges Range, MatchCollection mc)
@@ -2185,9 +2196,11 @@ namespace DIBIndexingCLR
                     r = xr,
                     marks = mo.matches
                                 .Where(m =>
-                                        (xr.Offseth.Between(m.match.Index, m.match.Index + m.match.Length, true))
-                                    || ((xr.Offseth + xr.Length).Between(m.match.Index, m.match.Index + m.match.Length, true))
-                                    || ((xr.Offseth <= m.match.Index) && ((xr.Offseth + xr.Length) >= (m.match.Index + m.match.Length)))
+                                       (m.match.Index >= xr.Offseth && m.match.Index < xr.Offseth + xr.Length)
+                                    || (m.match.Index + m.match.Length > xr.Offseth && m.match.Index + m.match.Length <= xr.Offseth + xr.Length)
+                                    //    (xr.Offseth.Between(m.match.Index, m.match.Index + m.match.Length, true))
+                                    //|| ((xr.Offseth + xr.Length).Between(m.match.Index, m.match.Index + m.match.Length, true))
+                                    //|| ((xr.Offseth <= m.match.Index) && ((xr.Offseth + xr.Length) >= (m.match.Index + m.match.Length)))
                                 )
                                 .ToList()
                 }
@@ -2199,6 +2212,15 @@ namespace DIBIndexingCLR
 
         public void ReplaceXtext(XTextRange xr, List<MatchObject> matches)//, IEnumerable<string> nonmarkupnodes, List<IdLink> idls)
         {
+            bool DropMark = (
+                                xr.Text.Ancestors("a").Where(p => (string)p.Attributes("data-class").FirstOrDefault() == "diblink").Count() > 0
+                                || xr.Text.Ancestors("span").Where(p => (string)p.Attributes("data-class").FirstOrDefault() == "index").Count() > 0
+                            );
+            if (DropMark)
+            {
+                return;
+            }
+
             XElement range = new XElement("range");
             int rangeStart = xr.Offseth;
             int rangeCursor = xr.Offseth;
@@ -2207,18 +2229,15 @@ namespace DIBIndexingCLR
             string rangeText = xr.Text.Value;
             foreach (MatchObject m in matches.OrderBy(p => p.match.Index))
             {
-                //Debug.Print(m.Value);
+                //Debug.Print(m.match.Value);
                 Markup mark = Actions.ExecuteMatchActions(m, Language, xr);
                 if (mark != null)
                 {
                     if (xr.Tag1 != null)
                     {
                         mark.tag1 = xr.Tag1;
-                        mark.tag2 = xr.Tag2;
+                        //mark.tag2 = xr.Tag2;
                     }
-                    xr.marks.Add(mark);
-                    //if (mark.id == "m1025") Debug.Print(mark.value);
-                    //if (mark.value.Trim() == "§§ 9-3 til 9-8") Debug.Print(mark.value); 
                     int markStart = mark.start;
                     int markLength = mark.length;
                     if (
@@ -2260,12 +2279,14 @@ namespace DIBIndexingCLR
 
                             rangeCursor = rangeCursor + (markLength - (rangeCursor - markStart));
                         }
-
+                        
                         List<IdLink> il = xr.parent.idLinks.Where(p => p.parent == mark.parentId).ToList();
                         if (il.Count() == 0 && linkText.Trim().Length > 0)
                         {
+                            xr.marks.Add(mark);
                             range.Add(
-                                    new XElement("x-index",
+                                    new XElement("span",
+                                        new XAttribute("data-class", "index"),
                                         new XAttribute("id", mark.id),
                                         new XAttribute("pid", (string)xr.Text.Parent.Attributes("id").FirstOrDefault()),
                                         new XAttribute("matches", mark.matches),
@@ -2283,14 +2304,15 @@ namespace DIBIndexingCLR
                             {
                                 case IdLinkType.Index:
                                     {
+                                        xr.marks.Add(mark);
                                         range.Add(
-                                            new XElement("x-index",
+                                            new XElement("span",
+                                                new XAttribute("data-class", "index"),
                                                 new XAttribute("id", mark.id),
                                                 new XAttribute("pid", (string)xr.Text.Parent.Attributes("id").FirstOrDefault()),
                                                 new XAttribute("matches", mark.matches),
                                                 mark.matches.Split(';').Skip(1)
-                                                .Select(p=> m.match.Groups[p].Success ? new XAttribute(p, m.match.Groups[p].Value) : null),
-                                                
+                                                .Select(p => m.match.Groups[p].Success ? new XAttribute(p, m.match.Groups[p].Value) : null),
                                                 linkText
                                             )
                                         );
@@ -2298,9 +2320,12 @@ namespace DIBIndexingCLR
                                     break;
                                 case IdLinkType.Link:
                                     {
+                                        xr.marks.Add(mark);
                                         range.Add(
-                                            new XElement("x-link-to",
-                                                new XAttribute("id", mark.id),
+                                            new XElement("a",
+                                                new XAttribute("id", Guid.NewGuid().ToString()),
+                                                new XAttribute("data-class", "diblink"),
+                                                new XAttribute("data-id", mark.id),
                                                 new XAttribute("pid", (string)xr.Text.Parent.Attributes("id").FirstOrDefault()),
                                                 linkText
                                             )
@@ -2309,6 +2334,9 @@ namespace DIBIndexingCLR
                                     break;
                             }
                         }
+                    }
+                    else
+                    {
 
                     }
                 }
@@ -2331,7 +2359,7 @@ namespace DIBIndexingCLR
         {
             XTextRanges xtextranges = null;
             XTextRange xtextrange = null;
-            string splitt = " | ";
+            string splitt = " q|q ";
             bool bSplitt = false;
 
             foreach (XText t in XTexts)

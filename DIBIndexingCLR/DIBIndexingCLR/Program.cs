@@ -14,21 +14,105 @@ namespace DIBIndexingCLR
     {
         static void Main(string[] args)
         {
+            XElement root = XElement.Load(@"D:\_DIBIndexingCLR\segments.xml");
+            root.DescendantsAndSelf().Attributes(XNamespace.Xml + "space").ToList().ForEach(p => p.Remove());
+            
 
 
-            //XElement document = XElement.Load(@"D:\_DIBIndexingCLR\segments.xml");
-            XElement document = XElement.Load(@"D:\_DIBIndexingCLR\document5.xml");
+
+            while (root.Descendants().Where(p => "diblink;dibparameter".Split(';').Contains(p.Name.LocalName)).Count() != 0)
+            {
+                root.Descendants().Where(p => "diblink;dibparameter".Split(';').Contains(p.Name.LocalName)).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+            }
+
+            while (root.Descendants("a").Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower() == "diblink" && ((string)p.Attributes("data-replacetext").FirstOrDefault() ?? "").Trim() != "").Count() != 0)
+            {
+                root.Descendants("a").Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower() == "diblink" && ((string)p.Attributes("data-replacetext").FirstOrDefault() ?? "").Trim() != "")
+                    .ToList()
+                    .ForEach(p => p.ReplaceWith(new XText((string)p.Attributes("data-replacetext").FirstOrDefault())));
+            }
+
+            while (root.Descendants("a").Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower() == "diblink").Count() != 0)
+            {
+                root.Descendants("a").Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower() == "diblink").ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+            }
+
+            root.Descendants("span").Where(p => Regex.IsMatch(p.DescendantNodes().OfType<XText>().Select(s => s.Value).StringConcatenate(), @"^\s+$")).ToList().ForEach(p => p.ReplaceWith(new XText(" ")));
+            root.Descendants("span").Where(p => p.DescendantNodes().Count() == 0).ToList().ForEach(p => p.ReplaceWith(new XText(" ")));
+
+            XElement regexps = XElement.Load(@"D:\_DIBIndexingCLR\100_total_no_20200930_new.xml");
+            string regex = regexps.DescendantsAndSelf("root").Select(p => p.Value).FirstOrDefault();
+            Regex rx = null;
+            rx = new Regex(regex);
+
+            XElement actions = XElement.Load(@"D:\_DIBIndexingCLR\InTextLinksActionsNOR.xml");
+            if (actions == null)
+            {
+                return;
+            }
+            string language = "no";
+
+            XElement newRoot = new XElement(root.Name.LocalName);
+            XElement links = null;
+            foreach (XElement d in root.Elements("segment").Elements("document"))
+            {
+            
+                Stream stream = new MemoryStream();
+                d.Save(stream);
+                // Rewind the stream ready to read from it elsewhere
+                stream.Position = 0;
+                XElement document = XElement.Load(stream);
+                document.Descendants().Where(p => p.Attributes("id").FirstOrDefault() == null).ToList().ForEach(p => p.Add(new XAttribute("id", Guid.NewGuid().ToString())));
+
+
+                TextProcuctionObject tpo = new TextProcuctionObject();
+                tpo.TextSize = 5000;
+                tpo.SetActions(rx, actions);
+                tpo.ExecuteTextProcuction(document, language);
+                newRoot.Add(
+                    new XElement(d.Parent.Name.LocalName,
+                        d.Parent.Attributes(),
+                        d.Elements("index"),
+                        document
+                    )
+                );
+                if (links == null)
+
+                    links = tpo.GetLinks();
+                else
+                    links.Add(tpo.GetLinks().Elements());
+
+            }
+            newRoot.Add(links);
+            newRoot.Save(@"D:\_DIBIndexingCLR\newRoot.xml");
+        }
+
+        static void MainF(string[] args)
+        {
+
+            //XElement document = XElement.Load(@"D:\_DIBIndexingCLR\74CF652A-7060-4608-BA23-F3CB15176EC4.xml");
+            //XElement document = XElement.Load(@"D:\_DIBIndexingCLR\sjekklist.xml");
+            XElement document = XElement.Load(@"D:\_DIBIndexingCLR\segments.xml");
+            //XElement document = XElement.Load(@"D:\_DIBIndexingCLR\document5.xml");
+
+            document = document.DescendantsAndSelf("document").FirstOrDefault();
+
             document.Descendants("searchitems").ToList().ForEach(p => p.Remove());
             document.Descendants("index").ToList().ForEach(p => p.Remove());
-            document.Descendants("diblink").ToList().ForEach(p => p.Remove());
+            document.Descendants("diblink").Where(p=>p.Elements("idlinks").Count()>0).ToList().ForEach(p => p.Remove());
             document.Descendants().Where(p => p.Attributes("id").FirstOrDefault() == null).ToList().ForEach(p => p.Add(new XAttribute("id", Guid.NewGuid().ToString())));
             XElement regexps = XElement.Load(@"D:\_DIBIndexingCLR\100_total_no_20200930_new.xml");
             string regex = regexps.DescendantsAndSelf("root").Select(p => p.Value).FirstOrDefault();
             Regex rx = null;
             rx = new Regex(regex);
-            
+
+            document.DescendantsAndSelf().Attributes(XNamespace.Xml + "space").ToList().ForEach(p => p.Remove());
 
             //<a class="diblink" data-refid="m148" data-replacetext="(#link;{E9C8D41B-183C-437C-B533-72049F2DF7B6}; 7c147780-2f64-41be-93e0-9fc8372e3150; Frivillig yrkesskadetrygd for selvstendig oppdragstakere;#)" href="#m148">Frivillig yrkesskadetrygd for selvstendig oppdragstakere</a>
+
+            List<XElement> dl = document.Descendants().Where(p => "diblink;dibparameter".Split(';').Contains(p.Name.LocalName.Trim().ToLower())).ToList();
+
+
             while (document.Descendants().Where(p => "diblink;dibparameter".Split(';').Contains(p.Name.LocalName)).Count() != 0)
             {
                 document.Descendants().Where(p => "diblink;dibparameter".Split(';').Contains(p.Name.LocalName)).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
@@ -71,12 +155,19 @@ namespace DIBIndexingCLR
 
             string language = "no";
 
+            document.Save(@"D:\_DIBIndexingCLR\sjekklist0.xml");
             TextProcuctionObject tpo = new TextProcuctionObject();
             tpo.TextSize = 5000;
             tpo.SetActions(rx, actions);
             tpo.ExecuteTextProcuction(document, language);
 
+            document.Save(@"D:\_DIBIndexingCLR\sjekklist.xml");
+
+            
             XElement diblinks = tpo.Links;
+
+            return;
+
 
             diblinks.IdetifyLinksTag1(iddoc, language);
 

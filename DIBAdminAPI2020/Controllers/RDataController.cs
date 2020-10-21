@@ -94,26 +94,33 @@ namespace DIBAdminAPI.Controllers
                 string rid = "rid=" + deleteData.resourceId + ";sid=" + deleteData.segmentId + ";_document";
                 DocumentContainer dc = null;
                 dc = _cache.Get<DocumentContainer>(rid);
+
                 Dictionary<string, JsonElement> updatedElements = null;
                 List<string> deletedLines = null;
-                List<KeyValuePair<string, AccountingElementApi>> ed = null;
+                //List<KeyValuePair<string, AccountingElementApi>> ed = null;
+                Dictionary<string, List<string>> ed = null;
                 TopicPartsAPI dp = null;
                 deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
+                
                 if (deleteData.ob == "accounting")
                 {
                     foreach (string s in deletedLines)
                     {
-                        AccountingElementApi ace = null;
+                        //AccountingElementApi ace = null;
+                        Dictionary<string, List<string>> ace;
                         dc.elementdata.TryGetValue(s, out ace);
                         if (ace != null)
                         {
                             
-                            foreach(string o in  ace.accounting.Select(p => p).Union(ace.tax).Select(p => p))
+                            foreach(string o in  ace.Where(p=>p.Key=="accounting").SelectMany(p => p.Value)
+                                .Union(ace.Where(p=>p.Key=="tax").SelectMany(p => p.Value))
+                            )
                             {
                                 dc.objects.Remove(o);
                             }
                             dc.elementdata.Remove(s);
                         }
+
                         KeyValuePair<string, JsonElement> ae = dc.elements.Where(p=>p.Key==s).FirstOrDefault();
                         if (ae.Value.otherprops!=null)
                         {
@@ -138,16 +145,16 @@ namespace DIBAdminAPI.Controllers
                 }
                 else if (deleteData.ob == "accline" || deleteData.ob == "taxline")
                 {
-                     ed =
-                        (from KeyValuePair<string, AccountingElementApi> k in dc.elementdata
-                         from a in k.Value.accounting
+                     ed = 
+                        (from Dictionary<string, List<string>> k in dc.elementdata.SelectMany(p=>p.Value).Where(p=>p.Key== "accounting").Select(p=>p)
+                         from a in k
                          join d in deletedLines
-                         on a equals d
+                         on a.Key equals d
                          select k
                         )
                         .Union(
-                            from KeyValuePair<string, AccountingElementApi> k in dc.elementdata
-                            from a in k.Value.tax
+                            from List<string> k in dc.elementdata.SelectMany(p => p.Value).Where(p => p.Key == "tax").Select(p => p.Value)
+                            from a in k
                             join d in deletedLines
                             on a equals d
                             select k
@@ -209,7 +216,23 @@ namespace DIBAdminAPI.Controllers
             string rid = "rid=" + resourceId + ";sid=" + segment_id + ";_document";
             DocumentContainer dc = null;
             dc = _cache.Get<DocumentContainer>(rid);
-
+            List<string> deletedLines = null;
+            //if (data.ob == "cllable")
+            //{
+            //    XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
+            //    if (result == null)
+            //    {
+            //        return BadRequest("No data");
+            //    }
+            //    if ((string)result.Attributes("value").FirstOrDefault() == "1")
+            //    {
+            //        if (data.op == "delete")
+            //        {
+            //            deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
+            //            dc.objects.Where(p=>p.Value.type=="clgroup")
+            //        }
+            //    }
+            //}
             if ("topicdata;database;name;tag;date;related".Split(';').Contains(data.ob))
             {
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
@@ -377,7 +400,7 @@ namespace DIBAdminAPI.Controllers
                 if ((string)result.Attributes("value").FirstOrDefault() == "1")
                 {
                     
-                    List<string> deletedLines = null;
+                    
                     if (data.op == "delete")
                     {
                         deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
