@@ -24,33 +24,36 @@ namespace DIBAdminAPI.Data.Entities
             {
                 return new Dictionary<string, Dictionary<string, List<string>>>();
             }
-            string showgroup = "showgroup";
-            string showtag = "showtag";
+            string showgroup = "viewgroup";
+            string showtag = "viewtag";
             if (type=="2")
             {
-                showgroup = "viewgroup";
-                showtag = "viewtag";
+                showgroup = "showgroup";
+                showtag = "showtag"; ;
             }
             
             var x =
             from i in itemData
             join l in labels
-            on i.labelId equals l.labelId
+            on i.labelId.ToString().ToLower() equals l.labelId.ToString().ToLower()
             join g in groups
-            on l.labelGroupId equals g.labelGroupId
+            on l.labelGroupId.ToString().ToLower() equals g.labelGroupId.ToString().ToLower()
             where g.type == type
-            group new { l, g } by i.id into q
+            group new { lable=l.labelId.ToString().ToLower(), gr=g.labelGroupId.ToString().ToLower() } by i.id.ToLower() into q
             select q;
 
-            return x.ToDictionary(
-                p => p.Key,
+            var y =
+                x.ToDictionary(
+                p => p.Key.ToLower(),
                 p=> new Dictionary<string, List<string>>()
                 {
-                    {showgroup, p.Select(s=>s.g.labelGroupId.ToString()).ToList() },
-                    {showtag, p.Select(s=>s.l.labelId.ToString()).ToList() }
+                    {showgroup, p.GroupBy(s=>s.gr.ToString().ToLower()).Select(p=>p.Key).ToList() },
+                    {showtag, p.GroupBy(s=>s.lable.ToString().ToLower()).Select(p=>p.Key).ToList() }
                 }
 
             );
+            
+            return y;
         }
         public static Dictionary<string, Dictionary<string, List<string>>> EDAccountLines(this IEnumerable<AccountLine> AccountLines)
         {
@@ -60,17 +63,16 @@ namespace DIBAdminAPI.Data.Entities
             }
 
             return AccountLines
-                .Select(p => p.id)
-                .GroupBy(p => p)
+                .GroupBy(p => p.id.ToLower())
                 .ToDictionary(
-                    p => p.Key,
+                    p => p.Key.ToLower(),
                     p => new Dictionary<string, List<string>>()
                     {
-                        { "accounting", AccountLines
-                                    .Where(a => a.id == p.Key)
+                        { "accounting", p.Select(a=>a)
+                                    //.Where(a => a.id == p.Key)
                                     .OrderBy(a => a.guiorder)
                                     .ThenBy(a => a.idx)
-                                    .Select(a => a.lineId.ToString())
+                                    .Select(a => a.lineId.ToString().ToLower())
                                     .ToList()
                         }
                     }
@@ -83,17 +85,15 @@ namespace DIBAdminAPI.Data.Entities
                 return new Dictionary<string, Dictionary<string, List<string>>>();
             }
             return TaxLines
-                .Select(p => p.id)
-                .GroupBy(p => p)
+                .GroupBy(p => p.id.ToLower())
                 .ToDictionary(
-                    p => p.Key,
+                    p => p.Key.ToLower(),
                     p => new Dictionary<string, List<string>>()
                     {
-                        { "tax", TaxLines
-                                    .Where(a => a.id == p.Key)
+                        { "tax", p.Select(a=>a)
                                     .OrderBy(a => a.guiorder)
                                     .ThenBy(a => a.idx)
-                                    .Select(a => a.lineId.ToString())
+                                    .Select(a => a.lineId.ToString().ToLower())
                                     .ToList()
                         }
                     }
@@ -157,7 +157,7 @@ namespace DIBAdminAPI.Data.Entities
                     }
                 ); ;
         }
-        public static Dictionary<string, ObjectApi> GetAccountLineObjects(IEnumerable<AccountLine> AccountLines)
+        public static Dictionary<string, ObjectApi> GetAccountLineObjects(this IEnumerable<AccountLine> AccountLines)
         {
             return AccountLines
                 .ToDictionary(
@@ -183,7 +183,7 @@ namespace DIBAdminAPI.Data.Entities
                 }
                 );
         }
-        public static Dictionary<string, ObjectApi> GetTaxLineObjects(IEnumerable<TaxLine> TaxLines)
+        public static Dictionary<string, ObjectApi> GetTaxLineObjects(this IEnumerable<TaxLine> TaxLines)
         {
             return TaxLines
                 .ToDictionary(

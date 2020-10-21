@@ -15,17 +15,20 @@ namespace DIBAdminAPI.Data.Entities
         public Guid? labelGroupId { get; set; }
         public string name { get; set; }
         public string type { get; set; }
+        public string transactionId { get; set; }
     }
     public class ChecklistLabel
     {
         public Guid? labelId { get; set; }
         public string name { get; set; }
         public Guid? labelGroupId { get; set; }
+        public string transactionId { get; set; }
     }
     public class ChecklistItemData
     {
         public string id { get; set; }
         public Guid? labelId { get; set; }
+        public string transactionId { get; set; }
     }
 
 }

@@ -19,6 +19,10 @@ namespace DIBAdminAPI.Data.Entities
     {
         public IEnumerable<AccountLine> AccountLines { get; set; }
         public IEnumerable<TaxLine> TaxLines { get; set; }
+        public IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
+        public IEnumerable<ChecklistLabel> Labels { get; set; }
+        public IEnumerable<ChecklistItemData> itemData { get; set; }
+
     }
     public class ResourceHTML5
     {
@@ -41,9 +45,8 @@ namespace DIBAdminAPI.Data.Entities
         public XElement Collections { get; set; }
         public XElement XObjects { get; set; }
         public XElement DgVariables { get; set; }
-        public IEnumerable<ChecklistLabelGroup> labelGroups { get; set; }
-        public IEnumerable<ChecklistLabel> labelGlobal { get; set; }
-        public IEnumerable<ChecklistLabel> labelShow { get; set; }
+        public IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
+        public IEnumerable<ChecklistLabel> Labels { get; set; }
         public IEnumerable<ChecklistItemData> itemData { get; set; }
     }
     //public class ResourceDataDocument

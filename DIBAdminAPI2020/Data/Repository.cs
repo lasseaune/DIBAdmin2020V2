@@ -241,9 +241,8 @@ namespace DIBAdminAPI.Data
                         result.Collections = multi.Read<XElement>().FirstOrDefault();
                         result.XObjects = multi.Read<XElement>().FirstOrDefault();
                         result.DgVariables = multi.Read<XElement>().FirstOrDefault();
-                        result.labelGroups = multi.Read<ChecklistLabelGroup>();
-                        result.labelGlobal = multi.Read<ChecklistLabel>();
-                        //result.labelShow = multi.Read<ChecklistLabel>();
+                        result.LabelGroups = multi.Read<ChecklistLabelGroup>();
+                        result.Labels = multi.Read<ChecklistLabel>();
                         result.itemData = multi.Read<ChecklistItemData>();
                         return result;
                     }
@@ -268,6 +267,9 @@ namespace DIBAdminAPI.Data
                     {
                         result.AccountLines = multi.Read<AccountLine>();
                         result.TaxLines = multi.Read<TaxLine>();
+                        result.LabelGroups = multi.Read<ChecklistLabelGroup>();
+                        result.Labels = multi.Read<ChecklistLabel>();
+                        result.itemData = multi.Read<ChecklistItemData>();
                         return result;
                     }
                 }
@@ -283,9 +285,6 @@ namespace DIBAdminAPI.Data
             IEnumerable<TopicBase> result;
             if (!timeOut.HasValue)
                 timeOut = 60;
-
-
-
             try
             {
                 using (IDbConnection conn = dbConnection)

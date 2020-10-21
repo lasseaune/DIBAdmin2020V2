@@ -101,43 +101,18 @@ namespace DIBAdminAPI.Controllers
                 Dictionary<string, List<string>> ed = null;
                 TopicPartsAPI dp = null;
                 deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
-                
+                Dictionary<string, List<string>> ace;
+                dc.elementdata.TryGetValue(deleteData.Id, out ace);
+
                 if (deleteData.ob == "accounting")
                 {
-                    foreach (string s in deletedLines)
-                    {
-                        //AccountingElementApi ace = null;
-                        Dictionary<string, List<string>> ace;
-                        dc.elementdata.TryGetValue(s, out ace);
-                        if (ace != null)
-                        {
-                            
-                            foreach(string o in  ace.Where(p=>p.Key=="accounting").SelectMany(p => p.Value)
-                                .Union(ace.Where(p=>p.Key=="tax").SelectMany(p => p.Value))
-                            )
-                            {
-                                dc.objects.Remove(o);
-                            }
-                            dc.elementdata.Remove(s);
-                        }
-
-                        KeyValuePair<string, JsonElement> ae = dc.elements.Where(p=>p.Key==s).FirstOrDefault();
-                        if (ae.Value.otherprops!=null)
-                        {
-                            if (ae.Value.otherprops.ContainsKey("accounting"))
-                            {
-                                ae.Value.otherprops.Remove("accounting");
-                            }
-                        }
-                        updatedElements = new Dictionary<string, JsonElement>();
-                        updatedElements.Add(ae.Key, ae.Value);
-
-                    }
+                    ace.Remove("accounting");
+                    ace.Remove("tax");
+                        
                     dp = new TopicPartsAPI
                     {
                         
                         root = deletedLines,
-                        elements = updatedElements,
                         objects = null
                     };
                     return Ok(dp);
@@ -145,38 +120,18 @@ namespace DIBAdminAPI.Controllers
                 }
                 else if (deleteData.ob == "accline" || deleteData.ob == "taxline")
                 {
-                     ed = 
-                        (from Dictionary<string, List<string>> k in dc.elementdata.SelectMany(p=>p.Value).Where(p=>p.Key== "accounting").Select(p=>p)
-                         from a in k
-                         join d in deletedLines
-                         on a.Key equals d
-                         select k
-                        )
-                        .Union(
-                            from List<string> k in dc.elementdata.SelectMany(p => p.Value).Where(p => p.Key == "tax").Select(p => p.Value)
-                            from a in k
-                            join d in deletedLines
-                            on a equals d
-                            select k
-                        )
-                        .ToList();
+                    List<string> acc = (List<string>)ace.Where(p => p.Key == "accounting").Select(p => p.Value);
+                    deletedLines.ForEach(p => acc.Remove(p));
+                    acc = (List<string>)ace.Where(p => p.Key == "tax").Select(p => p.Value);
+                    deletedLines.ForEach(p => acc.Remove(p));
 
-                    updatedElements =
-                    (
-                        from el in dc.elements
-                        join d in ed
-                        on el.Key equals d.Key
-                        select new { el, d }
-                    )
-                    .ToList()
-                    .SelectMany(p => p.el.UpdateOtherProps(p.d, deletedLines, "accounting"))
-                    .ToDictionary(p => p.Key, p => p.Value);
+                    
                 }
 
                 dp = new TopicPartsAPI
                 {
                     root = deletedLines,
-                    elementdata = ed.ToDictionary(p=>p.Key, p=>p.Value),
+                    elementdata = dc.elementdata.Where(p=>p.Key== deleteData.Id).ToDictionary(p=>p.Key, p=>p.Value),
                     elements = updatedElements,
                     objects = null
                 };
@@ -399,47 +354,23 @@ namespace DIBAdminAPI.Controllers
                 }
                 if ((string)result.Attributes("value").FirstOrDefault() == "1")
                 {
-                    
-                    
                     if (data.op == "delete")
                     {
                         deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
-                        List<KeyValuePair<string, AccountingElementApi>> ed = null;
-                        if (data.ob == "accline" || data.ob == "taxline")
+                        
+                        if (data.ob == "accline")
                         {
-                            ed =
-                                (from KeyValuePair<string, AccountingElementApi> k in dc.elementdata
-                                 from a in k.Value.accounting
-                                 join d in deletedLines
-                                 on a equals d
-                                 select k
-                                )
-                                .Union(
-                                    from KeyValuePair<string, AccountingElementApi> k in dc.elementdata
-                                    from a in k.Value.tax
-                                    join d in deletedLines
-                                    on a equals d
-                                    select k
-                                )
-                                .ToList();
-
-                            updatedElements =
-                            (
-                                from el in dc.elements
-                                join d in ed
-                                on el.Key equals d.Key
-                                select new { el, d }
-                            )
-                            .ToList()
-                            .SelectMany(p => p.el.UpdateOtherProps(p.d, deletedLines, "accounting"))
-                            .ToDictionary(p=>p.Key, p=>p.Value);
+                            dc.RemoveAccountLines(deletedLines);
+                        }
+                        else if (data.ob == "taxline")
+                        {
+                            dc.RemoveTaxLines(deletedLines);
                         }
 
                         TopicPartsAPI dp = new TopicPartsAPI
                         {
                             root = deletedLines,
-                            elementdata = ed.ToDictionary(p=>p.Key, p=>p.Value),
-                            elements = updatedElements,
+                            elementdata = dc.GetElementdata().Where(p=>p.Key==Id).ToDictionary(p=>p.Key, p=>p.Value),
                             objects = null
                             
                         };
@@ -463,13 +394,14 @@ namespace DIBAdminAPI.Controllers
                     }
                     DocumentContainer c = new DocumentContainer(resel);
                     DocumentElementdata ded = new DocumentElementdata
-                    
+
                     {
-                        elementdata = c.elementdata,
+                        elementdata = c.GetElementdata(),
                         objects = c.objects
                                 .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
                                 .ToDictionary(v => v.Key, v => v.Value)
                     };
+                    
                     if (dc!=null)
                     {
                         (
@@ -490,17 +422,6 @@ namespace DIBAdminAPI.Controllers
                          .ForEach(d => dc.objects.Remove(d.Key));
                         dc.objects.AddRange(ded.objects);
 
-
-                        updatedElements =
-                           (
-                               from el in dc.elements
-                               join d in ded.elementdata
-                               on el.Key equals d.Key
-                               select new { el, d }
-                           )
-                           .ToList()
-                           .SelectMany(p => p.el.UpdateOtherProps(p.d, deletedLines, "accounting"))
-                           .ToDictionary(p => p.Key, p => p.Value);
 
                         _cache.Set<DocumentContainer>(rid, dc);
                     }

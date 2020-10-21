@@ -416,7 +416,7 @@ namespace DIBAdminAPI.Data.Entities
     
     public class DocumentElementdata
     {
-        public Dictionary<string, AccountingElementApi> elementdata { get; set; }
+        public Dictionary<string,Dictionary<string,List<string>>> elementdata { get; set; }
         public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
     }
     public class LinkData
@@ -581,7 +581,9 @@ namespace DIBAdminAPI.Data.Entities
         private IEnumerable<ChecklistItemData> ItemData { get; set; }
         private IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
         private IEnumerable<ChecklistLabel> Labels { get; set; }
-
+        private IEnumerable<AccountLine> AccountLines { get; set; }
+        private IEnumerable<TaxLine> TaxLines { get; set; }
+        
         public IEnumerable<ChecklistLabel> GetLabels()
         {
             return Labels;
@@ -626,12 +628,64 @@ namespace DIBAdminAPI.Data.Entities
             ItemData = dc.ItemData;
             LabelGroups = dc.LabelGroups;
             Labels = dc.Labels;
+            AccountLines = dc.AccountLines;
+            TaxLines = dc.TaxLines;
         }
         public DocumentContainer(ResourceHTML5Element r)
         {
-            elementdata = ElementData.GetElementData(r.AccountLines, r.TaxLines);
-            objects.AddRange(ElementData.GetAccountLineObjects(r.AccountLines));
-            objects.AddRange(ElementData.GetTaxLineObjects(r.TaxLines));
+            ItemData = r.itemData;
+            Labels = r.Labels;
+            LabelGroups = r.LabelGroups;
+            AccountLines = r.AccountLines;
+            TaxLines = r.TaxLines;
+
+            elementdata.AddRange(GetElementdata());
+
+            objects.AddRange(AccountLines.GetAccountLineObjects());
+            objects.AddRange(TaxLines.GetTaxLineObjects());
+
+            CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
+            viewroot = cll.viewroot;
+            showroot = cll.showroot;
+            objects.AddRange(cll.objects);
+        }
+
+        public void RemoveAccountLines(List<string> elements)
+        {
+            AccountLines = AccountLines.Where(p => !elements.Contains(p.lineId.ToString()));
+        }
+        public void RemoveTaxLines(List<string> elements)
+        {
+            TaxLines = TaxLines.Where(p => !elements.Contains(p.lineId.ToString()));
+        }
+
+        public Dictionary<string, List<string>> ConcatDictionary(IEnumerable<Dictionary<string, List<string>>> l)
+        {
+            Dictionary<string, List<string>> result = new Dictionary<string, List<string>>();
+            foreach (Dictionary<string, List<string>> d  in l )
+            {
+                result.AddRange(d);
+            }
+            return result;
+        }
+        public Dictionary<string, Dictionary<string,List<string>>> GetElementdata()
+        {
+            return
+                AccountLines.EDAccountLines()
+                .Union(
+                    TaxLines.EDTaxLines()
+                )
+                .Union(
+                    ItemData.EDChecklistShow(Labels, LabelGroups, "1")
+                )
+                .Union(
+                    ItemData.EDChecklistShow(Labels, LabelGroups, "2")
+                )
+                .GroupBy(p => p.Key.ToLower())
+                .ToDictionary(
+                    p => p.Key.ToLower(),
+                    p => ConcatDictionary(p.Select(s => s).Select(s => s.Value))
+                );
         }
         public DocumentContainer(ResourceHTML5 r)
         {
@@ -657,7 +711,6 @@ namespace DIBAdminAPI.Data.Entities
                     companylookup = false;
                 else
                     companylookup = true;
-                
 
                 if (r.Document.Attributes("id").FirstOrDefault() == null)
                 {
@@ -670,8 +723,6 @@ namespace DIBAdminAPI.Data.Entities
 
 
                 XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links);
-
-                
                 
                 TocJson tocJson = new TocJson(map, docparthtml, r.id, r.segmentId);
                 tocroot = tocJson.tocroot;
@@ -706,110 +757,24 @@ namespace DIBAdminAPI.Data.Entities
                     .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
                 );
 
-                
-                elementdata.AddRange(
-                    r.AccountLines.EDAccountLines()
-                    .Union(
-                        r.TaxLines.EDTaxLines()
-                    )
-                    .Union(
-                        r.itemData.EDChecklistShow(r.labelGlobal, r.labelGroups, "1")
-                    )
-                    .GroupBy(p => new { key = p.Key, value = p.Value })
-                    .ToDictionary(
-                        p => p.Key.key, 
-                        p => p.Key.value
-                    )
-                );
+                ItemData = r.itemData;
+                Labels = r.Labels;
+                LabelGroups = r.LabelGroups;
+                AccountLines = r.AccountLines;
+                TaxLines = r.TaxLines;
 
-                CheckLabelJsons cll = new CheckLabelJsons(r.labelGroups, r.labelGlobal, r.itemData);
+                elementdata.AddRange(GetElementdata());
+                objects.AddRange(AccountLines.GetAccountLineObjects());
+                objects.AddRange(TaxLines.GetTaxLineObjects());
+
+                CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
                 viewroot = cll.viewroot;
                 showroot = cll.showroot;
                 objects.AddRange(cll.objects);
+               
 
-
-                ItemData = r.itemData;
-                Labels = r.labelGlobal;
-                LabelGroups = r.labelGroups;
-
-                //elementdata.AddRange(ElementData.GetElementData(r.AccountLines, r.TaxLines));
-
-                objects.AddRange(ElementData.GetAccountLineObjects(r.AccountLines));
-                objects.AddRange(ElementData.GetTaxLineObjects(r.TaxLines));
-
-                
-
-
-                //if (ItemData.Select(p => p.id).FirstOrDefault() != null)
-                //{
-
-                //    (
-                //        from e in elements
-                //        join i in r.itemData
-                //        on e.Key.ToLower() equals i.id.ToLower()
-                //        join l in r.labelGlobal
-                //        on i.labelId equals l.labelId
-                //        join lg in r.labelGroups
-                //        on l.labelGroupId equals lg.labelGroupId
-                //        where lg.type == "1"
-                //        group l.labelGroupId by e into g
-                //        select g
-                //    ).ToList()
-
-                //    .ForEach(p => p.Key.Value.AddOtherProps("showgroup", p.GroupBy(l=>l.ToString()).Select(l => l.Key).ToList()));
-                //    (
-                //        from e in elements
-                //        join i in r.itemData
-                //        on e.Key.ToLower() equals i.id.ToLower()
-                //        join l in r.labelGlobal
-                //        on i.labelId equals l.labelId
-                //        join lg in r.labelGroups
-                //        on l.labelGroupId equals lg.labelGroupId
-                //        where lg.type == "1"
-                //        group i.labelId by e into g
-                //        select g
-                //    ).ToList()
-                //    .ForEach(p => p.Key.Value.AddOtherProps("showtags", p.Select(l => l.ToString()).ToList()));
-
-                //    (
-                //        from e in elements
-                //        join i in r.itemData
-                //        on e.Key.ToLower() equals i.id.ToLower()
-                //        join l in r.labelGlobal
-                //        on i.labelId equals l.labelId
-                //        join lg in r.labelGroups
-                //        on l.labelGroupId equals lg.labelGroupId
-                //        where lg.type == "2"
-                //        group l.labelGroupId by e into g
-                //        select g
-                //    ).ToList().ForEach(p => p.Key.Value.AddOtherProps("viewgroup", p.GroupBy(l => l.ToString()).Select(p=>p.Key).ToList()));
-
-                //    (
-                //        from e in elements
-                //        join i in r.itemData
-                //        on e.Key.ToLower() equals i.id.ToLower()
-                //        join l in r.labelGlobal
-                //        on i.labelId equals l.labelId
-                //        join lg in r.labelGroups
-                //        on l.labelGroupId equals lg.labelGroupId
-                //        where lg.type == "2"
-                //        group i.labelId by e into g
-                //        select g
-                //    ).ToList().ForEach(p => p.Key.Value.AddOtherProps("viewtags", p.Select(l => l.ToString()).ToList()));
-                //}
 
                 eCount = elements.Count();
-                if (elementdata.Count()>0)
-                {
-                    (
-                        from e in elements
-                        join a in elementdata
-                        on e.Key.ToLower() equals a.Key.ToLower()
-                        select e
-                    ).ToList()
-                    .ForEach(p => p.UpdateOtherProps("accounting"));
-                }
-
 
                 if (r.Tags.Count()>0)
                 {
