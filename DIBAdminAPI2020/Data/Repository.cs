@@ -289,12 +289,8 @@ namespace DIBAdminAPI.Data
             {
                 using (IDbConnection conn = dbConnection)
                 {
-                    
                     result = await conn.QueryAsync<TopicBase>(QueryName, p, null, null, CommandType.StoredProcedure);
                 }
-
-
-
                 return result;
             }
             catch (Exception e)
@@ -326,7 +322,6 @@ namespace DIBAdminAPI.Data
                         result.Resources = multi.Read<ResourceDocuments>().ToList();
                     }
                 }
-
                 return result;
             }
             catch (Exception e)

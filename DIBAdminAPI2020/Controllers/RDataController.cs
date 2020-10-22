@@ -25,7 +25,6 @@ namespace DIBAdminAPI.Controllers
             _tempstore = tempstore;
             _cache = cacheService;
         }
-
         private class DeleteObject
         {
             public string resourceId { get; set; }
@@ -95,15 +94,13 @@ namespace DIBAdminAPI.Controllers
                 DocumentContainer dc = null;
                 dc = _cache.Get<DocumentContainer>(rid);
 
-                Dictionary<string, JsonElement> updatedElements = null;
                 List<string> deletedLines = null;
-                //List<KeyValuePair<string, AccountingElementApi>> ed = null;
-                Dictionary<string, List<string>> ed = null;
-                TopicPartsAPI dp = null;
                 deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
+
                 Dictionary<string, List<string>> ace;
                 dc.elementdata.TryGetValue(deleteData.Id, out ace);
 
+                TopicPartsAPI dp = null;
                 if (deleteData.ob == "accounting")
                 {
                     ace.Remove("accounting");
@@ -111,7 +108,6 @@ namespace DIBAdminAPI.Controllers
                         
                     dp = new TopicPartsAPI
                     {
-                        
                         root = deletedLines,
                         objects = null
                     };
@@ -124,15 +120,12 @@ namespace DIBAdminAPI.Controllers
                     deletedLines.ForEach(p => acc.Remove(p));
                     acc = (List<string>)ace.Where(p => p.Key == "tax").Select(p => p.Value);
                     deletedLines.ForEach(p => acc.Remove(p));
-
-                    
                 }
 
                 dp = new TopicPartsAPI
                 {
                     root = deletedLines,
                     elementdata = dc.elementdata.Where(p=>p.Key== deleteData.Id).ToDictionary(p=>p.Key, p=>p.Value),
-                    elements = updatedElements,
                     objects = null
                 };
                 return Ok(dp); 
@@ -172,22 +165,7 @@ namespace DIBAdminAPI.Controllers
             DocumentContainer dc = null;
             dc = _cache.Get<DocumentContainer>(rid);
             List<string> deletedLines = null;
-            //if (data.ob == "cllable")
-            //{
-            //    XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
-            //    if (result == null)
-            //    {
-            //        return BadRequest("No data");
-            //    }
-            //    if ((string)result.Attributes("value").FirstOrDefault() == "1")
-            //    {
-            //        if (data.op == "delete")
-            //        {
-            //            deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
-            //            dc.objects.Where(p=>p.Value.type=="clgroup")
-            //        }
-            //    }
-            //}
+
             if ("topicdata;database;name;tag;date;related".Split(';').Contains(data.ob))
             {
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
@@ -220,7 +198,6 @@ namespace DIBAdminAPI.Controllers
                                     }
                                 }
                             }
-
                             TopicPartsAPI tp = new TopicPartsAPI
                             {
                                 root = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList(),
@@ -243,12 +220,11 @@ namespace DIBAdminAPI.Controllers
                                     {
                                         ae.Value.otherprops.Remove("related");
                                         updatedElements.Add(ae.Key, ae.Value);
-                                        
                                     }
                                 }
                                 _cache.Set<DocumentContainer>(rid, dc);
                             }
-
+                            
                             TopicPartsAPI tp = new TopicPartsAPI
                             {
                                 root = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList(),
@@ -321,7 +297,6 @@ namespace DIBAdminAPI.Controllers
                     }
                     else
                     {
-
                         string query = "dbo.GetTopic";
                         TopicDetail topicresult = await _repo.ExecTopicDetail(query, t, null);
                         TopicDetailAPI tdapi = new TopicDetailAPI(topicresult);
@@ -334,7 +309,6 @@ namespace DIBAdminAPI.Controllers
                                     .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
                                     .ToDictionary(v => v.Key, v => v.Value)
                         };
-
                         return Ok(tp);
                     }
                 }
@@ -344,9 +318,8 @@ namespace DIBAdminAPI.Controllers
                     return BadRequest(message);
                 }
             }
-            else if ("accline;taxline".Split(';').Contains(data.ob) && (data.Id ?? "") != "")
+            else if ("accline;taxline;cllabel".Split(';').Contains(data.ob) && (data.Id ?? "") != "")
             {
-                
                 XElement result = await _repo.ExecRData("[dbo].[Update_RDATA]", p);
                 if (result == null)
                 {
@@ -354,11 +327,15 @@ namespace DIBAdminAPI.Controllers
                 }
                 if ((string)result.Attributes("value").FirstOrDefault() == "1")
                 {
+                    List<string> selectedObjects = dc.objects.Where(p => p.Value.selected == true).Select(p => p.Key.ToLower()).ToList();
                     if (data.op == "delete")
                     {
                         deletedLines = result.Elements("id").Select(p => (string)p.Attributes("id").FirstOrDefault()).ToList();
-                        
-                        if (data.ob == "accline")
+                        if (data.ob == "cllabel")
+                        {
+                            dc.RemoveItemData(deletedLines, Id);
+                        }
+                        else if (data.ob == "accline")
                         {
                             dc.RemoveAccountLines(deletedLines);
                         }
@@ -366,15 +343,28 @@ namespace DIBAdminAPI.Controllers
                         {
                             dc.RemoveTaxLines(deletedLines);
                         }
-
-                        TopicPartsAPI dp = new TopicPartsAPI
+                        TopicPartsAPI dp = new TopicPartsAPI();
+                        if (data.ob == "cllabel")
                         {
-                            root = deletedLines,
-                            elementdata = dc.GetElementdata().Where(p=>p.Key==Id).ToDictionary(p=>p.Key, p=>p.Value),
-                            objects = null
-                            
-                        };
+                            dp = new TopicPartsAPI
+                            {
+                                root = deletedLines,
+                                elementdata = dc.elementdata.Where(p => p.Key == Id).ToDictionary(p => p.Key, p => p.Value),
+                                objects = dc.objects
+                                .Where(v => (v.Value.type == data.ob || v.Value.type == "clgrouplabel") && (selectedObjects.Contains(v.Key.ToLower()) || v.Value.transactionId == transactionId || v.Value.selected == true))
+                                .ToDictionary(v => v.Key, v => v.Value)
+                            };
+                        }
+                        else
+                        {
+                            dp = new TopicPartsAPI
+                            {
+                                root = deletedLines,
+                                elementdata = dc.elementdata.Where(p => p.Key == Id).ToDictionary(p => p.Key, p => p.Value),
+                                objects = null
 
+                            };
+                        }
                         _cache.Set<DocumentContainer>(rid, dc);
                         return Ok(dp);
                     }
@@ -383,7 +373,7 @@ namespace DIBAdminAPI.Controllers
                     {
                         resource_id = resourceId,
                         id = data.Id,
-                        data.ob,
+                        ob="",// data.ob,
                         session_id = "apitest"
                     };
                     string query = "[dbo].[GetResourceHTMLElement]";
@@ -392,52 +382,36 @@ namespace DIBAdminAPI.Controllers
                     {
                         return BadRequest();
                     }
-                    DocumentContainer c = new DocumentContainer(resel);
-                    DocumentElementdata ded = new DocumentElementdata
 
+                    dc.UpdateElementData(resel);
+                    _cache.Set<DocumentContainer>(rid, dc);
+
+                    TopicPartsAPI tp = new TopicPartsAPI();
+                    if (data.ob == "cllabel")
                     {
-                        elementdata = c.GetElementdata(),
-                        objects = c.objects
-                                .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
+                        tp = new TopicPartsAPI
+                        {
+                            elementdata = dc.elementdata.Where(p => p.Key.ToLower() == Id.ToLower()).ToDictionary(p => p.Key, p => p.Value),
+                            root = deletedLines,
+                            objects = dc.objects
+                                .Where(v => (v.Value.type == data.ob || v.Value.type == "clgrouplabel") && (selectedObjects.Contains(v.Key.ToLower()) || v.Value.transactionId == transactionId || v.Value.selected == true))
                                 .ToDictionary(v => v.Key, v => v.Value)
-                    };
-                    
-                    if (dc!=null)
-                    {
-                        (
-                          from e in dc.elementdata
-                          join n in ded.elementdata
-                          on e.Key equals n.Key
-                          select e
-                        ).ToList()
-                        .ForEach(d => dc.elementdata.Remove(d.Key));
-
-                        dc.elementdata.AddRange(ded.elementdata);
-                        (
-                            from o in dc.objects
-                            join n in ded.objects
-                            on o.Key equals n.Key
-                            select o
-                         ).ToList()
-                         .ForEach(d => dc.objects.Remove(d.Key));
-                        dc.objects.AddRange(ded.objects);
-
-
-                        _cache.Set<DocumentContainer>(rid, dc);
+                        };
                     }
-                    
-
-                    TopicPartsAPI tp = new TopicPartsAPI
+                    else
                     {
-                        elementdata = c.elementdata,
-                        elements = updatedElements,
-                        root = c.objects
+                        tp = new TopicPartsAPI
+                        {
+                            elementdata = dc.elementdata.Where(p => p.Key.ToLower() == Id.ToLower()).ToDictionary(p => p.Key, p => p.Value),
+                            root = dc.objects
                                 .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
                                 .Select(v => v.Key).ToList(),
-                        objects = c.objects
+                            objects = dc.objects
                                 .Where(v => v.Value.type == data.ob && v.Value.transactionId == transactionId)
                                 .ToDictionary(v => v.Key, v => v.Value)
-                    };
+                        };
+                    }
+
                     return Ok(tp);
 
                 }

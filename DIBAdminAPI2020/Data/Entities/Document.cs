@@ -514,7 +514,9 @@ namespace DIBAdminAPI.Data.Entities
                         p => new ObjectApi
                         {
                             id = p.a.Key.labelGroupId,
-                            type = "clgrouplable",
+                            type = "clgrouplabel",
+                            selected = p.b,
+                            transactionId = p.a.Key.transactionId,
                             data = new
                             {
                                 id = p.a.Key.labelGroupId,
@@ -538,7 +540,9 @@ namespace DIBAdminAPI.Data.Entities
                         p => new ObjectApi
                         {
                             id = p.a.labelId,
-                            type = "cllable",
+                            type = "cllabel",
+                            selected = p.b,
+                            transactionId = p.a.transactionId,
                             data = new
                             {
                                 id = p.a.labelId,
@@ -650,13 +654,89 @@ namespace DIBAdminAPI.Data.Entities
             objects.AddRange(cll.objects);
         }
 
-        public void RemoveAccountLines(List<string> elements)
+        public void UpdateElementData(ResourceHTML5Element elementData)
         {
-            AccountLines = AccountLines.Where(p => !elements.Contains(p.lineId.ToString()));
+            ItemData = from i in ItemData
+                       join n in elementData.itemData
+                       on i.id equals n.id into g
+                       from s in g.DefaultIfEmpty()
+                       where s == null
+                       select i;
+
+            ItemData = ItemData.Concat(elementData.itemData);
+
+
+            AccountLines = from a in AccountLines
+                           join n in elementData.AccountLines
+                           on a.lineId equals n.lineId into g
+                           from s in g.DefaultIfEmpty()
+                           where s == null
+                           select a;
+
+            AccountLines = AccountLines.Concat(elementData.AccountLines);
+
+            TaxLines = from a in TaxLines
+                           join n in elementData.TaxLines
+                           on a.lineId equals n.lineId into g
+                           from s in g.DefaultIfEmpty()
+                           where s == null
+                           select a;
+            TaxLines = TaxLines.Concat(elementData.TaxLines);
+
+            elementdata = GetElementdata();
+
+            objects = new Dictionary<string, ObjectApi>();
+
+            objects.AddRange(AccountLines.GetAccountLineObjects());
+            objects.AddRange(TaxLines.GetTaxLineObjects());
+
+            CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
+            viewroot = cll.viewroot;
+            showroot = cll.showroot;
+            objects.AddRange(cll.objects);
         }
-        public void RemoveTaxLines(List<string> elements)
+        public void RemoveItemData(List<string> el, string id)
         {
-            TaxLines = TaxLines.Where(p => !elements.Contains(p.lineId.ToString()));
+            ItemData = ItemData.Where(p => !(p.id.ToLower()==id.ToLower() && el.Contains(p.labelId.ToString().ToLower()))).Select(p => p);
+                //from i in ItemData
+                //join e in el
+                //on new
+                //{
+                //    Id = i.id.ToLower(),
+                //    Lid = i.labelId.ToString().ToLower()
+                //}
+                //equals new
+                //{
+                //    Id = id.ToLower(),
+                //    Lid = e.ToLower()
+                //}
+                //       into g
+                //from s in g
+                //where s == null
+                //select i;
+            elementdata = GetElementdata();
+        }
+        public void RemoveAccountLines(List<string> el)
+        {
+            AccountLines = AccountLines.Where(p => !(el.Contains(p.lineId.ToString()))).Select(p => p);
+            //from a in AccountLines
+            //           join e in elements
+            //           on a.lineId.ToString().ToLower() equals e.ToLower() into g
+            //           from s in g
+            //           where s == null
+            //           select a;
+            elementdata = GetElementdata();
+        }
+        public void RemoveTaxLines(List<string> el)
+        {
+            TaxLines = TaxLines.Where(p => !(el.Contains(p.lineId.ToString()))).Select(p => p);
+            //from a in TaxLines
+            //        join e in elements
+            //        on a.lineId.ToString().ToLower() equals e.ToLower() into g
+            //        from s in g
+            //        where s == null
+            //        select a;
+            elementdata = GetElementdata();
         }
 
         public Dictionary<string, List<string>> ConcatDictionary(IEnumerable<Dictionary<string, List<string>>> l)

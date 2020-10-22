@@ -10,6 +10,7 @@ using System.IO;
 using System.Xml.Serialization;
 using static DIBAdminAPI.Models.Result;
 using System.IO.Compression;
+using System.Collections;
 
 namespace DIBAdminAPI.Helpers.Extentions
 {
@@ -496,7 +497,6 @@ namespace DIBAdminAPI.Helpers.Extentions
                                     ex_vars.Where(p => dgv.GetNumberInId((p.Elements("id").Select(s => s.Value).FirstOrDefault() ?? "")) == nr).ToList().ForEach(
                                         p => ex_vars.Remove(p)
                                     );
-
                                 }
                                 else
                                 {
@@ -1057,6 +1057,23 @@ namespace DIBAdminAPI.Helpers.Extentions
                 new StringBuilder(),
                 (s, i) => s.Append(projectionFunc(i)),
                 s => s.ToString());
+        }
+
+        public static IEnumerable Append(this IEnumerable first, params object[] second)
+        {
+            return first.OfType<object>().Concat(second);
+        }
+        public static IEnumerable<T> Append<T>(this IEnumerable<T> first, params T[] second)
+        {
+            return first.Concat(second);
+        }
+        public static IEnumerable Prepend(this IEnumerable first, params object[] second)
+        {
+            return second.Concat(first.OfType<object>());
+        }
+        public static IEnumerable<T> Prepend<T>(this IEnumerable<T> first, params T[] second)
+        {
+            return second.Concat(first);
         }
     }
 

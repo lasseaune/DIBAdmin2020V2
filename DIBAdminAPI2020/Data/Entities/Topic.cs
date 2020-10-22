@@ -211,6 +211,7 @@ namespace DIBAdminAPI.Data.Entities
         public string type { get; set; }
         public dynamic id { get; set; }
         public string transactionId { get; set; }
+        public bool? selected { get; set; }
         //public Dictionary<string, string> data { get; set; }
         public dynamic data { get; set; }
         public List<string> children { get; set; }
