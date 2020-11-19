@@ -48,6 +48,8 @@ namespace DIBAdminAPI.Data.Entities
         public IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
         public IEnumerable<ChecklistLabel> Labels { get; set; }
         public IEnumerable<ChecklistItemData> itemData { get; set; }
+        public IEnumerable<TopicBase> topicBases { get; set; }
+        public IEnumerable<TopicSubElement> topicSubElements { get; set; }
     }
     //public class ResourceDataDocument
     //{

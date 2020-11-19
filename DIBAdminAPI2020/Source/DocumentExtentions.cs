@@ -82,6 +82,15 @@ namespace DIBAdminAPI.Data.Entities
                     )
                 );
             }
+            else if (xElement.Name.LocalName + ((string)xElement.Attributes("class").FirstOrDefault() ?? "") == "sectioncheck-children")
+            {
+                result.Add(new XElement(xElement.Name.LocalName,
+                    xElement.Attributes(),
+                    xElement.Elements().Select(p => p.GetChecklistElement(Global, Local))
+                    )
+                );
+            }
+
             else
             {
                 bool select = xElement.Annotations<Labels>().FirstOrDefault().EvalLabels(Global, Local);
@@ -92,10 +101,12 @@ namespace DIBAdminAPI.Data.Entities
                         xElement.Name.LocalName,
                         xElement.Attributes(),
                         xElement.Elements()
-                            .TakeWhile(p=>p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") != "sectioncheck-item"),
+                            //.TakeWhile(p=>p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") != "sectioncheck-item"),
+                            .TakeWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") != "sectioncheck-children"),
                         xElement.Elements()
-                            .SkipWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault()??"") != "sectioncheck-item")
-                            .TakeWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") == "sectioncheck-item").Select(p=>p.GetChecklistElement(Global, Local))
+                            .SkipWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault()??"") != "sectioncheck-children")
+                            .TakeWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") == "sectioncheck-children")
+                            .Select(p=> p.GetChecklistElement(Global, Local))
                         )
                     );
                 }
@@ -107,8 +118,9 @@ namespace DIBAdminAPI.Data.Entities
                         xElement.Elements()
                             .TakeWhile(p => p.Name.LocalName.StartsWith("h")),
                         xElement.Elements()
-                            .SkipWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") != "sectioncheck-item")
-                            .TakeWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") == "sectioncheck-item").Select(p => p.GetChecklistElement(Global, Local))
+                            .SkipWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") != "sectioncheck-children")
+                            .TakeWhile(p => p.Name.LocalName + ((string)p.Attributes("class").FirstOrDefault() ?? "") == "sectioncheck-children")
+                            .Select(p => p.GetChecklistElement(Global, Local))
                         )
                     );
 

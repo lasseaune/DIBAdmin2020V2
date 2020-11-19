@@ -244,6 +244,9 @@ namespace DIBAdminAPI.Data
                         result.LabelGroups = multi.Read<ChecklistLabelGroup>();
                         result.Labels = multi.Read<ChecklistLabel>();
                         result.itemData = multi.Read<ChecklistItemData>();
+                        result.topicBases = multi.Read<TopicBase>();
+                        result.topicSubElements = multi.Read<TopicSubElement>();
+                        
                         return result;
                     }
                 }

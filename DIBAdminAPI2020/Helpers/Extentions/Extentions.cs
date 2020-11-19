@@ -11,6 +11,7 @@ using System.Xml.Serialization;
 using static DIBAdminAPI.Models.Result;
 using System.IO.Compression;
 using System.Collections;
+using DIBAdminAPI.Data.Entities;
 
 namespace DIBAdminAPI.Helpers.Extentions
 {
@@ -275,13 +276,25 @@ namespace DIBAdminAPI.Helpers.Extentions
     }
     public static class Extentions
     {
-        
+        public static bool IsGuid(this string value)
+        {
+            Guid x;
+            return Guid.TryParse(value, out x);
+        }
         public static XElement CreateXMLDocument(this int resourcetypeId)
         {
             XElement document = null;
             string id = null;
             switch (resourcetypeId)
             {
+                case 20:
+                    id = Guid.NewGuid().ToString();
+
+                    document =
+                        new XElement("document",
+                            new ElementConstructor().CreateCheckItem()
+                        );
+                    return document;
                 case 19:
                     {
                         id = Guid.NewGuid().ToString();

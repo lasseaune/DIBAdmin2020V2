@@ -145,7 +145,7 @@ namespace DIBAdminAPI.Controllers
             
             if (!(Guid.TryParse(data.resourceId, out Guid test)))
             {
-                return BadRequest();
+                return BadRequest("No resourceID!");
             }
             string resourceId = data.resourceId;
             string segment_id = data.segmentId ?? "";
@@ -351,8 +351,13 @@ namespace DIBAdminAPI.Controllers
                                 root = deletedLines,
                                 elementdata = dc.elementdata.Where(p => p.Key == Id).ToDictionary(p => p.Key, p => p.Value),
                                 objects = dc.objects
-                                .Where(v => (v.Value.type == data.ob || v.Value.type == "clgrouplabel") && (selectedObjects.Contains(v.Key.ToLower()) || v.Value.transactionId == transactionId || v.Value.selected == true))
-                                .ToDictionary(v => v.Key, v => v.Value)
+                                .Where(v => 
+                                    (v.Value.type == data.ob || v.Value.type == "clgrouplabel") 
+                                    && (selectedObjects.Contains(v.Key.ToLower()) || v.Value.transactionId == transactionId || v.Value.selected == true))
+                                .ToDictionary(v => v.Key, v => v.Value),
+                                viewroot = dc.viewroot,
+                                showroot = dc.showroot
+
                             };
                         }
                         else
@@ -394,8 +399,12 @@ namespace DIBAdminAPI.Controllers
                             elementdata = dc.elementdata.Where(p => p.Key.ToLower() == Id.ToLower()).ToDictionary(p => p.Key, p => p.Value),
                             root = deletedLines,
                             objects = dc.objects
-                                .Where(v => (v.Value.type == data.ob || v.Value.type == "clgrouplabel") && (selectedObjects.Contains(v.Key.ToLower()) || v.Value.transactionId == transactionId || v.Value.selected == true))
-                                .ToDictionary(v => v.Key, v => v.Value)
+                                .Where(v => 
+                                    (v.Value.type == data.ob || v.Value.type == "clgrouplabel") 
+                                    && (selectedObjects.Contains(v.Key.ToLower()) || v.Value.transactionId == transactionId || v.Value.selected == true))
+                                .ToDictionary(v => v.Key, v => v.Value),
+                            viewroot = dc.viewroot,
+                            showroot= dc.showroot
                         };
                     }
                     else

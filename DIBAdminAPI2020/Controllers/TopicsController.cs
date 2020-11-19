@@ -44,7 +44,11 @@ namespace DIBAdminAPI.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
             string query = "dbo.GetTopic";
-            TopicDetail result = await _repo.ExecTopicDetail(query, new {topic_id = id}, null);
+            TopicDetail result = await _repo.ExecTopicDetail(query, new {resourceId = id}, null);
+            if (result==null)
+            {
+                return BadRequest("Missing!");
+            }
             TopicDetailAPI tdapi = new TopicDetailAPI(result);
             return Ok(tdapi);
         }

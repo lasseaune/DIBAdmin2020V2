@@ -110,21 +110,21 @@ namespace DIBAdminAPI.Controllers
                 {
                     return Ok(result);
                 }
-                DocumentContainer select =  new DocumentContainer(result);
+                DocumentContainer dcselect =  new DocumentContainer(result);
 
-                XElement xDocument = select.GetDocumentContainerXML();
-                xDocument = xDocument.GetChecklistElements(labelId, select.GetItemData(), select.GetLabels(), select.GetLabelGroups());
+                XElement xDocument = dcselect.GetDocumentContainerXML();
+                xDocument = xDocument.GetChecklistElements(labelId, dcselect.GetItemData(), dcselect.GetLabels(), dcselect.GetLabelGroups());
                 TocJson tocJson = new TocJson(null, xDocument, result.id, "");
-                select.tocroot = tocJson.tocroot;
-                select.toc = tocJson.toc;
+                dcselect.tocroot = tocJson.tocroot;
+                dcselect.toc = tocJson.toc;
 
                 string document_id = "document;" + result.id + ";" + "";
                 xDocument.SetAttributeValueEx("id", document_id);
-                select.root = new List<JsonChild>
+                dcselect.root = new List<JsonChild>
                 {
                     new JsonChild { id = document_id }
                 };
-                select.elements = new Dictionary<string, JsonElement>
+                dcselect.elements = new Dictionary<string, JsonElement>
                 {
                     {
                         document_id,
@@ -139,14 +139,24 @@ namespace DIBAdminAPI.Controllers
                         }
                     }
                 };
-                select.elements.AddRange(
+                dcselect.elements.AddRange(
                     xDocument
                     .Descendants()
                     .Select(p => p)
                     .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
                 );
-                select.eCount = select.elements.Count();
-                return Ok(select);
+                dcselect.genroot = (
+                    from e in xDocument.Descendants()
+                    join el in dcselect.elements
+                        on ((string)e.Attributes("id").FirstOrDefault() ?? "").ToLower() equals el.Key.ToLower()
+                    join eld in dcselect.elementdata
+                        on el.Key equals eld.Key
+                    from v in eld.Value.Where(p => p.Key == "related").SelectMany(p => p.Value)
+                    group v by v into g
+                    select g.Key
+                ).ToList();
+                dcselect.eCount = dcselect.elements.Count();
+                return Ok(dcselect);
 
             }
             if ((Id == null ? "" : Id) == "" && result != null)

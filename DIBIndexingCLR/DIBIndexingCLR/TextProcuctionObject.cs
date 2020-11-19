@@ -2213,8 +2213,8 @@ namespace DIBIndexingCLR
         public void ReplaceXtext(XTextRange xr, List<MatchObject> matches)//, IEnumerable<string> nonmarkupnodes, List<IdLink> idls)
         {
             bool DropMark = (
-                                xr.Text.Ancestors("a").Where(p => (string)p.Attributes("data-class").FirstOrDefault() == "diblink").Count() > 0
-                                || xr.Text.Ancestors("span").Where(p => (string)p.Attributes("data-class").FirstOrDefault() == "index").Count() > 0
+                                xr.Text.Ancestors("a").Count() > 0
+                                || xr.Text.Ancestors("span").Where(p => (string)p.Attributes("class").FirstOrDefault() == "dib-index").Count() > 0
                             );
             if (DropMark)
             {

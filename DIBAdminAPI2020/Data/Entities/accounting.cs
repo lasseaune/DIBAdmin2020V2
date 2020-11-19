@@ -14,6 +14,26 @@ namespace DIBAdminAPI.Data.Entities
 {
     public static class ElementData
     {
+        public static Dictionary<string, Dictionary<string, List<string>>> EDRelated(this IEnumerable<TopicSubElement> related)
+        {
+            if (related == null) return new Dictionary<string, Dictionary<string, List<string>>>();
+
+            Dictionary<string, Dictionary<string, List<string>>> y =
+                related
+                .Where(p=>(p.itemId==null?"" : p.itemId.Trim())!="")
+                .GroupBy(p => p.itemId)
+                .ToDictionary(
+                    p => p.Key.ToLower(),
+                    p => new Dictionary<string, List<string>>()
+                    {
+                        {"related", p.Select(p=>p.id.ToString()).ToList() }
+                    }
+
+            );
+
+            return y;
+            
+        }
         public static Dictionary<string, Dictionary<string, List<string>>> EDChecklistShow(this IEnumerable<ChecklistItemData> itemData, IEnumerable<ChecklistLabel> labels, IEnumerable<ChecklistLabelGroup> groups, string type)
         {
             if (itemData.Select(p=>p.id).FirstOrDefault()==null)

@@ -582,12 +582,23 @@ namespace DIBAdminAPI.Data.Entities
         public IEnumerable<XObj> xobjects { get; set; }
         public List<string> viewroot { get; set; }
         public List<string> showroot { get; set; }
+        public List<string> genroot { get; set; }
         private IEnumerable<ChecklistItemData> ItemData { get; set; }
         private IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
         private IEnumerable<ChecklistLabel> Labels { get; set; }
         private IEnumerable<AccountLine> AccountLines { get; set; }
         private IEnumerable<TaxLine> TaxLines { get; set; }
-        
+        private IEnumerable<TopicBase> TopicBases { get; set; }
+        private IEnumerable<TopicSubElement> TopicSubElements { get; set; }
+
+        public IEnumerable<TopicBase> GetTopicBases()
+        {
+            return TopicBases;
+        }
+        public IEnumerable<TopicSubElement> GetTopicSubElements()
+        {
+            return TopicSubElements;
+        }
         public IEnumerable<ChecklistLabel> GetLabels()
         {
             return Labels;
@@ -634,6 +645,9 @@ namespace DIBAdminAPI.Data.Entities
             Labels = dc.Labels;
             AccountLines = dc.AccountLines;
             TaxLines = dc.TaxLines;
+            TopicBases = dc.TopicBases;
+            TopicSubElements = dc.TopicSubElements;
+            
         }
         public DocumentContainer(ResourceHTML5Element r)
         {
@@ -653,7 +667,10 @@ namespace DIBAdminAPI.Data.Entities
             showroot = cll.showroot;
             objects.AddRange(cll.objects);
         }
+        public void RemoveTopicSubElements()
+        {
 
+        }
         public void UpdateElementData(ResourceHTML5Element elementData)
         {
             ItemData = from i in ItemData
@@ -715,6 +732,19 @@ namespace DIBAdminAPI.Data.Entities
                 //where s == null
                 //select i;
             elementdata = GetElementdata();
+            CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
+            viewroot = cll.viewroot;
+            showroot = cll.showroot;
+            foreach (KeyValuePair<string, ObjectApi> pair in  cll.objects)
+            {
+                if (!objects.ContainsKey(pair.Key))
+                {
+                    objects.Add(pair.Key, pair.Value);
+                    
+                }
+            }
+            
+
         }
         public void RemoveAccountLines(List<string> el)
         {
@@ -760,6 +790,9 @@ namespace DIBAdminAPI.Data.Entities
                 )
                 .Union(
                     ItemData.EDChecklistShow(Labels, LabelGroups, "2")
+                )
+                .Union(
+                    TopicSubElements.EDRelated()
                 )
                 .GroupBy(p => p.Key.ToLower())
                 .ToDictionary(
@@ -842,17 +875,31 @@ namespace DIBAdminAPI.Data.Entities
                 LabelGroups = r.LabelGroups;
                 AccountLines = r.AccountLines;
                 TaxLines = r.TaxLines;
+                TopicBases = r.topicBases;
+                TopicSubElements = r.topicSubElements;
+
+                ObjectsApi relatedResources = new ObjectsApi(TopicBases, TopicSubElements);
 
                 elementdata.AddRange(GetElementdata());
                 objects.AddRange(AccountLines.GetAccountLineObjects());
                 objects.AddRange(TaxLines.GetTaxLineObjects());
-
+                if (TopicSubElements!= null)
+                    objects.AddRange(relatedResources.objects);
                 CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
                 viewroot = cll.viewroot;
                 showroot = cll.showroot;
                 objects.AddRange(cll.objects);
-               
 
+                genroot = (
+                    from e in docparthtml.Descendants()
+                    join el in elements
+                        on ((string)e.Attributes("id").FirstOrDefault() ?? "").ToLower() equals el.Key.ToLower()
+                    join eld in elementdata
+                        on el.Key equals eld.Key
+                    from v in eld.Value.Where(p => p.Key == "related").SelectMany(p => p.Value)
+                    group v by v into g
+                    select g.Key
+                ).ToList();
 
                 eCount = elements.Count();
 

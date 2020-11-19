@@ -204,6 +204,40 @@ namespace DIBAdminAPI.Data.Entities
                     }
             );
         }
+        public ObjectsApi(IEnumerable<TopicBase> topicBases, IEnumerable<TopicSubElement> topicSubElements)
+        {
+            if (topicSubElements == null) return;
+            if (topicBases.Select(p => p.resourceId).FirstOrDefault() == null || topicSubElements.Select(p => p.dataResourceId).FirstOrDefault() == null) return;
+            objects = (
+                from r in topicBases
+                join s in topicSubElements
+                on r.resourceId.ToLower() equals s.dataResourceId.ToLower()
+                where (s.itemId == null ? "" : s.itemId.Trim()) != ""
+                orderby r.topictypeId, r.name, s.idx
+                select new { r, s }
+            )
+            .ToDictionary(
+                p => p.s.id.ToLower(),
+                p => new ObjectApi
+                {
+                    type = "related",
+                    id = p.s.id.ToString().ToLower(),
+                    transactionId = p.s.transactionId,
+                    data = new Related
+                    {
+                        id = p.s.id.ToLower(),
+                        name = p.r.name,
+                        subname = p.s.name,
+                        topictypeId = p.r.topictypeId.ToLower(),
+                        dataResourceId = p.r.resourceId.ToLower(),
+                        dataId = p.s.dataId == null ? null : p.s.dataId.ToLower(),
+                        idx = p.s.idx,
+                        transactionId = p.s.transactionId
+                    }
+                }
+                
+            );
+        }
     }
         
     public class ObjectApi
@@ -248,6 +282,9 @@ namespace DIBAdminAPI.Data.Entities
         public Dictionary<string, JsonElement> elements { get; set; }
         public Dictionary<string, ObjectApi> objects { get; set; }
         public List<string> root { get; set; }
+        public List<string> viewroot { get; set; }
+        public List<string> showroot { get; set; }
+        public List<string> genroot { get; set; }
     }
     public class TopicDetailAPI
     {
@@ -375,6 +412,7 @@ namespace DIBAdminAPI.Data.Entities
         public string dataId { get; set; }
         public int idx { get; set; }
         public string transactionId { get; set; }
+        public string itemId { get; set; }
     }
     
     public class TopicBase

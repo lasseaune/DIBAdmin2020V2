@@ -11,6 +11,7 @@ using System.IO;
 using HtmlAgilityPack;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DIBAdminAPI.Data.Entities
 {
@@ -1383,6 +1384,41 @@ namespace DIBAdminAPI.Data.Entities
         public int rowEnd { get; set; }
     }
     
+    public class ElementConstructor
+    {
+        public XElement CreateCheckItem()
+        {
+            XElement checklistitem = new XElement("section",
+                new XAttribute("id", Guid.NewGuid().ToString()),
+                new XAttribute("data-type", "1"),
+                new XAttribute("class", "check-item"),
+                (
+                     new XElement("h2",
+                            new XAttribute("id", Guid.NewGuid().ToString()),
+                            new XAttribute("class", "check-title"),
+                            new XText("Tittel")
+                      )
+                ),
+                new XElement("section",
+                    new XAttribute("class", "check-ingress"),
+                    new XAttribute("id", Guid.NewGuid().ToString())
+                ),
+                new XElement("section",
+                    new XAttribute("class", "check-description"),
+                    new XAttribute("id", Guid.NewGuid().ToString())
+                ),
+                new XElement("section",
+                    new XAttribute("class", "check-law"),
+                    new XAttribute("id", Guid.NewGuid().ToString())
+                ),
+                new XElement("section",
+                    new XAttribute("id", Guid.NewGuid().ToString()),
+                    new XAttribute("class", "check-children")
+                )
+            );
+            return checklistitem;
+        }
+    }
     public static class Extentions
     {
         public static void SetHrefValue(this IEnumerable<XAttribute> xAttributes)
@@ -1872,19 +1908,41 @@ namespace DIBAdminAPI.Data.Entities
             if (jsonUpdate.action != "update") return null;
             bool updateToc = false;
             List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
+            
             foreach (KeyValuePair<string, JsonElement> pair in jsonUpdate.elements)
             {
                 if (documentContainer.elements.ContainsKey(pair.Key))
                 {
-                    if (pair.Value.name == "section") updateToc = true;
-                    documentContainer.elements[pair.Key] = pair.Value;
+                    if (!documentContainer.elements[pair.Key].Equals(pair.Value))
+                    {
+                        if (Regex.IsMatch(pair.Value.name, @"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;")) updateToc = true;
+                        documentContainer.elements[pair.Key] = pair.Value;
+                        updated.Add(pair);
+                    }
+                }
+                else
+                {
+                    documentContainer.elements.Add(pair.Key, pair.Value);
                     updated.Add(pair);
                 }
+                //if (documentContainer.elements.ContainsKey(pair.Key))
+                //{
+                //    if (Regex.IsMatch(pair.Value.name,@"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;") )  updateToc = true;
+                    
+                //    documentContainer.elements[pair.Key] = pair.Value;
+                   
+                //    updated.Add(pair);
+                //}
+                //else
+                //{
+
+                //}
             }
             List<TocUpdate> tocUpdates = null;
             if (updateToc)
             {
                 XElement document = documentContainer.GetDocumentContainerXML();
+                
 
                 TocJson tocJson = new TocJson(document, resourceId, segmentId);
 
@@ -1892,7 +1950,7 @@ namespace DIBAdminAPI.Data.Entities
                     from t in documentContainer.toc
                     join t1 in tocJson.toc
                     on t.Key equals t1.Key
-                    where t.Value != t1.Value
+                    where !t.Value.Equals(t1.Value)
                     select new TocUpdate { oldToc = t, newToc = t1 }
                 ).ToList();
 
@@ -1907,7 +1965,7 @@ namespace DIBAdminAPI.Data.Entities
                 List<TocUpdate> newToc =
                     tocJson
                         .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
-                        .Select(p=>new TocUpdate { newToc = p })
+                        .Select(p => new TocUpdate { newToc = p })
                         .ToList();
 
                 if (newToc.Count()>1)
@@ -2017,7 +2075,7 @@ namespace DIBAdminAPI.Data.Entities
             {
                 string newId = Guid.NewGuid().ToString();
                 XElement table = newId.CreateTable(rows, cols, headers, footers, className);
-                table = new XElement("div", new XAttribute("class", "table-wrapper"), new XAttribute("id", Guid.NewGuid().ToString()), table);
+                table = new XElement("div", new XAttribute("class", "table-wrapper"), new XAttribute("data-class", "table-wrapper"), new XAttribute("id", Guid.NewGuid().ToString()), table);
                 if (table != null)
                 {
                     //int i = 1;
@@ -2039,6 +2097,19 @@ namespace DIBAdminAPI.Data.Entities
                     return result;
                 }
             }
+            return result;
+        }
+       
+        public static JsonPaste CreateChecklistItem(this JsonCreateElement jsonCreate)
+        {
+            JsonPaste result = null;
+            XElement checklistitem = new ElementConstructor().CreateCheckItem();
+            checklistitem
+                .DescendantsAndSelf()
+                .Where(p => (string)p.Attributes("class").FirstOrDefault() != null)
+                .ToList()
+                .ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+            result = checklistitem.NewElementToJson();
             return result;
         }
         public static JsonObject Create_ElementWithchildren(this Dictionary<string, JsonElement> elements, JsonCreateElement jsonCreate)
@@ -2313,6 +2384,59 @@ namespace DIBAdminAPI.Data.Entities
             }
             return headings;
         }
+        public static XElement GetAgilityXMLAll(string inputHtml)
+        {
+            HtmlDocument htmlDoc = new HtmlDocument();
+            try
+            {
+                inputHtml = WebUtility.HtmlDecode(inputHtml);
+                Stream stream = GenerateStreamFromString(inputHtml);
+                htmlDoc.OptionOutputAsXml = true;
+                htmlDoc.OptionAutoCloseOnEnd = true;
+
+                htmlDoc.Load(stream, true);
+
+                StringWriter writer = new StringWriter();
+                htmlDoc.Save(writer);
+                StringReader reader = new StringReader(writer.ToString());
+
+                XDocument xDocument = XDocument.Load(reader);
+                if (xDocument == null) return null;
+                xDocument.RemoveNameSpace();
+                xDocument.Root.DescendantNodesAndSelf().OfType<XComment>().Remove();
+                XElement result = xDocument.Root;
+                if (result == null) return null;
+
+                string inline = "a;abbr;acronym;audio;b;bdi;bdo;big;br;button;canvas;cite;code;data;datalist;del;dfn;em;embed;i;iframe;img;input;ins;kbd;label;map;mark;meter;noscript;object;output;picture;progress;q;ruby;s;samp;script;select;slot;small;span;strong;sub;sup;svg;template;textarea;time;u;tt;var;video;wbr;";
+                string block = "address;article;aside;blockquote;details;dialog;dd;div;dl;dt;fieldset;figcaption;figure;figcaption;footer;form;h1;h2;h3;h4;h5;h6;header;hgroup;hr;li;main;nav;ol;p;pre;section;table;ul";
+
+
+
+                XElement container = new XElement("container", result);
+                
+                container.Descendants()
+                    .Where(p=>!((string)p.Attributes("id").FirstOrDefault()??"").IsGuid())
+                    .ToList()
+                    .ForEach(p => p.SetAttributeValueEx("id", Guid.NewGuid().ToString()));
+                
+
+                container
+                    .Descendants("table")
+                    .Where(p => p.Parent.Name.LocalName + ((string)p.Parent.Attributes("class").FirstOrDefault() ?? "") != "divtable-wrapper")
+                    .Reverse()
+                    .ToList()
+                    .ForEach(p => p.ReplaceWith(new XElement("div", new XAttribute("id", Guid.NewGuid().ToString()), new XAttribute("class", "table-wrapper"), p)));
+
+                container.Descendants().Attributes().Where(p => p.Name.LocalName == "class").ToList().ForEach(p => p.Remove());
+                container.Descendants().Attributes().Where(p => p.Name.LocalName == "data-class").ToList().ForEach(p => p.Parent.SetAttributeValueEx("class",p.Value));
+                
+                return container;
+            }
+            catch
+            {
+                return null;
+            }
+        }
         public static XElement GetAgilityXML(string inputHtml, string action)
         {
 
@@ -2360,7 +2484,7 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         element.ReplaceWith(new XElement(name, element.Nodes()));
                     }
-                    else if ("section;div".Split(';').Contains(name) && element.Nodes().OfType<XText>().Select(p => p.Value).StringConcatenate().Trim() == "")
+                    else if ("section;div".Split(';').Contains(name) && element.DescendantNodes().OfType<XText>().Select(p => p.Value).StringConcatenate().Trim() == "")
                     {
                         element.ReplaceWith(element.Nodes());
                     }
@@ -2372,7 +2496,7 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         //element.ReplaceWith(element.Nodes());
                     }
-                    else if ("span".Split(';').Contains(name) && element.Nodes().OfType<XText>().Select(p=>p.Value).StringConcatenate().Trim() == "")
+                    else if ("span".Split(';').Contains(name) && element.DescendantNodes().OfType<XText>().Select(p=>p.Value).StringConcatenate().Trim() == "")
                     {
                         element.ReplaceWith(element.Nodes());
                     }
@@ -2380,7 +2504,7 @@ namespace DIBAdminAPI.Data.Entities
                     {
                         element.Remove();
                     }
-                    else if ( !"br".Split(';').Contains(name) && element.Nodes().OfType<XText>().Select(p => p.Value).StringConcatenate().Trim() == "" && element.Nodes().OfType<XElement>().Count()==0)
+                    else if ( !"br".Split(';').Contains(name) && element.DescendantNodes().OfType<XText>().Select(p => p.Value).StringConcatenate().Trim() == "" && element.Nodes().OfType<XElement>().Count()==0)
                     {
                         element.Remove();
                     }
@@ -2521,6 +2645,19 @@ namespace DIBAdminAPI.Data.Entities
         {
             return s.Elements().Where(p => p.IsHeaderName()).Count();
         }
+        public static JsonPaste NewElementToJson(this XElement element)
+        {
+            JsonPaste result = new JsonPaste();
+            TocJson tocJson = new TocJson(element);
+            if ((tocJson.toc == null ? 0 : tocJson.toc.Count()) > 0)
+            {
+                result.toc = tocJson.toc;
+            }
+            JsonObject json = new JsonObject(element);
+            result.children.AddRange(json.root);
+            result.elements.AddRange(json.elements);
+            return result;
+        }
         public static JsonPaste ParseHtmlToJsonElement(this XElement container)
         {
             JsonPaste result = new JsonPaste();
@@ -2604,7 +2741,45 @@ namespace DIBAdminAPI.Data.Entities
             JsonObject result = null;
             jsonCreate.resourceId = jsonCreate.resourceId.ToLower();
             
-            if (jsonCreate.action=="create" && jsonCreate.html!=null)
+            if (jsonCreate.action == "create" && jsonCreate.html != null)
+            {
+                XElement container = GetAgilityXMLAll(jsonCreate.html);
+                JsonObject json = new JsonObject(container.Elements());
+                bool updateToc = false;
+                List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
+
+                foreach (KeyValuePair<string, JsonElement> pair in json.elements)
+                {
+                    if (documentContainer.elements.ContainsKey(pair.Key))
+                    {
+                        if (!documentContainer.elements[pair.Key].Equals(pair.Value))
+                        { 
+                            if (Regex.IsMatch(pair.Value.name, @"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;")) updateToc = true;
+                            documentContainer.elements[pair.Key] = pair.Value;
+                            updated.Add(pair);
+                        }
+                    }
+                    else
+                    {
+                        documentContainer.elements.Add(pair.Key, pair.Value); 
+                        updated.Add(pair);
+                    }
+                }
+
+                return new EditResult
+                {
+                    json = new JsonObject
+                    {
+                        resourceid = jsonCreate.resourceId,
+                        root = json.root,
+                        elements = updated.ToDictionary(p=>p.Key, p=>p.Value),
+                        toc = json.toc
+                    },
+                    documentContainer = documentContainer
+                };
+
+            }
+            else if (jsonCreate.action=="paste" && jsonCreate.html!=null)
             {
                 return PasteJsonElements(documentContainer, jsonCreate);
             }
@@ -2619,8 +2794,10 @@ namespace DIBAdminAPI.Data.Entities
                 Dictionary<string, string> newAttributes = null;
                 foreach (JsonCreateElement jce in jsonCreate.element)
                 {
+
                     switch (jce.name)
                     {
+
                         case "ol":
                         case "ul":
                             {
@@ -2634,7 +2811,7 @@ namespace DIBAdminAPI.Data.Entities
                                     )
                                 );
 
-                                JsonObject json = new JsonObject( list);
+                                JsonObject json = new JsonObject(list);
                                 result.root.AddRange(json.root);
                                 result.elements.AddRange(json.elements);
                                 break;
@@ -2664,33 +2841,56 @@ namespace DIBAdminAPI.Data.Entities
                             {
                                 name = jce.name,
                                 attributes = newAttributes,
-                                children = jce.children == null 
-                                    ? new List<JsonChild>() { new JsonChild { text = "" } } 
+                                children = jce.children == null
+                                    ? new List<JsonChild>() { new JsonChild { text = "" } }
                                     : (
-                                        jce.children.Count()== 0 
+                                        jce.children.Count() == 0
                                         ? new List<JsonChild>() { new JsonChild { text = "" } }
-                                        :jce.children
+                                        : jce.children
                                        )
                             }
                             );
                             break;
 
                         default:
+
+                            if (jce.name=="section" && jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "check-item").Count() > 0)
+                            {
+                                JsonPaste json = jce.CreateChecklistItem();
+                                result.root.AddRange(json.children);
+                                result.elements.AddRange(json.elements);
+                                result.toc.AddRange(json.toc);
+                                documentContainer.elements.AddRange(json.elements);
+                                documentContainer.toc.AddRange(json.toc);
+                                return new EditResult
+                                {
+                                    json = new JsonObject
+                                    {
+                                        resourceid = jsonCreate.resourceId,
+                                        root = json.children,
+                                        elements = json.elements,
+                                        toc = json.toc
+                                    },
+                                    documentContainer = documentContainer
+                                };
+                            }
+                            else
                             {
                                 newId = Guid.NewGuid().ToString();
                                 newAttributes = new Dictionary<string, string>();
                                 newAttributes.Add("id", newId);
-                                newAttributes.AddRange(jce.attributes.Where(p => p.Key != "id").ToDictionary(p => p.Key, p=>p.Value));
+                                newAttributes.AddRange(jce.attributes.Where(p => p.Key != "id").ToDictionary(p => p.Key, p => p.Value));
                                 result.root.Add(new JsonChild { id = newId });
                                 result.elements.Add(newId, new JsonElement
-                                    {
-                                        name = jce.name,
-                                        attributes = newAttributes,
-                                        children = jce.children == null ? new List<JsonChild>() : jce.children
-                                    }
+                                {
+                                    name = jce.name,
+                                    attributes = newAttributes,
+                                    children = jce.children == null ? new List<JsonChild>() : jce.children
+                                }
                                 );
 
                             }
+                            
                             break;
                     }
                 }
@@ -2740,10 +2940,10 @@ namespace DIBAdminAPI.Data.Entities
 
                     container
                     .Descendants("table")
-                    .Where(p => p.Parent.Name.LocalName + ((string)p.Parent.Attributes("class").FirstOrDefault() ?? "") != "divtable-wrapper")
+                    .Where(p => p.Parent.Name.LocalName + ((string)p.Parent.Attributes("data-class").FirstOrDefault() ?? "") != "divtable-wrapper")
                     .Reverse()
                     .ToList()
-                    .ForEach(p => p.ReplaceWith(new XElement("div", new XAttribute("id", Guid.NewGuid().ToString()), new XAttribute("class", "table-wrapper"), p)));
+                    .ForEach(p => p.ReplaceWith(new XElement("div", new XAttribute("id", Guid.NewGuid().ToString()), new XAttribute("class", "table-wrapper"), new XAttribute("data-class", "table-wrapper"), p)));
 
 
                     JsonPaste jsonPaste = container.ParseHtmlToJsonElement();
@@ -2878,13 +3078,13 @@ namespace DIBAdminAPI.Data.Entities
                 {
                     XElement elementnode = (XElement)n;
                     string id = ((string)elementnode.Attributes("id").FirstOrDefault() ?? "").Trim();
-                    if (id == "")
+                    if (id!="")
                     {
-                        result.Add(new JsonChild { element = elementnode.ToString() });
+                        result.Add(new JsonChild { id = id });
                     }
                     else
                     {
-                        result.Add(new JsonChild { id = id });
+
                     }
                 }
                 else if (n.NodeType == XmlNodeType.Text)
@@ -3116,27 +3316,49 @@ namespace DIBAdminAPI.Data.Entities
             return HashCode.Combine(attributes, children, name, type);
         }
     }
-    public class JsonElement
+    public class JsonElement : IJsonElement, IEquatable<JsonElement>
     {
 
-        public Dictionary<string, dynamic> otherprops;
-        public Dictionary<string, string> attributes = new Dictionary<string, string>();
+        public Dictionary<string, dynamic> otherprops { get; set; }
+        public Dictionary<string, string> attributes { get; set; }
         public List<JsonChild> children { get; set; } = new List<JsonChild>();
         public string  name { get; set; }
         public string type { get; set; }
+        
+
         public JsonElement(){}
         public JsonElement(XElement element)
         {
             name = element.Name.LocalName;
             children = element.GetElementChildren();
-            attributes = element.Attributes().Where(p=>(p.Value==null ? "" : p.Value)!="").Select(p => p).ToDictionary(p => p.Name.LocalName, p => p.Value);
+            attributes = element.Attributes().Where(p=>(p.Value==null ? "" : p.Value)!="").OrderBy(p=>p.Name.LocalName).Select(p => p).ToDictionary(p => p.Name.LocalName, p => p.Value);
         }
         public void RemoveChild(string id)
         {
             JsonChild child = children.Where(p => p.id == id).FirstOrDefault();
             children.Remove(child);
         }
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public bool Equals(JsonElement other)
+        {
+            if (other == null) return false;
+            if ((other.name ?? "null") != (name ?? "null")) return false;
+            if ((other.type ?? "null") != (type ?? "null")) return false;
+
+            if ((other.attributes == null ? "" : other.attributes.OrderBy(p=>p.Key).Select(p => p.Key + ":" + p.Value).StringConcatenate(";")) != (attributes == null ? "" : attributes.OrderBy(p => p.Key).Select(p => p.Key + ":" + p.Value).StringConcatenate(";"))) return false;
+            if ((other.children == null ? "" : other.children.Select(p => (p.id == null ? p.text : p.id)).StringConcatenate(";")) != (children == null ? "" : children.Select(p => (p.id == null ? p.text : p.id)).StringConcatenate())) return false;
+            return true;
+        }
+
         
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(attributes, children, name, type);
+        }
     }
     public class JsonChild
     {
@@ -3163,7 +3385,7 @@ namespace DIBAdminAPI.Data.Entities
         public TocJson(XElement container)
         {
             items = new XElement("items");
-            items.Add(container.Elements().Where(p => p.Descendants().Where(d => d.IsHeaderName()).Count() > 0).HeaderToToc());
+            items.Add(container.Elements().Where(p => p.DescendantsAndSelf().Where(d => d.IsHeaderName()).Count() > 0).HeaderToToc());
             toc = new Dictionary<string, JsonToc>();
             toc.AddRange(items
                 .Descendants()

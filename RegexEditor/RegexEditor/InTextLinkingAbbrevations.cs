@@ -360,7 +360,7 @@ namespace RegexEditor
         public string Tag1()
         {
             //New tag1
-            XElement e = XElement.Load(@"D:\_RegexEditor\idpart_new.xml");
+            XElement e = XElement.Load(@"D:\_RegexEditor\idpart_20201029.xml");
             string s = e.Value;
             //XElement iddoc = XElement.Load(@"D:\_RegexEditor\iddoc.xml");
             //string s = iddoc.BuildRegexFromIdDoc();

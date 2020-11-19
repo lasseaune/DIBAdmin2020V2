@@ -100,8 +100,9 @@ namespace DIBAdminAPI.Helpers.Extentions
             .ToList()
             .ForEach(p => p.e.AddAnnotation(new LinkInfo(p.l)));
 
-
-            return new XElement("document", document.Transform());
+            XElement xElement = new XElement("document", document.Transform());
+            xElement.Descendants().Where(p => (string)p.Attributes("class").FirstOrDefault() != null).ToList().ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+            return xElement;
         }
         //public static XElement ConvertXMLtoHTML5(this XElement document, XElement links)
         //{
@@ -217,6 +218,89 @@ namespace DIBAdminAPI.Helpers.Extentions
                     XElement e = ((XElement)n);
                     switch (e.Name.LocalName)
                     {
+                        //satt inn
+                        case "x-alternative":
+                            //x-alternative title="Redusere pålydende" n="1" id="x45"
+                            result.Add(new XElement("section",
+                                new XAttribute("id", Guid.NewGuid().ToString()),
+                                new XAttribute("class", "dib-x-alternative"),
+                                new XAttribute("data-var-value", (string)e.Attributes("n").FirstOrDefault()),
+                                new XAttribute("data-var-id", (string)e.Parent.Attributes("id").FirstOrDefault()),
+                                new XAttribute("data-var-name", (string)e.Attributes("title").FirstOrDefault()),
+                                e.Nodes().SelectMany(p => p.Transform())
+                                )
+                            );
+                            break;
+                        case "x-alternatives":
+                            //x-alternatives id="1_Alternative"
+                            result.Add(new XElement("section",
+                                new XAttribute("id", Guid.NewGuid().ToString()),
+                                new XAttribute("class", "dib-x-alternatives"),
+                                new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
+                                e.Nodes().SelectMany(p => p.Transform())
+                                )
+                            );
+                            break;
+                        case "x-letterhead":
+                            result.Add(new XElement("section",
+                                new XAttribute("id", Guid.NewGuid().ToString()),
+                                new XAttribute("class", "dib-x-letterhead"),
+                                e.Nodes().SelectMany(p => p.Transform())
+                                )
+                            );
+                            break;
+                        case "x-list":
+                            //header="Antall øvrige styremedlemmer i Hjelpeselskapet:" varname="Antall-S---S-øvrige-S-styremedlemmer-S-i-S-Hjelpeselskapet" defaultcounter="0" oftype="cell-line"
+                            result.Add(new XElement("section",
+                                new XAttribute("id", Guid.NewGuid().ToString()),
+                                new XAttribute("class", "dib-x-list"),
+                                new XAttribute("data-var-oftype", (string)e.Attributes("oftype").FirstOrDefault()),
+                                new XAttribute("data-var-id", (string)e.Attributes("varname").FirstOrDefault()),
+                                new XAttribute("data-var-header", (string)e.Attributes("header").FirstOrDefault()),
+                                new XAttribute("data-default-counter", (string)e.Attributes("defaultcounter").FirstOrDefault()),
+                                e.Nodes().SelectMany(p => p.Transform())
+                                )
+                            );
+                            break;
+                        case "x-optional":
+                            //keyword="IAS 23" id="IAS - S - 23_FreeElement"
+                            result.Add(new XElement("section",
+                                new XAttribute("id", Guid.NewGuid().ToString()),
+                                new XAttribute("class", "dib-x-optional"),
+                                new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
+                                new XAttribute("data-var-keyword", (string)e.Attributes("keyword").FirstOrDefault()),
+                                e.Nodes().SelectMany(p => p.Transform())
+                                )
+                            );
+                            break;
+                        case "x-var":
+                            if (Regex.IsMatch(((string)e.Attributes("id").FirstOrDefault() ?? ""), @"\*[nN]\*"))
+                            {
+                                result.Add(new XElement("span",
+                                    new XAttribute("id", Guid.NewGuid().ToString()),
+                                    new XAttribute("class", "dib-var-n"),
+                                    new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
+                                    new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
+                                    new XAttribute("data-var-text", e.Value),
+                                    e.Nodes().SelectMany(p => p.Transform())
+                                    )
+                                );
+                            }
+                            else
+                            {
+                                result.Add(new XElement("span",
+                                    new XAttribute("id", Guid.NewGuid().ToString()),
+                                    new XAttribute("class", "dib-var"),
+                                    new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
+                                    new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
+                                    new XAttribute("data-var-text", e.Value),
+                                    e.Nodes().SelectMany(p => p.Transform())
+                                    )
+                                );
+                            }
+
+                            break;
+                            //satt inn
                         case "docpart":
                         case "document": result.AddRange(e.Document()); break;
                         case "h1":
@@ -280,7 +364,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                 e.Attributes("type").FirstOrDefault()==null ? null : new XAttribute("data-type", (string)e.Attributes("type").FirstOrDefault()),
                 new XAttribute("class", "check-item"),
                 (
-                    e.Nodes().OfType<XElement>().Where(p=>p.Name.LocalName=="ititle").Count()==1 
+                    e.Nodes().OfType<XElement>().Where(p=>p.Name.LocalName=="ititle").DescendantNodes().OfType<XText>().Select(p=>p.Value).StringConcatenate().Trim() !="" 
                     ? new XElement("h"+ n.ToString(),
                         e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "ititle").Attributes("id").FirstOrDefault(),
                         new XAttribute("class", "check-title"),
@@ -288,7 +372,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                     : new XElement("h" + n.ToString(),
                             new XAttribute("id", Guid.NewGuid().ToString()),
                             new XAttribute("class", "check-title"),
-                            new XText("[Infopunkt]")
+                            new XText(((string)e.Attributes("type").FirstOrDefault()??"2") == "2" ? "[Infopunkt]" : "[Uten tittel]")
                       )
                 ),
                 new XElement("section",
@@ -324,6 +408,8 @@ namespace DIBAdminAPI.Helpers.Extentions
                     e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "item").SelectMany(p => p.Transform())
                     )
                 )
+                //e.Nodes().OfType<XElement>().Where(p => p.Name.LocalName == "item").SelectMany(p => p.Transform()))
+
             );
 
             return result;
