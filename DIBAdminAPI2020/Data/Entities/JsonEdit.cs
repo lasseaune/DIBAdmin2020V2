@@ -2747,7 +2747,7 @@ namespace DIBAdminAPI.Data.Entities
                 JsonObject json = new JsonObject(container.Elements());
                 bool updateToc = false;
                 List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
-
+                bool variableAdded = false;
                 foreach (KeyValuePair<string, JsonElement> pair in json.elements)
                 {
                     if (documentContainer.elements.ContainsKey(pair.Key))
@@ -2764,6 +2764,16 @@ namespace DIBAdminAPI.Data.Entities
                         documentContainer.elements.Add(pair.Key, pair.Value); 
                         updated.Add(pair);
                     }
+                    if (pair.Value.name == "span" && pair.Value.attributes.ContainsKey("data-var-id") && pair.Value.attributes.ContainsKey("class") ? pair.Value.attributes["class"].Split(' ').Contains("dib-x-var") : false)
+                    {
+                        string varId = pair.Value.attributes["data-var-id"];
+                        if (!documentContainer.variableroot.Contains(varId))
+                        {
+                            documentContainer.variableroot.Add(varId);
+                            variableAdded = true;
+
+                        }
+                    }
                 }
 
                 return new EditResult
@@ -2773,7 +2783,8 @@ namespace DIBAdminAPI.Data.Entities
                         resourceid = jsonCreate.resourceId,
                         root = json.root,
                         elements = updated.ToDictionary(p=>p.Key, p=>p.Value),
-                        toc = json.toc
+                        toc = json.toc,
+                        variableroot = variableAdded ? documentContainer.variableroot : null
                     },
                     documentContainer = documentContainer
                 };
@@ -3252,6 +3263,7 @@ namespace DIBAdminAPI.Data.Entities
         public Dictionary<string, JsonElement> elements { get; set; }
 
         public Dictionary<string, JsonToc> toc = new Dictionary<string, JsonToc>();
+        public List<string> variableroot { get; set; }
         public JsonObject() { }
         public JsonObject(IEnumerable<XElement> xelements)
         {

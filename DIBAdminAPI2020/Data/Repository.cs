@@ -246,7 +246,10 @@ namespace DIBAdminAPI.Data
                         result.itemData = multi.Read<ChecklistItemData>();
                         result.topicBases = multi.Read<TopicBase>();
                         result.topicSubElements = multi.Read<TopicSubElement>();
-                        
+                        result.dibVariables =  multi.Read<DibVariable>();
+                        result.dibTrigger = multi.Read<DibTrigger>();
+
+
                         return result;
                     }
                 }

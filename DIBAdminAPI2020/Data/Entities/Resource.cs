@@ -50,6 +50,8 @@ namespace DIBAdminAPI.Data.Entities
         public IEnumerable<ChecklistItemData> itemData { get; set; }
         public IEnumerable<TopicBase> topicBases { get; set; }
         public IEnumerable<TopicSubElement> topicSubElements { get; set; }
+        public IEnumerable<DibVariable> dibVariables { get; set; }
+        public IEnumerable<DibTrigger> dibTrigger { get; set; }
     }
     //public class ResourceDataDocument
     //{

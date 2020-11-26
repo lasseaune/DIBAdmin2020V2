@@ -13,7 +13,23 @@ using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
 
 namespace DIBAdminAPI.Data.Entities
-{ 
+{
+    public class DibVariable
+    {
+        public Guid? id { get; set; }
+        public string name { get; set; }
+        public int n { get; set; }
+        public string language { get; set; }
+        public string varId { get; set; }
+        public string transactionId { get; set; }
+    }
+    public class DibTrigger
+    {
+        public string name { get; set; }
+        public string trigName { get; set; }
+        
+
+    }
     public class DibLinkSelect
     {
         public Guid resourceId { get; set; }
@@ -468,6 +484,44 @@ namespace DIBAdminAPI.Data.Entities
         }
     }
 
+    public class VariableJson
+    {
+        public List<string> variablesroot { get; set; }
+        public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+        public VariableJson(IEnumerable<DibVariable> variables, IEnumerable<DibTrigger> triggers)
+        {
+            if (variables.Select(p => p.id).FirstOrDefault() == null) return;
+            try
+            {
+
+
+                variablesroot = variables.Select(p => p.id.ToString()).ToList();
+                objects = variables
+                        .ToDictionary(
+                            p => p.id.ToString(),
+                            p => new ObjectApi
+                            {
+                                id = p.id.ToString().ToLower(),
+                                type = "dib-x-var",
+                                transactionId = p.transactionId,
+                                data = new
+                                {
+                                    id = p.id.ToString().ToLower(),
+                                    name = p.name,
+                                    type = "dib-x-var",
+                                    language = p.language,
+                                    counter = p.n == 1 ? true : false,
+                                    trigger = triggers.Where(p=>p.name.Trim().ToLower().Contains(p.name.Trim().ToLower())).Select(p=>p.trigName).FirstOrDefault()
+                                }
+                            }
+                        );
+            }
+            catch(SystemException e)
+            {
+                return;
+            }
+        }
+    }
     public class CheckLabelJsons
     {
         public List<string> viewroot { get; set; }
@@ -583,6 +637,7 @@ namespace DIBAdminAPI.Data.Entities
         public List<string> viewroot { get; set; }
         public List<string> showroot { get; set; }
         public List<string> genroot { get; set; }
+        public List<string> variableroot { get; set; }
         private IEnumerable<ChecklistItemData> ItemData { get; set; }
         private IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
         private IEnumerable<ChecklistLabel> Labels { get; set; }
@@ -590,6 +645,8 @@ namespace DIBAdminAPI.Data.Entities
         private IEnumerable<TaxLine> TaxLines { get; set; }
         private IEnumerable<TopicBase> TopicBases { get; set; }
         private IEnumerable<TopicSubElement> TopicSubElements { get; set; }
+        private IEnumerable<DibVariable> DibVariables { get; set; }
+        private IEnumerable<DibTrigger> DibTrigger { get; set; }
 
         public IEnumerable<TopicBase> GetTopicBases()
         {
@@ -640,6 +697,7 @@ namespace DIBAdminAPI.Data.Entities
             xobjects = dc.xobjects;
             viewroot = dc.viewroot;
             showroot = dc.showroot;
+            variableroot = dc.variableroot;
             ItemData = dc.ItemData;
             LabelGroups = dc.LabelGroups;
             Labels = dc.Labels;
@@ -647,6 +705,8 @@ namespace DIBAdminAPI.Data.Entities
             TaxLines = dc.TaxLines;
             TopicBases = dc.TopicBases;
             TopicSubElements = dc.TopicSubElements;
+            DibVariables = dc.DibVariables;
+            DibTrigger = dc.DibTrigger;
             
         }
         public DocumentContainer(ResourceHTML5Element r)
@@ -666,6 +726,9 @@ namespace DIBAdminAPI.Data.Entities
             viewroot = cll.viewroot;
             showroot = cll.showroot;
             objects.AddRange(cll.objects);
+            VariableJson dv = new VariableJson(DibVariables,DibTrigger);
+            variableroot = dv.variablesroot;
+            objects.AddRange(dv.objects);
         }
         public void RemoveTopicSubElements()
         {
@@ -711,26 +774,14 @@ namespace DIBAdminAPI.Data.Entities
             viewroot = cll.viewroot;
             showroot = cll.showroot;
             objects.AddRange(cll.objects);
+            VariableJson dv = new VariableJson(DibVariables, DibTrigger);
+            variableroot = dv.variablesroot;
+            objects.AddRange(dv.objects);
         }
         public void RemoveItemData(List<string> el, string id)
         {
             ItemData = ItemData.Where(p => !(p.id.ToLower()==id.ToLower() && el.Contains(p.labelId.ToString().ToLower()))).Select(p => p);
-                //from i in ItemData
-                //join e in el
-                //on new
-                //{
-                //    Id = i.id.ToLower(),
-                //    Lid = i.labelId.ToString().ToLower()
-                //}
-                //equals new
-                //{
-                //    Id = id.ToLower(),
-                //    Lid = e.ToLower()
-                //}
-                //       into g
-                //from s in g
-                //where s == null
-                //select i;
+              
             elementdata = GetElementdata();
             CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
             viewroot = cll.viewroot;
@@ -743,8 +794,6 @@ namespace DIBAdminAPI.Data.Entities
                     
                 }
             }
-            
-
         }
         public void RemoveAccountLines(List<string> el)
         {
@@ -834,8 +883,13 @@ namespace DIBAdminAPI.Data.Entities
                     r.Document.Attributes("id").FirstOrDefault().SetValue(r.resourceId);
                 }
 
+                DibVariables = r.dibVariables;
+                DibTrigger = r.dibTrigger;
+                VariableJson dv = new VariableJson(DibVariables, DibTrigger);
+                
+                objects.AddRange(dv.objects);
 
-                XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links);
+                XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links, DibVariables, DibTrigger);
                 
                 TocJson tocJson = new TocJson(map, docparthtml, r.id, r.segmentId);
                 tocroot = tocJson.tocroot;
@@ -863,12 +917,16 @@ namespace DIBAdminAPI.Data.Entities
                     }
                 };
 
+                
+
                 elements.AddRange(
                     docparthtml
                     .Descendants()
                     .Select(p => p)
                     .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
                 );
+
+                variableroot = elements.Where(p => p.Value.attributes.ContainsKey("class") ? p.Value.attributes["class"].Split(' ').Contains("dib-x-var") : false).GroupBy(p => p.Value.attributes["data-var-id"]).Select(p => p.Key).ToList();
 
                 ItemData = r.itemData;
                 Labels = r.Labels;
@@ -890,6 +948,9 @@ namespace DIBAdminAPI.Data.Entities
                 showroot = cll.showroot;
                 objects.AddRange(cll.objects);
 
+
+
+                
                 genroot = (
                     from e in docparthtml.Descendants()
                     join el in elements

@@ -276,6 +276,35 @@ namespace DIBAdminAPI.Helpers.Extentions
     }
     public static class Extentions
     {
+        public static int StringIsMatchValue(this string text, string search)
+        {
+            int rank = 0;
+            foreach (string s in search.Split(' ').Where(p => p != ""))
+            {
+                int hit = text.IndexOf(s.ToLower());
+                if (hit < 0)
+                {
+                    return hit;
+                }
+                else
+                {
+                    rank = rank + hit;
+                }
+            }
+            return rank;
+        }
+        public static bool StringIsMatch(this string text, string search )
+        {
+            foreach (string s in search.Split(' ').Where(p=>p!=""))
+            {
+                
+                if (text.IndexOf(s.ToLower())<0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         public static bool IsGuid(this string value)
         {
             Guid x;

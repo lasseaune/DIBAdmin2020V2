@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Text.Encodings;
 using System.IO.Compression;
+using System.Net;
 
 namespace DIBAdminAPI.Controllers
 {
@@ -33,6 +34,36 @@ namespace DIBAdminAPI.Controllers
             _tempstore = tempStorage;
             _cache = cacheService;
 
+        }
+        [HttpGet("searchvariable")]
+        public async Task<IActionResult> GetVariable(
+                [FromQuery] string resourceId,
+                [FromQuery] string segmentId,
+                [FromQuery] string search
+            )
+        {
+            search = WebUtility.HtmlDecode(search);
+            segmentId = segmentId ?? "";
+            string rid = "rid=" + resourceId + ";sid=" + segmentId + ";_document";
+            DocumentContainer result = null;
+            result = _cache.Get<DocumentContainer>(rid);
+            int n = 1;
+            string sRegex = search.Split(' ').Select(p => @"(?<v" + (n++).ToString() + ">(" + p + @"))").StringConcatenate();
+            List<string> root = new List<string>();
+            Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+            await Task.Factory.StartNew(delegate
+            {
+                //objects = result.objects.Where(p => p.Value.type == "dib-x-var" ? ((string)p.Value.data.name).StringIsMatch(search):false).ToDictionary(p=>p.Key, p=>p.Value);
+                objects = result.objects.Where(p => p.Value.type == "dib-x-var").Select(p=>new { rank = ((string)p.Value.data.name).StringIsMatchValue(search), x=p }).Where(p=>p.rank > 0).OrderByDescending(p=>p.rank).ToDictionary(p => p.x.Key, p => p.x.Value);
+            });
+
+            TopicPartsAPI tp = new TopicPartsAPI
+            {
+                root = objects.Select(p => p.Key).ToList(),
+                objects = objects
+            };
+
+            return Ok(tp);
         }
 
         [HttpGet("{objectname}", Name = "GetResource")]

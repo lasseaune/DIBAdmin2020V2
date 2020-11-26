@@ -61,7 +61,16 @@ namespace DIBAdminAPI.Helpers.Extentions
                     );
             }
         }
-      
+        private class VariableInfo
+        {
+            public DibVariable v { get; set; }
+            public DibTrigger t { get; set; }
+            public  VariableInfo(DibVariable variable, DibTrigger trigger)
+            {
+                v = variable;
+                t = trigger;
+            }
+        }
         private class MoreinfoItem
         {
             public bool hasRelations { get; set; }
@@ -88,21 +97,56 @@ namespace DIBAdminAPI.Helpers.Extentions
                 item.AddAnnotation(new CommentsItem(xcs));
             }
         }
-        public static XElement ConvertXMLtoHTML5(this XElement document, IEnumerable<LinkData> linkDatas)
+        public static XElement ConvertXMLtoHTML5(this XElement document, IEnumerable<LinkData> linkDatas, IEnumerable<DibVariable> variables, IEnumerable<DibTrigger> trigger )
         {
-            document.DescendantsAndSelf().Attributes("idx").Remove();
-            (
-                from e in document.Descendants()
-                join l in linkDatas
-                on ((string)e.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower() equals l.id.Trim().ToLower()
-                select new { e, l }
-            )
-            .ToList()
-            .ForEach(p => p.e.AddAnnotation(new LinkInfo(p.l)));
+            try
+            {
 
-            XElement xElement = new XElement("document", document.Transform());
-            xElement.Descendants().Where(p => (string)p.Attributes("class").FirstOrDefault() != null).ToList().ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
-            return xElement;
+
+                if (variables.Select(p => p.id).FirstOrDefault() != null)
+                {
+                    (
+                        from x in document.Descendants("x-var").Reverse()
+                        join v in variables
+                        on ((string)x.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower() equals v.varId.Trim().ToLower()
+                        select new { x, v }
+                    ).ToList()
+                    .ForEach(p => p.x.AddAnnotation(new VariableInfo(p.v, trigger.Where(t => (t.name == null ? false : t.name.Trim().ToLower() == p.v.name.Trim().ToLower())).Select(t => t).FirstOrDefault())));
+
+                    //.ForEach(p => p.x.ReplaceWith(
+                    //        new XElement("span",
+                    //                new XAttribute("id", Guid.NewGuid().ToString()),
+                    //                new XAttribute("class", "dib-var" + (p.v.n == 1 ? " -nvar" : "") + (trigger.Where(t => (t.name == null ? false : t.name.Trim().ToLower() == p.v.name.Trim().ToLower())).Count() > 0 ? "" : " -trig")),
+                    //                new XAttribute("data-var-id", p.v.varId),
+                    //                (string)p.x.Attributes("class").FirstOrDefault() == null ? null : new XAttribute("data-var-area", (string)p.x.Attributes("class").FirstOrDefault()),
+                    //                new XAttribute("data-var-text", p.v.name),
+                    //                new XText(p.v.name)
+                    //        )
+
+                    //    )
+                    //);
+
+                }
+
+
+                document.DescendantsAndSelf().Attributes("idx").Remove();
+                (
+                    from e in document.Descendants()
+                    join l in linkDatas
+                    on ((string)e.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower() equals l.id.Trim().ToLower()
+                    select new { e, l }
+                )
+                .ToList()
+                .ForEach(p => p.e.AddAnnotation(new LinkInfo(p.l)));
+
+                XElement xElement = new XElement("document", document.Transform());
+                xElement.Descendants().Where(p => (string)p.Attributes("class").FirstOrDefault() != null).ToList().ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+                return xElement;
+            }
+            catch (SystemException e)
+            {
+                return null;
+            }
         }
         //public static XElement ConvertXMLtoHTML5(this XElement document, XElement links)
         //{
@@ -274,33 +318,47 @@ namespace DIBAdminAPI.Helpers.Extentions
                             );
                             break;
                         case "x-var":
-                            if (Regex.IsMatch(((string)e.Attributes("id").FirstOrDefault() ?? ""), @"\*[nN]\*"))
                             {
+                                VariableInfo vi = e.Annotations<VariableInfo>().FirstOrDefault();
                                 result.Add(new XElement("span",
                                     new XAttribute("id", Guid.NewGuid().ToString()),
-                                    new XAttribute("class", "dib-var-n"),
-                                    new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
-                                    new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
-                                    new XAttribute("data-var-text", e.Value),
-                                    e.Nodes().SelectMany(p => p.Transform())
+                                    new XAttribute("class", "dib-x-var" + (vi.v.n == 1 ? " -nvar" : "") + ((vi.t == null ? false : vi.t.name.Trim().ToLower() == vi.v.name.Trim().ToLower()) ? "" : " -trig")),
+                                    new XAttribute("data-var-id", vi.v.id.ToString().ToLower()),
+                                    //(string)e.Attributes("class").FirstOrDefault() == null ? null : new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
+                                    new XAttribute("data-var-text", vi.v.name),
+                                    new XText(vi.v.name)
                                     )
                                 );
                             }
-                            else
-                            {
-                                result.Add(new XElement("span",
-                                    new XAttribute("id", Guid.NewGuid().ToString()),
-                                    new XAttribute("class", "dib-var"),
-                                    new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
-                                    new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
-                                    new XAttribute("data-var-text", e.Value),
-                                    e.Nodes().SelectMany(p => p.Transform())
-                                    )
-                                );
-                            }
-
                             break;
-                            //satt inn
+                        //case "x-var":
+                        //    if (Regex.IsMatch(((string)e.Attributes("id").FirstOrDefault() ?? ""), @"\*[nN]\*"))
+                        //    {
+                        //        result.Add(new XElement("span",
+                        //            new XAttribute("id", Guid.NewGuid().ToString()),
+                        //            new XAttribute("class", "dib-var-n"),
+                        //            new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
+                        //            new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
+                        //            new XAttribute("data-var-text", e.Value),
+                        //            e.Nodes().SelectMany(p => p.Transform())
+                        //            )
+                        //        );
+                        //    }
+                        //    else
+                        //    {
+                        //        result.Add(new XElement("span",
+                        //            new XAttribute("id", Guid.NewGuid().ToString()),
+                        //            new XAttribute("class", "dib-var"),
+                        //            new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
+                        //            new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
+                        //            new XAttribute("data-var-text", e.Value),
+                        //            e.Nodes().SelectMany(p => p.Transform())
+                        //            )
+                        //        );
+                        //    }
+
+                        //    break;
+                        //    //satt inn
                         case "docpart":
                         case "document": result.AddRange(e.Document()); break;
                         case "h1":
