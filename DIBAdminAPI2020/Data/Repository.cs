@@ -248,7 +248,7 @@ namespace DIBAdminAPI.Data
                         result.topicSubElements = multi.Read<TopicSubElement>();
                         result.dibVariables =  multi.Read<DibVariable>();
                         result.dibTrigger = multi.Read<DibTrigger>();
-
+                        result.dibVariableAttritutes = multi.Read<DibVariableAttritutes>();
 
                         return result;
                     }

@@ -281,7 +281,7 @@ namespace DIBAdminAPI.Helpers.Extentions
             int rank = 0;
             foreach (string s in search.Split(' ').Where(p => p != ""))
             {
-                int hit = text.IndexOf(s.ToLower());
+                int hit = text.ToLower().IndexOf(s.ToLower());
                 if (hit < 0)
                 {
                     return hit;

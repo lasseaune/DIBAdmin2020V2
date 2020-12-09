@@ -249,6 +249,7 @@ namespace DIBAdminAPI.Data.Entities
         //public Dictionary<string, string> data { get; set; }
         public dynamic data { get; set; }
         public List<string> children { get; set; }
+        private List<Dictionary<string, ObjectApi>> objects { get; set; }
     }
     public class TagsAPI
     {

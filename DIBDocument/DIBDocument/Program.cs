@@ -20,7 +20,7 @@ namespace DIBDocument
             XElement result = diblink.xlinks();
 
         }
-        static void MainZZ(string[] args)
+        static void Main(string[] args)
         {
             //string path = @"D:\_tema\";
             //string fileName = "temadoc.xml";
@@ -313,7 +313,7 @@ namespace DIBDocument
             Debug.Print(options == null ? "" : options.ToString());
         }
         //Byggekloss
-        static void Main(string[] args)
+        static void MainBygge(string[] args)
         {
             string path = @"D:\_DIBDocument\Byggeklosser\";
 

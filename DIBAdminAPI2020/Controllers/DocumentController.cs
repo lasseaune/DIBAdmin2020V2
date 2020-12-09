@@ -50,17 +50,25 @@ namespace DIBAdminAPI.Controllers
             int n = 1;
             string sRegex = search.Split(' ').Select(p => @"(?<v" + (n++).ToString() + ">(" + p + @"))").StringConcatenate();
             List<string> root = new List<string>();
-            Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+            List<KeyValuePair<string, ObjectApi>> sresult = new List<KeyValuePair<string, ObjectApi>>();
+            //Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
             await Task.Factory.StartNew(delegate
             {
                 //objects = result.objects.Where(p => p.Value.type == "dib-x-var" ? ((string)p.Value.data.name).StringIsMatch(search):false).ToDictionary(p=>p.Key, p=>p.Value);
-                objects = result.objects.Where(p => p.Value.type == "dib-x-var").Select(p=>new { rank = ((string)p.Value.data.name).StringIsMatchValue(search), x=p }).Where(p=>p.rank > 0).OrderByDescending(p=>p.rank).ToDictionary(p => p.x.Key, p => p.x.Value);
+                 sresult = result.GetVarObjects().Where(p => p.Value.type == "dib-x-var")
+                    .Select(p => new { 
+                        u = (int)p.Value.data.useage,
+                        l = ((string)p.Value.data.name).Length,
+                        rank = ((string)p.Value.data.name).StringIsMatchValue(search), 
+                        x = p 
+                    })
+                    .Where(p => p.rank >= 0).OrderByDescending(p => p.u).ThenByDescending(p=>p.rank).ThenBy(p=>p.l).Select(p=>p.x).ToList();
             });
 
             TopicPartsAPI tp = new TopicPartsAPI
             {
-                root = objects.Select(p => p.Key).ToList(),
-                objects = objects
+                root = sresult.Select(p => p.Key).ToList(),
+                objects = sresult.ToDictionary(p => p.Key, p => p.Value)
             };
 
             return Ok(tp);

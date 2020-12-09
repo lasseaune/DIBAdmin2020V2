@@ -52,6 +52,7 @@ namespace DIBAdminAPI.Data.Entities
         public IEnumerable<TopicSubElement> topicSubElements { get; set; }
         public IEnumerable<DibVariable> dibVariables { get; set; }
         public IEnumerable<DibTrigger> dibTrigger { get; set; }
+        public IEnumerable<DibVariableAttritutes> dibVariableAttritutes { get; set; }
     }
     //public class ResourceDataDocument
     //{

@@ -67,6 +67,10 @@ namespace DIBAdminAPI.Helpers.Extentions
             public DibTrigger t { get; set; }
             public  VariableInfo(DibVariable variable, DibTrigger trigger)
             {
+                if (variable == null )
+                {
+
+                }
                 v = variable;
                 t = trigger;
             }
@@ -101,14 +105,14 @@ namespace DIBAdminAPI.Helpers.Extentions
         {
             try
             {
-
+                
 
                 if (variables.Select(p => p.id).FirstOrDefault() != null)
                 {
                     (
                         from x in document.Descendants("x-var").Reverse()
                         join v in variables
-                        on ((string)x.Attributes("id").FirstOrDefault() ?? "").Trim().ToLower() equals v.varId.Trim().ToLower()
+                        on ((string)x.Attributes("id").FirstOrDefault() ?? "").Trim() equals v.varId.Trim()
                         select new { x, v }
                     ).ToList()
                     .ForEach(p => p.x.AddAnnotation(new VariableInfo(p.v, trigger.Where(t => (t.name == null ? false : t.name.Trim().ToLower() == p.v.name.Trim().ToLower())).Select(t => t).FirstOrDefault())));
@@ -263,11 +267,32 @@ namespace DIBAdminAPI.Helpers.Extentions
                     switch (e.Name.LocalName)
                     {
                         //satt inn
+                        case "x-comment":
+                            { 
+                                if (e.DescendantNodesAndSelf().OfType<XText>().Select(s=>s.Value).StringConcatenate().Trim()!="" || ((string)e.Attributes("title").FirstOrDefault()??"").Trim()!="")
+                                {
+                                    result.Add(new XElement("section",
+                                        new XAttribute("id", Guid.NewGuid().ToString()),
+                                        new XAttribute("class", "dib-x-comment"),
+                                        new XAttribute("data-gen-object", true),
+                                        ((string)e.Attributes("title").FirstOrDefault() ?? "").Trim() != "" ? new XElement("em", new XAttribute("class","dib-x-comment-tag"), new XText(((string)e.Attributes("title").FirstOrDefault() ?? "").Trim())) : null,
+                                        new XElement("p",
+                                            new XAttribute("id", Guid.NewGuid().ToString()),
+                                            e.Nodes().SelectMany(p => p.Transform())
+                                        )
+                                        
+                                        )
+                                    );
+                                }
+                            }
+
+                            break;
                         case "x-alternative":
                             //x-alternative title="Redusere pålydende" n="1" id="x45"
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-alternative"),
+                                new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-value", (string)e.Attributes("n").FirstOrDefault()),
                                 new XAttribute("data-var-id", (string)e.Parent.Attributes("id").FirstOrDefault()),
                                 new XAttribute("data-var-name", (string)e.Attributes("title").FirstOrDefault()),
@@ -280,6 +305,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-alternatives"),
+                                new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
                                 e.Nodes().SelectMany(p => p.Transform())
                                 )
@@ -289,6 +315,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-letterhead"),
+                                new XAttribute("data-gen-object", true),
                                 e.Nodes().SelectMany(p => p.Transform())
                                 )
                             );
@@ -298,6 +325,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-list"),
+                                new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-oftype", (string)e.Attributes("oftype").FirstOrDefault()),
                                 new XAttribute("data-var-id", (string)e.Attributes("varname").FirstOrDefault()),
                                 new XAttribute("data-var-header", (string)e.Attributes("header").FirstOrDefault()),
@@ -308,9 +336,10 @@ namespace DIBAdminAPI.Helpers.Extentions
                             break;
                         case "x-optional":
                             //keyword="IAS 23" id="IAS - S - 23_FreeElement"
-                            result.Add(new XElement("section",
+                            result.Add(new XElement("span",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-optional"),
+                                new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
                                 new XAttribute("data-var-keyword", (string)e.Attributes("keyword").FirstOrDefault()),
                                 e.Nodes().SelectMany(p => p.Transform())
@@ -322,43 +351,24 @@ namespace DIBAdminAPI.Helpers.Extentions
                                 VariableInfo vi = e.Annotations<VariableInfo>().FirstOrDefault();
                                 result.Add(new XElement("span",
                                     new XAttribute("id", Guid.NewGuid().ToString()),
-                                    new XAttribute("class", "dib-x-var" + (vi.v.n == 1 ? " -nvar" : "") + ((vi.t == null ? false : vi.t.name.Trim().ToLower() == vi.v.name.Trim().ToLower()) ? "" : " -trig")),
+                                    new XAttribute("class", "dib-x-var"
+                                                        + (vi.v.n == 1 ? " -nvar" : "")
+                                                        + ((vi.t == null ? false : vi.t.trigName.Trim().ToLower() != vi.v.name.Trim().ToLower() && vi.t.name.Trim().ToLower() == vi.v.name.Trim().ToLower()) ? "" : " -trigby")
+                                                        + ((vi.t == null ? false : vi.t.trigName.Trim().ToLower() == vi.v.name.Trim().ToLower()) ? "" : " -trig")
+                                                        ),
+                                    (vi.t == null ? false : vi.t.trigName.Trim().ToLower() != vi.v.name.Trim().ToLower() && vi.t.name.Trim().ToLower() == vi.v.name.Trim().ToLower()) ? new XAttribute("data-trigby", vi.t.trigName) : null,
                                     new XAttribute("data-var-id", vi.v.id.ToString().ToLower()),
+                                    new XAttribute("data-var-object", true),
                                     //(string)e.Attributes("class").FirstOrDefault() == null ? null : new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
                                     new XAttribute("data-var-text", vi.v.name),
                                     new XText(vi.v.name)
                                     )
                                 );
+                                
+                                
                             }
                             break;
-                        //case "x-var":
-                        //    if (Regex.IsMatch(((string)e.Attributes("id").FirstOrDefault() ?? ""), @"\*[nN]\*"))
-                        //    {
-                        //        result.Add(new XElement("span",
-                        //            new XAttribute("id", Guid.NewGuid().ToString()),
-                        //            new XAttribute("class", "dib-var-n"),
-                        //            new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
-                        //            new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
-                        //            new XAttribute("data-var-text", e.Value),
-                        //            e.Nodes().SelectMany(p => p.Transform())
-                        //            )
-                        //        );
-                        //    }
-                        //    else
-                        //    {
-                        //        result.Add(new XElement("span",
-                        //            new XAttribute("id", Guid.NewGuid().ToString()),
-                        //            new XAttribute("class", "dib-var"),
-                        //            new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
-                        //            new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
-                        //            new XAttribute("data-var-text", e.Value),
-                        //            e.Nodes().SelectMany(p => p.Transform())
-                        //            )
-                        //        );
-                        //    }
-
-                        //    break;
-                        //    //satt inn
+                        
                         case "docpart":
                         case "document": result.AddRange(e.Document()); break;
                         case "h1":
@@ -802,6 +812,25 @@ namespace DIBAdminAPI.Helpers.Extentions
 
             return result;
         }
+        private static IEnumerable<XAttribute> GetSectionAttributes(this XElement e)
+        {
+            List<XAttribute> result = new List<XAttribute>();
+            bool dataOptional = ((string)e.Attributes("data-optional").FirstOrDefault() ?? "").Trim().ToLower() == "true";
+            bool dataAutocount = ((string)e.Attributes("data-autocount").FirstOrDefault() ?? "").Trim().ToLower() == "true";
+
+            if (dataOptional || dataAutocount)
+            {
+                List<string> classValue = ((string)e.Attributes("class").FirstOrDefault() ?? "").Split(' ').Where(p => p.Trim() != "" && p != "x-section-optional").ToList();
+                classValue.Add("dib-x-section-optional");
+                result.Add(new XAttribute("class", classValue.Select(p => p).StringConcatenate(" ")));
+                result.Add(new XAttribute("data-gen-object", true));
+            }
+            else 
+            {
+                result.Add(e.Attributes("class").FirstOrDefault());
+            }
+            return result;
+        }
         private static IEnumerable<XNode> Section(this XElement e)
         {
             List<XNode> result = new List<XNode>();
@@ -809,7 +838,8 @@ namespace DIBAdminAPI.Helpers.Extentions
             CommentsItem cmi = e.Annotations<CommentsItem>().FirstOrDefault();
             result.Add(new XElement("section",
                 e.Attributes("id"),
-                e.Attributes("class"),
+                e.GetSectionAttributes(),
+                
                 e.Attributes().Where(a => a.Name.LocalName.StartsWith("data")),
                 cmi != null && e.Elements().Where(p => Regex.IsMatch(p.Name.LocalName, @"h\d")).FirstOrDefault() == null ? cmi.comments : null,
                 moreinfo == null ? null : new XAttribute("data-hasrelations", moreinfo.hasRelations),

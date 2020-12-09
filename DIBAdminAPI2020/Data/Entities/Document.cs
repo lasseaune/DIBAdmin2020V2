@@ -11,6 +11,7 @@ using System.IO;
 using DIBAdminAPI.Services;
 using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace DIBAdminAPI.Data.Entities
 {
@@ -20,6 +21,7 @@ namespace DIBAdminAPI.Data.Entities
         public string name { get; set; }
         public int n { get; set; }
         public string language { get; set; }
+        public int count { get; set; }
         public string varId { get; set; }
         public string transactionId { get; set; }
     }
@@ -28,6 +30,17 @@ namespace DIBAdminAPI.Data.Entities
         public string name { get; set; }
         public string trigName { get; set; }
         
+
+    }
+    public class DibVariableAttritutes
+    {
+        public Guid id { get; set; }
+        public string type { get; set; }
+        public string trigName { get; set; }
+        public string name { get; set; }
+        public string value { get; set; }
+
+
 
     }
     public class DibLinkSelect
@@ -101,6 +114,217 @@ namespace DIBAdminAPI.Data.Entities
     }
     public static class DocumentContainerExtentions
     {
+        public static string GetGenObjectName (this XAttribute className, List<string> name)
+        {
+            if (className == null || name == null) return "";
+            return (
+                    from c in className.Value.Split(' ')
+                    join n in name on c.Trim().ToLower() equals n.Trim().ToLower()
+                    select n
+                ).FirstOrDefault();
+        }
+        
+        public static List<KeyValuePair<string, ObjectApi>> GetGenObject(this XElement element, List<string> names)
+        {
+            List<KeyValuePair<string, ObjectApi>> objects = new List<KeyValuePair<string, ObjectApi>>();
+            ObjectApi objApi = new ObjectApi();
+            string id = (string)element.Attributes("id").FirstOrDefault();
+            
+            string name = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
+            //Debug.Print(id + " - " + element.Ancestors().Count().ToString() + " - " + name);
+            if (name==null)
+            {
+
+            }
+            else if (name != null)
+            {
+                objApi.id = id;
+                objApi.type = name;
+                switch (name)
+                {
+                    case "dib-x-section-optional":
+
+                        bool bAutocount = (string)element.Attributes("data-autocount").FirstOrDefault() == "true";
+                        bool bOptional = (string)element.Attributes("data-optional").FirstOrDefault() == "true";
+                        bool ?bDefault = (string)element.Attributes("data-default").FirstOrDefault() == "true"; 
+                        objApi.data = new
+                        {
+                            id = id,
+                            autoCount = bAutocount,
+                            before = element.NodesBeforeSelf().OfType<XElement>().Where(p=>p.Attributes("class").FirstOrDefault().GetGenObjectName(names)==name).ToList(),
+                            optional = bOptional,
+                            varId = bOptional ? (string)element.Attributes("data-var-id").FirstOrDefault() : null,
+                            varvalue = bOptional ? bDefault : null
+                        };
+                        break;
+                    case "dib-x-optional":
+                        objApi.data = new
+                        {
+                            id = objApi.id,
+                            varId = (string)element.Attributes("data-var-id").FirstOrDefault(),
+                            varValue = (string)element.Attributes("data-var-keyword").FirstOrDefault(),
+                        };
+                        break;
+                    case "dib-x-list":
+                        objApi.data = new
+                        {
+                            id = objApi.id,
+                            ofType = (string)element.Attributes("data-var-oftype").FirstOrDefault(),
+                            heading = (string)element.Attributes("data-var-header").FirstOrDefault(),
+                            varId = (string)element.Attributes("data-var-id").FirstOrDefault(), 
+                            defaultCounter = (string)element.Attributes("default-counter").FirstOrDefault(),
+                            //loopObject = element
+                            //    .Descendants("span")
+                            //    .Where(p=>
+                            //        ((string)p.Attributes("class").FirstOrDefault()??"").Split(' ').Contains("dib-x-var") 
+                            //        && ((string)p.Attributes("class").FirstOrDefault() ?? "").Split(' ').Contains("-nvar")
+                            //    )
+                            //    .Select(p=>p.Ancestors())
+                        };
+                        break;
+                    case "dib-x-letterhead":
+                        objApi.data = new
+                        {
+                            id = objApi.id,
+                            heading = "Brevhode"
+                        };
+                        break;
+                    case "dib-x-alternatives":
+                        objApi.data = new
+                        {
+                            id = objApi.id,
+                            heading = "Alternativ"
+                        };
+                        break;
+                    case "dib-x-alternative":
+                        objApi.data = new
+                        {
+                            id = objApi.id,
+                            heading = (string)element.Attributes("data-var-name").FirstOrDefault(),
+                            varId = (string)element.Attributes("data-var-id").FirstOrDefault(),
+                            varValue = (string)element.Attributes("data-var-value").FirstOrDefault(),
+                        };
+                        break;
+                    case "dib-x-comment":
+                        objApi.data = new
+                        {
+                            id = objApi.id,
+                            heading = element.Elements("em").Where(p=>(string)p.Attributes("class").FirstOrDefault()== "dib-x-comment-tag").Select(p=>p.Value).FirstOrDefault()
+                        };
+                        break;
+                    default:
+                        objApi.data = new
+                        {
+                            id = objApi.id,
+                        };
+                        break;
+
+                }
+
+                XElement first = element
+                    .Descendants()
+                    .SkipWhile(p => p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 && p.Annotations<GenBuild>().FirstOrDefault() == null)
+                    .Take(1).FirstOrDefault();
+                while (first != null)
+                {
+                    if (first.Attributes("data-var-object").FirstOrDefault() != null)
+                    {
+                        List<XElement> elements = new List<XElement>();
+                        elements.Add(first);
+                        elements.AddRange(
+                            element
+                            .Descendants()
+                            .SkipWhile(p => p != first)
+                            .Skip(1)
+                            .TakeWhile(p => p.Attributes("data-gen-object").FirstOrDefault() == null)
+                            .Where(p => p.Attributes("data-var-object").FirstOrDefault() != null)
+                        );
+                        objects.AddRange(elements
+                            .Select(p=>new KeyValuePair<string, ObjectApi>(
+                                (string)p.Attributes("id").FirstOrDefault(),
+                                new ObjectApi
+                                {
+                                    id = (string)p.Attributes("id").FirstOrDefault(),
+                                    type = "x-var",
+                                    data = new
+                                    {
+                                        varId = (string)p.Attributes("id").FirstOrDefault()
+                                    }
+                                }
+                                )
+                            )
+                            .ToList()
+                            
+                        );
+                        elements.ForEach(p => new GenBuild(p));
+                        if (objApi.children == null) objApi.children = new List<string>();
+                        objApi.children.AddRange(elements.Select(p => (string)p.Attributes("id").FirstOrDefault()));
+                        
+                        first = element
+                            .Descendants()
+                            .SkipWhile(p => p != elements.LastOrDefault())
+                            .Skip(1)
+                            .SkipWhile(p => 
+                                p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
+                                || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                            .Take(1)
+                            .FirstOrDefault();
+                    }
+                    else if (first.Attributes("data-gen-object").FirstOrDefault() != null)
+                    {
+                        new GenBuild(first);
+                        if (objApi.children==null) objApi.children = new List<string>();
+                        objApi.children.Add((string)first.Attributes("id").FirstOrDefault());
+                        
+                        List<KeyValuePair<string, ObjectApi>> result = first.GetGenObject(names);
+                        
+                        objects.AddRange(result);
+                        
+                        first = element
+                            .Descendants()
+                            .SkipWhile(p => p != first)
+                            .Skip(1)
+                            .SkipWhile(p => 
+                                p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
+                                || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                            .Take(1)
+                            .FirstOrDefault();
+                    }
+                }
+                objects.Add(new KeyValuePair<string, ObjectApi>(id, objApi));
+
+            }
+            return objects;
+        }
+        public static List<KeyValuePair<string, ObjectApi>> GetGenObjects(this XElement element, List<string> names = null)
+        {
+            if (names == null)
+            {
+                names = "dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
+            }
+            List<KeyValuePair<string, ObjectApi>> objects = new List<KeyValuePair<string, ObjectApi>>();
+
+            string objectName = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
+            
+            //if (objectName != "" )
+            //{
+               
+               
+            //    objects.Add(element.GetGenObject(objApi, objectName, names));
+            //    genObj = new KeyValuePair<string, ObjectApi> ((string)element.Attributes("id").ToString().ToLower(), objApi );
+            //    objects.Add(new KeyValuePair<string, ObjectApi>( 
+            //        element.Attributes("id").ToString().ToLower(),
+            //        element.GetGenObject(objectName, name)
+            //        )
+            //    );
+            //} 
+            //else if (element.Descendants().Where(p => p.Attributes("class").FirstOrDefault().GetGenObjectName(name) != "").FirstOrDefault() != null)
+            //{
+            //    objects.AddRange(element.Elements().SelectMany(p => p.GetGenObjects()));
+            //}
+
+            return objects;
+        }
         public static void AddOtherProps(this JsonElement d, string name, List<string> e)
         {
             if (d.otherprops==null)
@@ -488,13 +712,47 @@ namespace DIBAdminAPI.Data.Entities
     {
         public List<string> variablesroot { get; set; }
         public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+        public VariableJson(IEnumerable<DibVariable> variables, IEnumerable<DibTrigger> triggers, IEnumerable<DibVariableAttritutes> variableAttritutes)
+        {
+            objects = (
+
+                        from v in variables
+                        join t in triggers.DefaultIfEmpty() on v.name.Trim().ToLower() equals t.name.Trim().ToLower() into g
+                        from tr in g
+                        join va in variableAttritutes.GroupBy(p => p.id).DefaultIfEmpty() on v.id equals va.Key into gv
+                        from ge in gv
+                        select new { v, tr, ge}
+                       )
+                       .ToDictionary(
+                            p => p.v.id.ToString().ToLower(),
+                            p => new ObjectApi
+                            {
+                                id = p.v.id.ToString().ToLower(),
+                                type = "dib-x-var",
+                                transactionId = p.v.transactionId,
+                                data = new
+                                {
+                                    id = p.v.id.ToString().ToLower(),
+                                    name = p.v.name,
+                                    standard_text =  p.ge.Where(s=>s.type=="standard_text").Select(s=>s.name).FirstOrDefault(),
+                                    comment = p.ge.Where(s => s.type == "comment").Select(s => s.name).FirstOrDefault(),
+                                    options = p.ge.Where(s=>s.type=="option").ToDictionary(s=>s.name, s=>s.value),
+                                    type = "dib-x-var",
+                                    useage = p.v.count,
+                                    counter = p.v.n == 1 ? true : false,
+                                    trigger = p.tr == null ? null : p.tr.trigName,
+                                }
+                            }
+                       );
+
+
+            variablesroot = objects.Select(p => p.Key).ToList();
+        }
         public VariableJson(IEnumerable<DibVariable> variables, IEnumerable<DibTrigger> triggers)
         {
             if (variables.Select(p => p.id).FirstOrDefault() == null) return;
             try
             {
-
-
                 variablesroot = variables.Select(p => p.id.ToString()).ToList();
                 objects = variables
                         .ToDictionary(
@@ -509,7 +767,7 @@ namespace DIBAdminAPI.Data.Entities
                                     id = p.id.ToString().ToLower(),
                                     name = p.name,
                                     type = "dib-x-var",
-                                    language = p.language,
+                                    useage = p.count,
                                     counter = p.n == 1 ? true : false,
                                     trigger = triggers.Where(p=>p.name.Trim().ToLower().Contains(p.name.Trim().ToLower())).Select(p=>p.trigName).FirstOrDefault()
                                 }
@@ -520,6 +778,98 @@ namespace DIBAdminAPI.Data.Entities
             {
                 return;
             }
+        }
+    }
+    public class GenBuild
+    {
+        public bool build { get; set; }
+        public GenBuild(XElement element)
+        {
+            build = true;
+            element.AddAnnotation(this);
+        }
+    }
+    public class GenObjects
+    {
+        public List<string> root = new List<string>();
+        public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+        public GenObjects(XElement element)
+        {
+            try
+            {
+
+
+                List<string> names = "dib-x-section-optional;dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
+
+                XElement first = element
+                        .Descendants()
+                        .SkipWhile(p => 
+                            p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
+                            || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                        .Take(1).FirstOrDefault();
+                while (first != null)
+                {
+                    if (first.Attributes("data-var-object").FirstOrDefault() != null)
+                    {
+                        List<XElement> elements = new List<XElement>();
+                        elements.Add(first);
+                        elements.AddRange(
+                            element
+                            .Descendants()
+                            .SkipWhile(p => p != first).Skip(1)
+                            .TakeWhile(p => 
+                                p.Attributes("data-gen-object").FirstOrDefault() == null
+                            )
+                            .Where(p => p.Attributes("data-var-object").FirstOrDefault() != null)
+                        );
+                        objects.AddRange(elements
+                            .ToDictionary(
+                                p => (string)p.Attributes("id").FirstOrDefault(),
+                                p => new ObjectApi
+                                {
+                                    id = (string)p.Attributes("id").FirstOrDefault(),
+                                    type = "x-var",
+                                    data = new
+                                    {
+                                        varId = (string)p.Attributes("id").FirstOrDefault()
+                                    }
+                                }
+                            )
+                        );
+                        
+                        elements.ForEach(p => new GenBuild(p));
+                        root.AddRange(elements.Select(p => (string)p.Attributes("id").FirstOrDefault()));
+
+                        first = element
+                            .Descendants()
+                            .SkipWhile(p => p != elements.LastOrDefault())
+                            .SkipWhile(p => p.Attributes("data-gen-object").FirstOrDefault() == null)
+                            .Take(1)
+                            .FirstOrDefault();
+                    }
+                    else if (first.Attributes("data-gen-object").FirstOrDefault() != null)
+                    {
+                        new GenBuild(first);
+                        root.Add((string)first.Attributes("id").FirstOrDefault());
+                        List<KeyValuePair<string, ObjectApi>> result = first.GetGenObject(names);
+                        objects.AddRange(result.ToDictionary(p => p.Key, p => p.Value));
+                        first = element
+                            .Descendants()
+                            .SkipWhile(p => p != first)
+                            .Skip(1)
+                            .SkipWhile(p => 
+                                p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
+                                || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                            .Take(1)
+                            .FirstOrDefault();
+                    }
+                }
+            }
+            catch (SystemException e)
+            {
+                
+            }
+            
         }
     }
     public class CheckLabelJsons
@@ -638,6 +988,7 @@ namespace DIBAdminAPI.Data.Entities
         public List<string> showroot { get; set; }
         public List<string> genroot { get; set; }
         public List<string> variableroot { get; set; }
+        public List<string> genobjectroot { get; set; }
         private IEnumerable<ChecklistItemData> ItemData { get; set; }
         private IEnumerable<ChecklistLabelGroup> LabelGroups { get; set; }
         private IEnumerable<ChecklistLabel> Labels { get; set; }
@@ -647,7 +998,8 @@ namespace DIBAdminAPI.Data.Entities
         private IEnumerable<TopicSubElement> TopicSubElements { get; set; }
         private IEnumerable<DibVariable> DibVariables { get; set; }
         private IEnumerable<DibTrigger> DibTrigger { get; set; }
-
+        private IEnumerable<DibVariableAttritutes> DibVariableAttritutes { get; set; }
+        private Dictionary<string, ObjectApi> varobjects = new Dictionary<string, ObjectApi>();
         public IEnumerable<TopicBase> GetTopicBases()
         {
             return TopicBases;
@@ -669,6 +1021,10 @@ namespace DIBAdminAPI.Data.Entities
             return ItemData;
         }
 
+        public Dictionary<string, ObjectApi> GetVarObjects()
+        {
+            return varobjects;
+        }
         public void RemoveItemData(string id,  List<string> labelIds)
         {
             IEnumerable<ChecklistItemData> temp = ItemData.Where(p => !(p.id.Trim().ToLower() == id.Trim().ToLower() && labelIds.Contains(p.labelId.ToString())));
@@ -698,6 +1054,7 @@ namespace DIBAdminAPI.Data.Entities
             viewroot = dc.viewroot;
             showroot = dc.showroot;
             variableroot = dc.variableroot;
+            genobjectroot = dc.genobjectroot;
             ItemData = dc.ItemData;
             LabelGroups = dc.LabelGroups;
             Labels = dc.Labels;
@@ -707,7 +1064,9 @@ namespace DIBAdminAPI.Data.Entities
             TopicSubElements = dc.TopicSubElements;
             DibVariables = dc.DibVariables;
             DibTrigger = dc.DibTrigger;
-            
+            DibVariableAttritutes = dc.DibVariableAttritutes;
+
+
         }
         public DocumentContainer(ResourceHTML5Element r)
         {
@@ -726,8 +1085,9 @@ namespace DIBAdminAPI.Data.Entities
             viewroot = cll.viewroot;
             showroot = cll.showroot;
             objects.AddRange(cll.objects);
-            VariableJson dv = new VariableJson(DibVariables,DibTrigger);
+            VariableJson dv = new VariableJson(DibVariables,DibTrigger, DibVariableAttritutes);
             variableroot = dv.variablesroot;
+            //GenObjects go 
             objects.AddRange(dv.objects);
         }
         public void RemoveTopicSubElements()
@@ -774,8 +1134,9 @@ namespace DIBAdminAPI.Data.Entities
             viewroot = cll.viewroot;
             showroot = cll.showroot;
             objects.AddRange(cll.objects);
-            VariableJson dv = new VariableJson(DibVariables, DibTrigger);
+            VariableJson dv = new VariableJson(DibVariables, DibTrigger,DibVariableAttritutes);
             variableroot = dv.variablesroot;
+            
             objects.AddRange(dv.objects);
         }
         public void RemoveItemData(List<string> el, string id)
@@ -885,15 +1246,29 @@ namespace DIBAdminAPI.Data.Entities
 
                 DibVariables = r.dibVariables;
                 DibTrigger = r.dibTrigger;
+                DibVariableAttritutes = r.dibVariableAttritutes;
+
+                //VariableJson dv = new VariableJson(DibVariables, DibTrigger, DibVariableAttritutes);
+                //variableroot = dv.variablesroot;
+                //objects.AddRange(dv.objects);
+
+
                 VariableJson dv = new VariableJson(DibVariables, DibTrigger);
+                varobjects = dv.objects;
                 
-                objects.AddRange(dv.objects);
 
                 XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links, DibVariables, DibTrigger);
                 
                 TocJson tocJson = new TocJson(map, docparthtml, r.id, r.segmentId);
                 tocroot = tocJson.tocroot;
                 toc = tocJson.toc;
+
+                GenObjects go = new GenObjects(docparthtml);
+
+                objects.AddRange(go.objects);
+                genobjectroot = go.root;
+                
+
 
                 string document_id = "document;" + r.id + ";" + r.segmentId;
                 root = new List<JsonChild>
@@ -926,7 +1301,16 @@ namespace DIBAdminAPI.Data.Entities
                     .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p))
                 );
 
+
+                //genobjectroot = docparthtml
+                //    .Descendants()
+                //    .Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower().StartsWith("dib-x"))
+                //    .Select(p => (string)p.Attributes("id").FirstOrDefault())
+                //    .ToList();
+
                 variableroot = elements.Where(p => p.Value.attributes.ContainsKey("class") ? p.Value.attributes["class"].Split(' ').Contains("dib-x-var") : false).GroupBy(p => p.Value.attributes["data-var-id"]).Select(p => p.Key).ToList();
+
+                objects.AddRange(dv.objects.Where(p => variableroot.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value));
 
                 ItemData = r.itemData;
                 Labels = r.Labels;

@@ -1849,16 +1849,17 @@ namespace DIBAdminAPI.Data.Entities
             string document_id = "document;" + resourceId + ";" + segmentId;
             if (documentContainer == null) return null;
             if (jsonDelete.action != "delete") return null;
+            string CurrId = "";
             foreach (string id in jsonDelete.id)
             {
-                string CurrId = id;
+                CurrId = id;
                 if (documentContainer.elements.ContainsKey(CurrId))
                 {
                     KeyValuePair<string,JsonElement> je = documentContainer.elements.Where(p => p.Key == id).Select(p=>p).FirstOrDefault();
                     if (je.Value.name == "table")
                     {
-                        je = documentContainer.elements.Where(p => p.Value.children.Select(c => c.id == je.Key).Count() != 0).FirstOrDefault();
-                        if (je.Value.name == "dib" && (je.Value.attributes.Where(p => p.Key == "class" && p.Value == "tablewrapper").Count() != 0))
+                        je = documentContainer.elements.Where(p => p.Value.children.Where(c => c.id == je.Key).Count() != 0).FirstOrDefault();
+                        if (je.Value.name == "div" && (je.Value.attributes.Where(p => p.Key == "data-class" && p.Value == "table-wrapper").Count() != 0))
                         {
                             CurrId = je.Key;
                         }
@@ -1866,10 +1867,17 @@ namespace DIBAdminAPI.Data.Entities
                     JsonElement e = documentContainer.elements.Values.Where(p => p.children.Where(c => c.id == CurrId).Count() > 0).FirstOrDefault();
                     if (e != null)
                     {
-                        e.RemoveChild(id);
+                        e.RemoveChild(CurrId);
+                    }
+                    else
+                    {
+                        return null;
                     }
                 }
             }
+            if (CurrId == "")
+                return null;
+
             XElement document = documentContainer.GetDocumentContainerXML();
             TocJson tocJson = new TocJson(document,resourceId,segmentId);
 
@@ -1896,6 +1904,7 @@ namespace DIBAdminAPI.Data.Entities
             {
                 json = new JsonObject
                 {
+                    root = new List<JsonChild> { new JsonChild { id = CurrId } },
                     toc = tocUpdates == null ? null : (tocUpdates.Count() == 0 ? null : tocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value))
                 },
                 documentContainer = documentContainer
@@ -1925,54 +1934,44 @@ namespace DIBAdminAPI.Data.Entities
                     documentContainer.elements.Add(pair.Key, pair.Value);
                     updated.Add(pair);
                 }
-                //if (documentContainer.elements.ContainsKey(pair.Key))
-                //{
-                //    if (Regex.IsMatch(pair.Value.name,@"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;") )  updateToc = true;
-                    
-                //    documentContainer.elements[pair.Key] = pair.Value;
-                   
-                //    updated.Add(pair);
-                //}
-                //else
-                //{
-
-                //}
             }
             List<TocUpdate> tocUpdates = null;
             if (updateToc)
             {
-                XElement document = documentContainer.GetDocumentContainerXML();
+                tocUpdates = documentContainer.UpdateToc(resourceId, segmentId);
+
+                //XElement document = documentContainer.GetDocumentContainerXML();
                 
 
-                TocJson tocJson = new TocJson(document, resourceId, segmentId);
+                //TocJson tocJson = new TocJson(document, resourceId, segmentId);
 
-                tocUpdates = (
-                    from t in documentContainer.toc
-                    join t1 in tocJson.toc
-                    on t.Key equals t1.Key
-                    where !t.Value.Equals(t1.Value)
-                    select new TocUpdate { oldToc = t, newToc = t1 }
-                ).ToList();
+                //tocUpdates = (
+                //    from t in documentContainer.toc
+                //    join t1 in tocJson.toc
+                //    on t.Key equals t1.Key
+                //    where !t.Value.Equals(t1.Value)
+                //    select new TocUpdate { oldToc = t, newToc = t1 }
+                //).ToList();
 
 
-                foreach (TocUpdate tu in tocUpdates)
-                {
-                    if (documentContainer.toc.ContainsKey(tu.newToc.Key))
-                    {
-                        documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
-                    }
-                }
-                List<TocUpdate> newToc =
-                    tocJson
-                        .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
-                        .Select(p => new TocUpdate { newToc = p })
-                        .ToList();
+                //foreach (TocUpdate tu in tocUpdates)
+                //{
+                //    if (documentContainer.toc.ContainsKey(tu.newToc.Key))
+                //    {
+                //        documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
+                //    }
+                //}
+                //List<TocUpdate> newToc =
+                //    tocJson
+                //        .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
+                //        .Select(p => new TocUpdate { newToc = p })
+                //        .ToList();
 
-                if (newToc.Count()>1)
-                {
-                    documentContainer.toc.AddRange(newToc.ToDictionary(p => p.newToc.Key, p => p.newToc.Value));
-                    tocUpdates.AddRange(newToc);
-                }
+                //if (newToc.Count()>1)
+                //{
+                //    documentContainer.toc.AddRange(newToc.ToDictionary(p => p.newToc.Key, p => p.newToc.Value));
+                //    tocUpdates.AddRange(newToc);
+                //}
             }
             return new EditDocumentContainerResult
             {
@@ -1982,6 +1981,44 @@ namespace DIBAdminAPI.Data.Entities
                 },
                 documentContainer = documentContainer
             };
+        }
+        public static List<TocUpdate> UpdateToc(this DocumentContainer documentContainer, string resourceId, string segmentId)
+        {
+            List<TocUpdate> tocUpdates = null;
+            XElement document = documentContainer.GetDocumentContainerXML();
+
+
+            TocJson tocJson = new TocJson(document, resourceId, segmentId);
+
+            
+            tocUpdates = (
+                from t in documentContainer.toc
+                join t1 in tocJson.toc
+                on t.Key equals t1.Key
+                where !t.Value.Equals(t1.Value)
+                select new TocUpdate { oldToc = t, newToc = t1 }
+            ).ToList();
+
+
+            foreach (TocUpdate tu in tocUpdates)
+            {
+                if (documentContainer.toc.ContainsKey(tu.newToc.Key))
+                {
+                    documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
+                }
+            }
+            List<TocUpdate> newToc =
+                tocJson
+                    .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
+                    .Select(p => new TocUpdate { newToc = p })
+                    .ToList();
+
+            if (newToc.Count() > 0)
+            {
+                documentContainer.toc.AddRange(newToc.ToDictionary(p => p.newToc.Key, p => p.newToc.Value));
+                tocUpdates.AddRange(newToc);
+            }
+            return tocUpdates;
         }
         //public static bool UpdateJsonElements(this Dictionary<string, JsonElement> elements, JsonUpdate jsonUpdate)
         //{
@@ -2075,7 +2112,12 @@ namespace DIBAdminAPI.Data.Entities
             {
                 string newId = Guid.NewGuid().ToString();
                 XElement table = newId.CreateTable(rows, cols, headers, footers, className);
-                table = new XElement("div", new XAttribute("class", "table-wrapper"), new XAttribute("data-class", "table-wrapper"), new XAttribute("id", Guid.NewGuid().ToString()), table);
+                table = new XElement("div",
+                    new XAttribute("class", "table-wrapper"),
+                    new XAttribute("data-class", "table-wrapper"),
+                    new XAttribute("id", Guid.NewGuid().ToString())
+                    , table
+                );
                 if (table != null)
                 {
                     //int i = 1;
@@ -2775,6 +2817,11 @@ namespace DIBAdminAPI.Data.Entities
                         }
                     }
                 }
+                List<TocUpdate> tocUpdates = null;
+                if (updateToc)
+                {
+                    tocUpdates = documentContainer.UpdateToc(documentContainer.id, documentContainer.segmentId);
+                }
 
                 return new EditResult
                 {
@@ -2783,7 +2830,7 @@ namespace DIBAdminAPI.Data.Entities
                         resourceid = jsonCreate.resourceId,
                         root = json.root,
                         elements = updated.ToDictionary(p=>p.Key, p=>p.Value),
-                        toc = json.toc,
+                        toc = tocUpdates == null ? null : (tocUpdates.Count() == 0 ? null : tocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
                         variableroot = variableAdded ? documentContainer.variableroot : null
                     },
                     documentContainer = documentContainer
