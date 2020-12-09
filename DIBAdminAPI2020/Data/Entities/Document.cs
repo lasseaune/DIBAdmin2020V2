@@ -151,10 +151,16 @@ namespace DIBAdminAPI.Data.Entities
                         {
                             id = id,
                             autoCount = bAutocount,
-                            before = element.NodesBeforeSelf().OfType<XElement>().Where(p=>p.Attributes("class").FirstOrDefault().GetGenObjectName(names)==name).ToList(),
+                            before = element
+                                .NodesBeforeSelf().OfType<XElement>()
+                                .Where(p=>p.Attributes("class").FirstOrDefault()
+                                .GetGenObjectName(names)==name)
+                                .Select(p=>(string)p.Attributes("id").FirstOrDefault())
+                                .ToList(),
                             optional = bOptional,
                             varId = bOptional ? (string)element.Attributes("data-var-id").FirstOrDefault() : null,
-                            varvalue = bOptional ? bDefault : null
+                            varvalue = bOptional ? bDefault : null,
+                            dataType = (string)element.Attributes("data-type").FirstOrDefault()
                         };
                         break;
                     case "dib-x-optional":
@@ -240,21 +246,21 @@ namespace DIBAdminAPI.Data.Entities
                             .Where(p => p.Attributes("data-var-object").FirstOrDefault() != null)
                         );
                         objects.AddRange(elements
-                            .Select(p=>new KeyValuePair<string, ObjectApi>(
+                            .Select(p => new KeyValuePair<string, ObjectApi>(
                                 (string)p.Attributes("id").FirstOrDefault(),
                                 new ObjectApi
                                 {
                                     id = (string)p.Attributes("id").FirstOrDefault(),
-                                    type = "x-var",
+                                    type = "pointer-x-var",
                                     data = new
                                     {
-                                        varId = (string)p.Attributes("id").FirstOrDefault()
+                                        varId = (string)p.Attributes("data-var-id").FirstOrDefault()
                                     }
                                 }
                                 )
                             )
                             .ToList()
-                            
+
                         );
                         elements.ForEach(p => new GenBuild(p));
                         if (objApi.children == null) objApi.children = new List<string>();
@@ -296,35 +302,35 @@ namespace DIBAdminAPI.Data.Entities
             }
             return objects;
         }
-        public static List<KeyValuePair<string, ObjectApi>> GetGenObjects(this XElement element, List<string> names = null)
-        {
-            if (names == null)
-            {
-                names = "dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
-            }
-            List<KeyValuePair<string, ObjectApi>> objects = new List<KeyValuePair<string, ObjectApi>>();
+        //public static List<KeyValuePair<string, ObjectApi>> GetGenObjects(this XElement element, List<string> names = null)
+        //{
+        //    if (names == null)
+        //    {
+        //        names = "dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
+        //    }
+        //    List<KeyValuePair<string, ObjectApi>> objects = new List<KeyValuePair<string, ObjectApi>>();
 
-            string objectName = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
+        //    string objectName = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
             
-            //if (objectName != "" )
-            //{
+        //    //if (objectName != "" )
+        //    //{
                
                
-            //    objects.Add(element.GetGenObject(objApi, objectName, names));
-            //    genObj = new KeyValuePair<string, ObjectApi> ((string)element.Attributes("id").ToString().ToLower(), objApi );
-            //    objects.Add(new KeyValuePair<string, ObjectApi>( 
-            //        element.Attributes("id").ToString().ToLower(),
-            //        element.GetGenObject(objectName, name)
-            //        )
-            //    );
-            //} 
-            //else if (element.Descendants().Where(p => p.Attributes("class").FirstOrDefault().GetGenObjectName(name) != "").FirstOrDefault() != null)
-            //{
-            //    objects.AddRange(element.Elements().SelectMany(p => p.GetGenObjects()));
-            //}
+        //    //    objects.Add(element.GetGenObject(objApi, objectName, names));
+        //    //    genObj = new KeyValuePair<string, ObjectApi> ((string)element.Attributes("id").ToString().ToLower(), objApi );
+        //    //    objects.Add(new KeyValuePair<string, ObjectApi>( 
+        //    //        element.Attributes("id").ToString().ToLower(),
+        //    //        element.GetGenObject(objectName, name)
+        //    //        )
+        //    //    );
+        //    //} 
+        //    //else if (element.Descendants().Where(p => p.Attributes("class").FirstOrDefault().GetGenObjectName(name) != "").FirstOrDefault() != null)
+        //    //{
+        //    //    objects.AddRange(element.Elements().SelectMany(p => p.GetGenObjects()));
+        //    //}
 
-            return objects;
-        }
+        //    return objects;
+        //}
         public static void AddOtherProps(this JsonElement d, string name, List<string> e)
         {
             if (d.otherprops==null)
@@ -712,16 +718,20 @@ namespace DIBAdminAPI.Data.Entities
     {
         public List<string> variablesroot { get; set; }
         public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
-        public VariableJson(IEnumerable<DibVariable> variables, IEnumerable<DibTrigger> triggers, IEnumerable<DibVariableAttritutes> variableAttritutes)
+        public VariableJson(IEnumerable<XElement> xvar, IEnumerable<DibVariable> variables, IEnumerable<DibTrigger> triggers, IEnumerable<DibVariableAttritutes> variableAttritutes)
         {
+            
+            
+
             objects = (
 
-                        from v in variables
-                        join t in triggers.DefaultIfEmpty() on v.name.Trim().ToLower() equals t.name.Trim().ToLower() into g
-                        from tr in g
-                        join va in variableAttritutes.GroupBy(p => p.id).DefaultIfEmpty() on v.id equals va.Key into gv
-                        from ge in gv
-                        select new { v, tr, ge}
+                        from x in xvar.GroupBy(p => (string)p.Attributes("id").FirstOrDefault()).Select(p => p.Key)
+                        join v in variables on x equals v.varId
+                        join t in triggers.GroupBy(p=>p.name) on v.name.Trim().ToLower() equals t.Key.Trim().ToLower() into g
+                        from tr in g.DefaultIfEmpty()
+                        join va in variableAttritutes.GroupBy(p => p.id) on v.id equals va.Key into gv
+                        from ge in gv.DefaultIfEmpty()
+                        select new { v, tr, ge }
                        )
                        .ToDictionary(
                             p => p.v.id.ToString().ToLower(),
@@ -733,14 +743,14 @@ namespace DIBAdminAPI.Data.Entities
                                 data = new
                                 {
                                     id = p.v.id.ToString().ToLower(),
-                                    name = p.v.name,
-                                    standard_text =  p.ge.Where(s=>s.type=="standard_text").Select(s=>s.name).FirstOrDefault(),
-                                    comment = p.ge.Where(s => s.type == "comment").Select(s => s.name).FirstOrDefault(),
-                                    options = p.ge.Where(s=>s.type=="option").ToDictionary(s=>s.name, s=>s.value),
+                                    default_text = p.v.name,
+                                    standard_text = p.ge == null ? null : p.ge.Where(s => s.type == "standard_text").Select(s => s.name).FirstOrDefault(),
+                                    comment = p.ge == null ? null : p.ge.Where(s => s.type == "comment").Select(s => s.name).FirstOrDefault(),
+                                    options = p.ge == null ? null : p.ge.Where(s => s.type == "option").ToDictionary(s => s.name, s => s.value),
                                     type = "dib-x-var",
                                     useage = p.v.count,
                                     counter = p.v.n == 1 ? true : false,
-                                    trigger = p.tr == null ? null : p.tr.trigName,
+                                    triggers = p.tr == null ? null : p.tr.Select(p=>p.trigName).ToList(),
                                 }
                             }
                        );
@@ -828,15 +838,15 @@ namespace DIBAdminAPI.Data.Entities
                                 p => new ObjectApi
                                 {
                                     id = (string)p.Attributes("id").FirstOrDefault(),
-                                    type = "x-var",
+                                    type = "pointer-x-var",
                                     data = new
                                     {
-                                        varId = (string)p.Attributes("id").FirstOrDefault()
+                                        varId = (string)p.Attributes("data-var-id").FirstOrDefault()
                                     }
                                 }
                             )
                         );
-                        
+
                         elements.ForEach(p => new GenBuild(p));
                         root.AddRange(elements.Select(p => (string)p.Attributes("id").FirstOrDefault()));
 
@@ -1068,28 +1078,29 @@ namespace DIBAdminAPI.Data.Entities
 
 
         }
-        public DocumentContainer(ResourceHTML5Element r)
-        {
-            ItemData = r.itemData;
-            Labels = r.Labels;
-            LabelGroups = r.LabelGroups;
-            AccountLines = r.AccountLines;
-            TaxLines = r.TaxLines;
+        //public DocumentContainer(ResourceHTML5Element r)
+        //{
+        //    ItemData = r.itemData;
+        //    Labels = r.Labels;
+        //    LabelGroups = r.LabelGroups;
+        //    AccountLines = r.AccountLines;
+        //    TaxLines = r.TaxLines;
 
-            elementdata.AddRange(GetElementdata());
+        //    elementdata.AddRange(GetElementdata());
 
-            objects.AddRange(AccountLines.GetAccountLineObjects());
-            objects.AddRange(TaxLines.GetTaxLineObjects());
+        //    objects.AddRange(AccountLines.GetAccountLineObjects());
+        //    objects.AddRange(TaxLines.GetTaxLineObjects());
 
-            CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
-            viewroot = cll.viewroot;
-            showroot = cll.showroot;
-            objects.AddRange(cll.objects);
-            VariableJson dv = new VariableJson(DibVariables,DibTrigger, DibVariableAttritutes);
-            variableroot = dv.variablesroot;
-            //GenObjects go 
-            objects.AddRange(dv.objects);
-        }
+        //    CheckLabelJsons cll = new CheckLabelJsons(LabelGroups, Labels, ItemData);
+        //    viewroot = cll.viewroot;
+        //    showroot = cll.showroot;
+        //    objects.AddRange(cll.objects);
+            
+        //    VariableJson dv = new VariableJson(DibVariables,DibTrigger, DibVariableAttritutes);
+        //    variableroot = dv.variablesroot;
+        //    //GenObjects go 
+        //    objects.AddRange(dv.objects);
+        //}
         public void RemoveTopicSubElements()
         {
 
@@ -1134,10 +1145,10 @@ namespace DIBAdminAPI.Data.Entities
             viewroot = cll.viewroot;
             showroot = cll.showroot;
             objects.AddRange(cll.objects);
-            VariableJson dv = new VariableJson(DibVariables, DibTrigger,DibVariableAttritutes);
-            variableroot = dv.variablesroot;
             
-            objects.AddRange(dv.objects);
+            //VariableJson dv = new VariableJson(DibVariables, DibTrigger,DibVariableAttritutes);
+            //variableroot = dv.variablesroot;
+            //objects.AddRange(dv.objects);
         }
         public void RemoveItemData(List<string> el, string id)
         {
@@ -1248,14 +1259,15 @@ namespace DIBAdminAPI.Data.Entities
                 DibTrigger = r.dibTrigger;
                 DibVariableAttritutes = r.dibVariableAttritutes;
 
-                //VariableJson dv = new VariableJson(DibVariables, DibTrigger, DibVariableAttritutes);
-                //variableroot = dv.variablesroot;
-                //objects.AddRange(dv.objects);
+                VariableJson dv = new VariableJson(r.Document.Descendants("x-var"), DibVariables, DibTrigger, DibVariableAttritutes);
+                variableroot = dv.variablesroot;
+                objects.AddRange(dv.objects);
 
 
-                VariableJson dv = new VariableJson(DibVariables, DibTrigger);
+                dv = new VariableJson(DibVariables, DibTrigger);
                 varobjects = dv.objects;
                 
+
 
                 XElement docparthtml = r.Document.ConvertXMLtoHTML5(r.Links, DibVariables, DibTrigger);
                 
@@ -1308,9 +1320,9 @@ namespace DIBAdminAPI.Data.Entities
                 //    .Select(p => (string)p.Attributes("id").FirstOrDefault())
                 //    .ToList();
 
-                variableroot = elements.Where(p => p.Value.attributes.ContainsKey("class") ? p.Value.attributes["class"].Split(' ').Contains("dib-x-var") : false).GroupBy(p => p.Value.attributes["data-var-id"]).Select(p => p.Key).ToList();
+                //variableroot = elements.Where(p => p.Value.attributes.ContainsKey("class") ? p.Value.attributes["class"].Split(' ').Contains("dib-x-var") : false).GroupBy(p => p.Value.attributes["data-var-id"]).Select(p => p.Key).ToList();
 
-                objects.AddRange(dv.objects.Where(p => variableroot.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value));
+                //objects.AddRange(dv.objects.Where(p => variableroot.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value));
 
                 ItemData = r.itemData;
                 Labels = r.Labels;
