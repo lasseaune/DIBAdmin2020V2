@@ -105,8 +105,6 @@ namespace DIBAdminAPI.Helpers.Extentions
         {
             try
             {
-                
-
                 if (variables.Select(p => p.id).FirstOrDefault() != null)
                 {
                     (
@@ -134,6 +132,7 @@ namespace DIBAdminAPI.Helpers.Extentions
 
 
                 document.DescendantsAndSelf().Attributes("idx").Remove();
+                
                 (
                     from e in document.Descendants()
                     join l in linkDatas
@@ -271,7 +270,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             { 
                                 if (e.DescendantNodesAndSelf().OfType<XText>().Select(s=>s.Value).StringConcatenate().Trim()!="" || ((string)e.Attributes("title").FirstOrDefault()??"").Trim()!="")
                                 {
-                                    result.Add(new XElement("section",
+                                    result.Add(new XElement("aside",
                                         new XAttribute("id", Guid.NewGuid().ToString()),
                                         new XAttribute("class", "dib-x-comment"),
                                         new XAttribute("data-gen-object", true),
@@ -280,7 +279,6 @@ namespace DIBAdminAPI.Helpers.Extentions
                                             new XAttribute("id", Guid.NewGuid().ToString()),
                                             e.Nodes().SelectMany(p => p.Transform())
                                         )
-                                        
                                         )
                                     );
                                 }
@@ -387,6 +385,24 @@ namespace DIBAdminAPI.Helpers.Extentions
                         case "h14":
                             result.AddRange(e.h()); break;
                         case "x-box": result.AddRange(e.xbox()); break;
+                        case "diblink":
+                            result.Add(new XElement("a",
+                                 new XAttribute("id", Guid.NewGuid().ToString()),
+                                 new XAttribute("class", "diblink"),
+                                 new XAttribute("data-id", (string)e.Attributes("rid").FirstOrDefault()),   
+                                 e.Nodes().SelectMany(p => p.Transform())
+                                 )
+                            );
+                            break;
+                        case "dibparameter":
+                            result.Add(new XElement("a",
+                                 new XAttribute("id", Guid.NewGuid().ToString()),
+                                 new XAttribute("class", "diblink"),
+                                 new XAttribute("data-id", (string)e.Attributes("rid").FirstOrDefault()),
+                                 new XText((string)e.Attributes("replaceText").FirstOrDefault())
+                                 )
+                            );
+                            break;
                         case "a": result.AddRange(e.a()); break;
                         case "img": result.AddRange(e.img()); break;
                         case "section":
@@ -801,6 +817,16 @@ namespace DIBAdminAPI.Helpers.Extentions
         private static IEnumerable<XNode> Default(this XElement e)
         {
             List<XNode> result = new List<XNode>();
+            if (e.Name.LocalName == "p" && "(ny side);(new page)".Contains(e.DescendantNodes().OfType<XText>().Select(s=>s.Value).StringConcatenate().Trim().ToLower()))
+            {
+                result.Add(new XElement(e.Name.LocalName.ToString(),
+                    e.Attributes("id"),
+                    new XAttribute("class", "dib-x-pagebreak"),
+                    e.Nodes().SelectMany(p => p.Transform())
+                    )
+                );
+                return result;
+            }
             if (e == null) return result;
             CommentsItem cmi = e.Annotations<CommentsItem>().FirstOrDefault();
             result.Add(new XElement(e.Name.LocalName.ToString(),
@@ -817,11 +843,15 @@ namespace DIBAdminAPI.Helpers.Extentions
             List<XAttribute> result = new List<XAttribute>();
             bool dataOptional = ((string)e.Attributes("data-optional").FirstOrDefault() ?? "").Trim().ToLower() == "true";
             bool dataAutocount = ((string)e.Attributes("data-autocount").FirstOrDefault() ?? "").Trim().ToLower() == "true";
+            bool bDataAutocount = e.NodesAfterSelf().OfType<XElement>().Where(p => p.IsHeaderName() && p.Name.LocalName == "section" && ((string)e.Attributes("data-autocount").FirstOrDefault() ?? "").Trim().ToLower() == "true").FirstOrDefault() != null;
+            bool aDataAutocount = e.NodesBeforeSelf().OfType<XElement>().Where(p => p.IsHeaderName() && p.Name.LocalName == "section" && ((string)e.Attributes("data-autocount").FirstOrDefault() ?? "").Trim().ToLower() == "true").FirstOrDefault() != null;
 
-            if (dataOptional || dataAutocount)
+            if (dataOptional || dataAutocount || bDataAutocount || aDataAutocount)
             {
                 List<string> classValue = ((string)e.Attributes("class").FirstOrDefault() ?? "").Split(' ').Where(p => p.Trim() != "" && p != "x-section-optional").ToList();
-                classValue.Add("dib-x-section-optional");
+                
+                if (dataOptional)  classValue.Add("-optional");
+                if (dataAutocount || bDataAutocount || aDataAutocount) classValue.Add("-autocount");
                 result.Add(new XAttribute("class", classValue.Select(p => p).StringConcatenate(" ")));
                 result.Add(new XAttribute("data-gen-object", true));
             }

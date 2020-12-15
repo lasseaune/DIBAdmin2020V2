@@ -12,9 +12,28 @@ using DIBAdminAPI.Services;
 using System.Security.Cryptography;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace DIBAdminAPI.Data.Entities
 {
+    public enum ObjectNames
+    {
+        [Description("dib-x-section")]
+        XSection = 1,
+        [Description("dib-x-optional")]
+        XOptional = 2
+    }
+    public static class MyEnumExtensions
+    {
+        public static string ToDescriptionString(this ObjectNames val)
+        {
+            DescriptionAttribute[] attributes = (DescriptionAttribute[])val
+               .GetType()
+               .GetField(val.ToString())
+               .GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return attributes.Length > 0 ? attributes[0].Description : string.Empty;
+        }
+    }
     public class DibVariable
     {
         public Guid? id { get; set; }
@@ -128,53 +147,55 @@ namespace DIBAdminAPI.Data.Entities
         {
             List<KeyValuePair<string, ObjectApi>> objects = new List<KeyValuePair<string, ObjectApi>>();
             ObjectApi objApi = new ObjectApi();
-            string id = (string)element.Attributes("id").FirstOrDefault();
-            
+            string id = ((string)element.Attributes("id").FirstOrDefault()??"").ToLower();
             string name = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
-            //Debug.Print(id + " - " + element.Ancestors().Count().ToString() + " - " + name);
-            if (name==null)
-            {
 
-            }
-            else if (name != null)
+            if ((name ?? "") == "")
             {
+                return objects;
+            }
+            else
+            { 
                 objApi.id = id;
                 objApi.type = name;
                 switch (name)
                 {
-                    case "dib-x-section-optional":
-
+                    case "-optional":
+                    case "-autocount":
+                        objApi.type = "dib-x-section";
                         bool bAutocount = (string)element.Attributes("data-autocount").FirstOrDefault() == "true";
                         bool bOptional = (string)element.Attributes("data-optional").FirstOrDefault() == "true";
                         bool ?bDefault = (string)element.Attributes("data-default").FirstOrDefault() == "true"; 
                         objApi.data = new
                         {
-                            id = id,
+                            id,
+                            name = element.Elements().Where(p=>Regex.IsMatch(p.Name.LocalName.Trim().ToLower(),@"^h\d$")).Select(p=>p.DescendantNodes().OfType<XText>().Where(s=>s.Ancestors("sup").Count()==0).Select(s=>s.Value).StringConcatenate()).FirstOrDefault(),
                             autoCount = bAutocount,
-                            before = element
-                                .NodesBeforeSelf().OfType<XElement>()
-                                .Where(p=>p.Attributes("class").FirstOrDefault()
-                                .GetGenObjectName(names)==name)
-                                .Select(p=>(string)p.Attributes("id").FirstOrDefault())
-                                .ToList(),
+                            //before = element
+                            //    .NodesBeforeSelf().OfType<XElement>()
+                            //    .Where(p=>p.Attributes("class").FirstOrDefault()
+                            //    .GetGenObjectName(names)==name)
+                            //    .Select(p=>(string)p.Attributes("id").FirstOrDefault())
+                            //    .ToList(),
                             optional = bOptional,
                             varId = bOptional ? (string)element.Attributes("data-var-id").FirstOrDefault() : null,
-                            varvalue = bOptional ? bDefault : null,
+                            varvalue = bOptional ? bDefault : false,
                             dataType = (string)element.Attributes("data-type").FirstOrDefault()
                         };
                         break;
                     case "dib-x-optional":
                         objApi.data = new
                         {
-                            id = objApi.id,
+                            id,
                             varId = (string)element.Attributes("data-var-id").FirstOrDefault(),
-                            varValue = (string)element.Attributes("data-var-keyword").FirstOrDefault(),
+                            varvalue = true,
+                            optionKey = (string)element.Attributes("data-var-keyword").FirstOrDefault(),
                         };
                         break;
                     case "dib-x-list":
                         objApi.data = new
                         {
-                            id = objApi.id,
+                            id,
                             ofType = (string)element.Attributes("data-var-oftype").FirstOrDefault(),
                             heading = (string)element.Attributes("data-var-header").FirstOrDefault(),
                             varId = (string)element.Attributes("data-var-id").FirstOrDefault(), 
@@ -191,21 +212,21 @@ namespace DIBAdminAPI.Data.Entities
                     case "dib-x-letterhead":
                         objApi.data = new
                         {
-                            id = objApi.id,
+                            id,
                             heading = "Brevhode"
                         };
                         break;
                     case "dib-x-alternatives":
                         objApi.data = new
                         {
-                            id = objApi.id,
+                            id,
                             heading = "Alternativ"
                         };
                         break;
                     case "dib-x-alternative":
                         objApi.data = new
                         {
-                            id = objApi.id,
+                            id,
                             heading = (string)element.Attributes("data-var-name").FirstOrDefault(),
                             varId = (string)element.Attributes("data-var-id").FirstOrDefault(),
                             varValue = (string)element.Attributes("data-var-value").FirstOrDefault(),
@@ -214,14 +235,14 @@ namespace DIBAdminAPI.Data.Entities
                     case "dib-x-comment":
                         objApi.data = new
                         {
-                            id = objApi.id,
+                            id,
                             heading = element.Elements("em").Where(p=>(string)p.Attributes("class").FirstOrDefault()== "dib-x-comment-tag").Select(p=>p.Value).FirstOrDefault()
                         };
                         break;
                     default:
                         objApi.data = new
                         {
-                            id = objApi.id,
+                            id,
                         };
                         break;
 
@@ -720,9 +741,6 @@ namespace DIBAdminAPI.Data.Entities
         public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
         public VariableJson(IEnumerable<XElement> xvar, IEnumerable<DibVariable> variables, IEnumerable<DibTrigger> triggers, IEnumerable<DibVariableAttritutes> variableAttritutes)
         {
-            
-            
-
             objects = (
 
                         from x in xvar.GroupBy(p => (string)p.Attributes("id").FirstOrDefault()).Select(p => p.Key)
@@ -809,7 +827,7 @@ namespace DIBAdminAPI.Data.Entities
             {
 
 
-                List<string> names = "dib-x-section-optional;dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
+                List<string> names = "-autocount;-optional;dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
 
                 XElement first = element
                         .Descendants()
@@ -924,10 +942,10 @@ namespace DIBAdminAPI.Data.Entities
                         from subG in g.DefaultIfEmpty()
                         select new {a = ga, b = (subG == null ? false : true)}
                     ).ToDictionary(
-                        p => p.a.Key.labelGroupId.ToString(),
+                        p => p.a.Key.labelGroupId.ToString().ToLower(),
                         p => new ObjectApi
                         {
-                            id = p.a.Key.labelGroupId,
+                            id = p.a.Key.labelGroupId.ToString().ToLower(),
                             type = "clgrouplabel",
                             selected = p.b,
                             transactionId = p.a.Key.transactionId,
@@ -950,10 +968,10 @@ namespace DIBAdminAPI.Data.Entities
                      select new {a = l, b = (subG == null ? false :true)}
                     )
                     .ToDictionary(
-                        p => p.a.labelId.ToString(),
+                        p => p.a.labelId.ToString().ToLower(),
                         p => new ObjectApi
                         {
-                            id = p.a.labelId,
+                            id = p.a.labelId.ToString().ToLower(),
                             type = "cllabel",
                             selected = p.b,
                             transactionId = p.a.transactionId,

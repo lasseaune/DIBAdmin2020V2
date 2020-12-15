@@ -324,6 +324,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             new ElementConstructor().CreateCheckItem()
                         );
                     return document;
+                case 24:
                 case 19:
                     {
                         id = Guid.NewGuid().ToString();
@@ -1082,6 +1083,13 @@ namespace DIBAdminAPI.Helpers.Extentions
                     sb.Append(s);
                 else
                     sb.Append(split + s);
+            return sb.ToString();
+        }
+        public static string StringConcatenate(this List<string> source)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in source)
+                sb.Append(s);
             return sb.ToString();
         }
         public static string StringConcatenate(this IEnumerable<string> source)

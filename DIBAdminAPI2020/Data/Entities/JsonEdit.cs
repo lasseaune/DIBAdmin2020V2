@@ -1878,26 +1878,28 @@ namespace DIBAdminAPI.Data.Entities
             if (CurrId == "")
                 return null;
 
-            XElement document = documentContainer.GetDocumentContainerXML();
-            TocJson tocJson = new TocJson(document,resourceId,segmentId);
+            SectionUpdateObjects updatedObjects = documentContainer.UpdateJsonObjects(resourceId, segmentId);
 
-            List<TocUpdate> tocUpdates = null;
-            tocUpdates = (
-                from t in documentContainer.toc
-                join t1 in tocJson.toc
-                on t.Key equals t1.Key
-                where !t.Value.Equals(t1.Value)
-                select new TocUpdate { oldToc = t, newToc = t1 }
-            ).ToList();
+            //XElement document = documentContainer.GetDocumentContainerXML();
+            //TocJson tocJson = new TocJson(document,resourceId,segmentId);
 
-            foreach (TocUpdate tu in tocUpdates)
-            {
-                if (documentContainer.toc.ContainsKey(tu.newToc.Key))
-                {
-                    documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
-                }
+            //List<TocUpdate> tocUpdates = null;
+            //tocUpdates = (
+            //    from t in documentContainer.toc
+            //    join t1 in tocJson.toc
+            //    on t.Key equals t1.Key
+            //    where !t.Value.Equals(t1.Value)
+            //    select new TocUpdate { oldToc = t, newToc = t1 }
+            //).ToList();
+
+            //foreach (TocUpdate tu in tocUpdates)
+            //{
+            //    if (documentContainer.toc.ContainsKey(tu.newToc.Key))
+            //    {
+            //        documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
+            //    }
                     
-            }
+            //}
             
 
             return new EditDocumentContainerResult
@@ -1905,7 +1907,9 @@ namespace DIBAdminAPI.Data.Entities
                 json = new JsonObject
                 {
                     root = new List<JsonChild> { new JsonChild { id = CurrId } },
-                    toc = tocUpdates == null ? null : (tocUpdates.Count() == 0 ? null : tocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value))
+                    toc = updatedObjects.TocUpdates == null ? null : (updatedObjects.TocUpdates.Count() == 0 ? null : updatedObjects.TocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
+                    objects = updatedObjects.objects.Count() == 0 ? null : updatedObjects.objects,
+                    genobjectroot = updatedObjects.genRoot.Count() == 0 ? null : updatedObjects.genRoot
                 },
                 documentContainer = documentContainer
             };
@@ -1916,6 +1920,7 @@ namespace DIBAdminAPI.Data.Entities
             //string document_id = "document;" + resourceId + ";" + segmentId;
             if (jsonUpdate.action != "update") return null;
             bool updateToc = false;
+            bool autocount = false;
             List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
             
             foreach (KeyValuePair<string, JsonElement> pair in jsonUpdate.elements)
@@ -1924,7 +1929,28 @@ namespace DIBAdminAPI.Data.Entities
                 {
                     if (!documentContainer.elements[pair.Key].Equals(pair.Value))
                     {
-                        if (Regex.IsMatch(pair.Value.name, @"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;")) updateToc = true;
+                        if (Regex.IsMatch(pair.Value.name, @"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;"))
+                        {
+                            updateToc = true;
+                            if (pair.Value.name == "section")
+                            {
+
+                            }
+                            if (pair.Value.attributes.ContainsKey("data-class"))
+                            {
+                                autocount = (pair.Value.attributes.GetValueOrDefault("data-class") ?? "").Split(' ').Contains("-autocount");
+                            }
+                            else
+                            {
+                                if ((documentContainer.elements[pair.Key].attributes.GetValueOrDefault("data-class") ?? "").Split(' ').Contains("-autocount"))
+                                {
+                                    string removeO
+                                }
+
+                            }
+
+                        }
+
                         documentContainer.elements[pair.Key] = pair.Value;
                         updated.Add(pair);
                     }
@@ -1935,59 +1961,124 @@ namespace DIBAdminAPI.Data.Entities
                     updated.Add(pair);
                 }
             }
-            List<TocUpdate> tocUpdates = null;
-            if (updateToc)
-            {
-                tocUpdates = documentContainer.UpdateToc(resourceId, segmentId);
-
-                //XElement document = documentContainer.GetDocumentContainerXML();
+            SectionUpdateObjects updatedObjects = documentContainer.UpdateJsonObjects(resourceId, segmentId);
+            //List<TocUpdate> tocUpdates = null;
+            //if (updateToc)
+            //{
+            //    tocUpdates = documentContainer.UpdateToc(resourceId, segmentId);
                 
-
-                //TocJson tocJson = new TocJson(document, resourceId, segmentId);
-
-                //tocUpdates = (
-                //    from t in documentContainer.toc
-                //    join t1 in tocJson.toc
-                //    on t.Key equals t1.Key
-                //    where !t.Value.Equals(t1.Value)
-                //    select new TocUpdate { oldToc = t, newToc = t1 }
-                //).ToList();
-
-
-                //foreach (TocUpdate tu in tocUpdates)
-                //{
-                //    if (documentContainer.toc.ContainsKey(tu.newToc.Key))
-                //    {
-                //        documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
-                //    }
-                //}
-                //List<TocUpdate> newToc =
-                //    tocJson
-                //        .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
-                //        .Select(p => new TocUpdate { newToc = p })
-                //        .ToList();
-
-                //if (newToc.Count()>1)
-                //{
-                //    documentContainer.toc.AddRange(newToc.ToDictionary(p => p.newToc.Key, p => p.newToc.Value));
-                //    tocUpdates.AddRange(newToc);
-                //}
-            }
+            //}
             return new EditDocumentContainerResult
             {
                 json = new JsonObject {
-                    toc = tocUpdates == null ? null : (tocUpdates.Count() == 0 ? null : tocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
-                    elements = updated.Count()==0 ? null : updated.ToDictionary(p => p.Key, p => p.Value) 
+                    toc = updatedObjects.TocUpdates == null ? null : (updatedObjects.TocUpdates.Count() == 0 ? null : updatedObjects.TocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
+                    elements = updated.Count()==0 ? null : updated.ToDictionary(p => p.Key, p => p.Value),
+                    objects = updatedObjects.objects.Count() == 0 ?  null : updatedObjects.objects,
+                    genobjectroot = updatedObjects.genRoot.Count() ==0 ? null : updatedObjects.genRoot
+
                 },
                 documentContainer = documentContainer
             };
+        }
+        public class SectionUpdateObjects
+        {
+            public List<TocUpdate> TocUpdates = new List<TocUpdate>();
+            public List<string> genRoot = new List<string>();
+            public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+
+        }
+        public class ObjectAPIUpdated
+        {
+            public KeyValuePair<string, ObjectApi> prevObj { get; set; }
+            public KeyValuePair<string, ObjectApi> currObj { get; set; }
+        }
+
+        public static SectionUpdateObjects UpdateJsonObjects(this DocumentContainer documentContainer, string resourceId, string segmentId)
+        {
+            SectionUpdateObjects result = new SectionUpdateObjects();
+            
+            List<TocUpdate> tocUpdates = null;
+            XElement document = documentContainer.GetDocumentContainerXML();
+
+            if (documentContainer.resourceTypeId == "24")
+            {
+                GenObjects genObjects = new GenObjects(document);
+                List<ObjectAPIUpdated> objectAPIUpdateds =
+                (
+                    from o in documentContainer.objects.Where(p => p.Value.type.StartsWith("pointer-x-var") || p.Value.type.StartsWith("dib-x"))
+                    join go in genObjects.objects on o.Key equals go.Key
+                    where !o.Value.Equals(go.Value)
+                    select new ObjectAPIUpdated { prevObj = o, currObj = go }
+                )
+                .ToList();
+
+                foreach (ObjectAPIUpdated o in objectAPIUpdateds)
+                {
+                    if (documentContainer.objects.ContainsKey(o.currObj.Key))
+                    {
+                        documentContainer.objects[o.currObj.Key] = o.currObj.Value;
+                    }
+                }
+
+                result.objects.AddRange(objectAPIUpdateds.ToDictionary(p => p.currObj.Key, p => p.currObj.Value));
+
+                Dictionary<string, ObjectApi> newObjects =
+                    genObjects
+                    .objects
+                    .Where(p => !documentContainer.objects.ContainsKey(p.Key))
+                    .ToDictionary(p => p.Key, p => p.Value);
+
+
+                if (newObjects.Count() > 0)
+                {
+                    documentContainer.objects.AddRange(newObjects.ToDictionary(p => p.Key, p => p.Value));
+                    result.objects.AddRange(newObjects.ToDictionary(p => p.Key, p => p.Value));
+                }
+
+                if (documentContainer.genobjectroot.StringConcatenate() != genObjects.root.StringConcatenate())
+                {
+                    documentContainer.genobjectroot = genObjects.root;
+                    result.genRoot = genObjects.root;
+                }
+            }
+
+            TocJson tocJson = new TocJson(document, resourceId, segmentId);
+
+            tocUpdates = (
+                from t in documentContainer.toc
+                join t1 in tocJson.toc
+                on t.Key equals t1.Key
+                where !t.Value.Equals(t1.Value)
+                select new TocUpdate { oldToc = t, newToc = t1 }
+            ).ToList();
+
+
+            foreach (TocUpdate tu in tocUpdates)
+            {
+                if (documentContainer.toc.ContainsKey(tu.newToc.Key))
+                {
+                    documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
+                }
+            }
+            List<TocUpdate> newToc =
+                tocJson
+                    .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
+                    .Select(p => new TocUpdate { newToc = p })
+                    .ToList();
+
+            if (newToc.Count() > 0)
+            {
+                documentContainer.toc.AddRange(newToc.ToDictionary(p => p.newToc.Key, p => p.newToc.Value));
+                tocUpdates.AddRange(newToc);
+            }
+            result.TocUpdates = tocUpdates;
+
+            return result;
         }
         public static List<TocUpdate> UpdateToc(this DocumentContainer documentContainer, string resourceId, string segmentId)
         {
             List<TocUpdate> tocUpdates = null;
             XElement document = documentContainer.GetDocumentContainerXML();
-
-
             TocJson tocJson = new TocJson(document, resourceId, segmentId);
 
             
@@ -2817,12 +2908,30 @@ namespace DIBAdminAPI.Data.Entities
                         }
                     }
                 }
-                List<TocUpdate> tocUpdates = null;
+                SectionUpdateObjects updatedObjects = new SectionUpdateObjects();
+                if (updateToc)
+                {
+                    updatedObjects = documentContainer.UpdateJsonObjects(documentContainer.id, documentContainer.segmentId);
+
+                }
+                /*
+                return new EditDocumentContainerResult
+                {
+                    json = new JsonObject
+                    {
+                        toc = updatedObjects.TocUpdates == null ? null : (updatedObjects.TocUpdates.Count() == 0 ? null : updatedObjects.TocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
+                        elements = updated.Count() == 0 ? null : updated.ToDictionary(p => p.Key, p => p.Value),
+                        objects = updatedObjects.objects.Count() == 0 ? null : updatedObjects.objects,
+                        genobjectroot = updatedObjects.genRoot.Count() == 0 ? null : updatedObjects.genRoot
+
+                    },
+                    documentContainer = documentContainer
+                };
                 if (updateToc)
                 {
                     tocUpdates = documentContainer.UpdateToc(documentContainer.id, documentContainer.segmentId);
                 }
-
+                */
                 return new EditResult
                 {
                     json = new JsonObject
@@ -2830,8 +2939,10 @@ namespace DIBAdminAPI.Data.Entities
                         resourceid = jsonCreate.resourceId,
                         root = json.root,
                         elements = updated.ToDictionary(p=>p.Key, p=>p.Value),
-                        toc = tocUpdates == null ? null : (tocUpdates.Count() == 0 ? null : tocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
-                        variableroot = variableAdded ? documentContainer.variableroot : null
+                        toc = updatedObjects.TocUpdates == null ? null : (updatedObjects.TocUpdates.Count() == 0 ? null : updatedObjects.TocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
+                        variableroot = variableAdded ? documentContainer.variableroot : null,
+                        objects = updatedObjects.objects.Count() == 0 ? null : updatedObjects.objects,
+                        genobjectroot = updatedObjects.genRoot.Count() == 0 ? null : updatedObjects.genRoot
                     },
                     documentContainer = documentContainer
                 };
@@ -3311,6 +3422,8 @@ namespace DIBAdminAPI.Data.Entities
 
         public Dictionary<string, JsonToc> toc = new Dictionary<string, JsonToc>();
         public List<string> variableroot { get; set; }
+        public List<string> genobjectroot { get; set; }
+        public Dictionary<string, ObjectApi> objects { get; set; }
         public JsonObject() { }
         public JsonObject(IEnumerable<XElement> xelements)
         {
@@ -3370,10 +3483,10 @@ namespace DIBAdminAPI.Data.Entities
             return true;
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(attributes, children, name, type);
-        }
+        //public override int GetHashCode()
+        //{
+        //    return HashCode.Combine(attributes, children, name, type);
+        //}
     }
     public class JsonElement : IJsonElement, IEquatable<JsonElement>
     {

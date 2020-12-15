@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DIBAdminAPI.Helpers.Extentions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -243,13 +244,79 @@ namespace DIBAdminAPI.Data.Entities
     public class ObjectApi
     {
         public string type { get; set; }
-        public dynamic id { get; set; }
+        public string id { get; set; }
         public string transactionId { get; set; }
         public bool? selected { get; set; }
         //public Dictionary<string, string> data { get; set; }
         public dynamic data { get; set; }
         public List<string> children { get; set; }
-        private List<Dictionary<string, ObjectApi>> objects { get; set; }
+        //private List<Dictionary<string, ObjectApi>> objects { get; set; }
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public bool Equals(ObjectApi other)
+        {
+            if (other == null) return false;
+
+            if ((other.type ?? "null") != (type ?? "null")) return false;
+            if ((other.id ?? "null") != (id ?? "null")) return false;
+            if ((other.transactionId ?? "null") != (transactionId ?? "null")) return false;
+            if ((other.selected ?? false) != (selected ?? false)) return false;
+            switch (type)
+            {
+                case "pointer-x-var":
+                    {
+                        if (other.data.varId ?? "" != data.varId ?? "") return false;
+                    }
+                    break;
+                case "dib-x-optional":
+                    {
+                        if (other.data.varId ?? "" != data.varId ?? "") return false;
+                        if (((bool)other.data.varvalue) != ((bool)data.varvalue)) return false;
+                        if (other.data.dataType ?? "" != data.dataType ?? "") return false;
+                    }
+                    break;
+                case "dib-x-list":
+                    {
+                        if (other.data.ofType ?? "" != data.ofType ?? "") return false;
+                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                        if (other.data.varId ?? "" != data.varId ?? "") return false;
+                        if (other.data.defaultCounter ?? "" != data.defaultCounter ?? "") return false;
+                    }
+                    break;
+                case "dib-x-letterhead":
+                    {
+                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                    }
+                    break;
+                case "dib-x-alternatives":
+                    {
+                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                    }
+                    break;
+                case "dib-x-alternative":
+                    {
+                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                        if (other.data.varId ?? "" != data.varId ?? "") return false;
+                        if (other.data.varValue ?? "" != data.varValue ?? "") return false;
+                    }
+                    break;
+                case "dib-x-comment":
+                    {
+                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                    }
+                    break;
+                default:
+                    return false; ;
+
+            }
+
+            if ((other.children == null ? "" : other.children.Select(p=>p).StringConcatenate()) == (children == null ? "" : children.Select(p => p).StringConcatenate())) return false;
+            return true;
+        }
+
     }
     public class TagsAPI
     {
