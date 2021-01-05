@@ -126,6 +126,19 @@ namespace DIBAdminAPI.Data.Entities
             }
         }
     }
+    public class GenObjectTypeAttributes
+    {
+        public string elementName { get; set; }
+        public string className { get; set; }
+        public bool hasHeader { get; set; }
+        public bool autoCount { get; set; }
+        public bool Optional { get; set; }
+        public bool Default { get; set; }
+        public string type { get; set; }
+        public bool Object { get; set; }
+
+        public GenObjectTypeAttributes() { }
+    }
     public class SelectedElement
     {
         public XElement element { get; set; }
@@ -142,45 +155,147 @@ namespace DIBAdminAPI.Data.Entities
                     select n
                 ).FirstOrDefault();
         }
-        
-        public static List<KeyValuePair<string, ObjectApi>> GetGenObject(this XElement element, List<string> names)
+
+        public static void SetGenObjectAttributes(this XElement element, List<string> names)
+        {
+            string elementName = element.Name.LocalName;
+            string className = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
+            bool hasHeader = element.Elements().Where(p => p.IsHeaderName()).Count() > 0;
+            bool autoCount = element.Attributes("autocount").FirstOrDefault() == null ? false : (bool)element.Attributes("autocount").FirstOrDefault();
+            bool Optional = element.Attributes("optional").FirstOrDefault() == null ? false : (bool)element.Attributes("optional").FirstOrDefault();
+            bool Default = element.Attributes("data-default").FirstOrDefault() == null ? false : (bool)element.Attributes("data-default").FirstOrDefault();
+
+            GenObjectTypeAttributes gota = new GenObjectTypeAttributes();
+            gota.elementName = elementName;
+            gota.className = className;
+            gota.hasHeader = hasHeader;
+            gota.autoCount = autoCount;
+            gota.Optional = Optional;
+            gota.Default = Default;
+            gota.type = "none";
+            gota.Object = true;
+
+
+            if (elementName == "section" && hasHeader && (autoCount || Optional))
+            {
+                gota.className = "dib-x-section";
+                gota.type = "gen";
+                element.AddAnnotation(gota);
+                return;
+            }
+            else if (elementName == "section" && hasHeader)
+            {
+                gota.className = "dib-x-section";
+                gota.type = "gen";
+                gota.Object = false;
+                element.AddAnnotation(gota);
+                return;
+            }
+            else if (className == "dib-x-var")
+            {
+                gota.type = "var";
+                element.AddAnnotation(gota);
+                return;
+            }
+            else if ((className == null ? "" : className) != "")
+            {
+                gota.type = "gen";
+                element.AddAnnotation(gota);
+                return;
+            }
+            gota.type = "none";
+            gota.Object = false;
+            element.AddAnnotation(gota);
+            return;
+        }
+        public static GenObjectTypeAttributes IsGenObject(this XElement element)
+        {
+            GenObjectTypeAttributes gota = element.Annotations<GenObjectTypeAttributes>().FirstOrDefault();
+            if (gota == null)
+            {
+                gota = new GenObjectTypeAttributes { type = "none", Object=false };
+            }
+            return gota;
+        }
+        public static GenObjectTypeAttributes IsGenObject(this XElement element, List<string> names)
+        {
+            string elementName = element.Name.LocalName;
+            string className = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
+            bool hasHeader = element.Elements().Where(p => p.IsHeaderName()).Count() > 0;
+            bool autoCount = element.Attribute("autocount") == null ? false : (bool)element.Attribute("autocount");
+            bool Optional = element.Attribute("optional") == null ? false :  (bool)element.Attribute("optional");
+            bool Default = element.Attribute("data-default")==null ? false : (bool)element.Attribute("data-default");
+
+            GenObjectTypeAttributes gota = new GenObjectTypeAttributes();
+            gota.elementName = elementName;
+            gota.className = className;
+            gota.hasHeader = hasHeader;
+            gota.autoCount = autoCount;
+            gota.Optional = Optional;
+            gota.Default = Default;
+
+
+            if (elementName == "section" && hasHeader && (autoCount || Optional))
+            {
+                gota.className = "dib-x-section";
+                gota.type = "gen";
+                element.AddAnnotation(gota);
+                return gota;
+            }
+            else if (elementName == "section" && hasHeader)
+            {
+                gota.className = "dib-x-section";
+                gota.type = "gen";
+                element.AddAnnotation(gota);
+                return gota;
+            }
+            else if (className == "dib-x-var")
+            {
+                gota.type = "var";
+                element.AddAnnotation(gota);
+                return gota;
+            }
+            else if ((className == null ? "" : className) != "")
+            {
+                gota.type = "gen";
+                element.AddAnnotation(gota);
+                return gota;
+            }
+            element.AddAnnotation(gota);
+            gota.type = "none";
+            return gota;
+        }
+        public static List<KeyValuePair<string, ObjectApi>> GetGenObject(this XElement element)
         {
             List<KeyValuePair<string, ObjectApi>> objects = new List<KeyValuePair<string, ObjectApi>>();
             ObjectApi objApi = new ObjectApi();
-            string id = ((string)element.Attributes("id").FirstOrDefault()??"").ToLower();
-            string name = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
+            GenObjectTypeAttributes gota = element.Annotations<GenObjectTypeAttributes>().FirstOrDefault();
 
-            if ((name ?? "") == "")
-            {
-                return objects;
-            }
-            else
+            string id = ((string)element.Attributes("id").FirstOrDefault()??"").ToLower();
+            string elementName = element.Name.LocalName;
+            //string className = element.Attributes("class").FirstOrDefault().GetGenObjectName(names);
+            //bool hasHeader = element.Elements().Where(p => p.IsHeaderName()).Count() > 0;
+            //bool autoCount = element.Attribute("autocount") == null ? false : (bool)element.Attribute("autocount");
+            //bool Optional = element.Attribute("optional") == null ? false : (bool)element.Attribute("optional");
+            //bool Default = element.Attribute("data-default") == null ? false : (bool)element.Attribute("data-default");
+
+            
+            if ((gota.className == null ? "" : gota.className)!="")
             { 
                 objApi.id = id;
-                objApi.type = name;
-                switch (name)
+                objApi.type = gota.className;
+                switch (gota.className)
                 {
-                    case "-optional":
-                    case "-autocount":
-                        objApi.type = "dib-x-section";
-                        bool bAutocount = (string)element.Attributes("data-autocount").FirstOrDefault() == "true";
-                        bool bOptional = (string)element.Attributes("data-optional").FirstOrDefault() == "true";
-                        bool ?bDefault = (string)element.Attributes("data-default").FirstOrDefault() == "true"; 
+                    case "dib-x-section":
                         objApi.data = new
                         {
                             id,
-                            name = element.Elements().Where(p=>Regex.IsMatch(p.Name.LocalName.Trim().ToLower(),@"^h\d$")).Select(p=>p.DescendantNodes().OfType<XText>().Where(s=>s.Ancestors("sup").Count()==0).Select(s=>s.Value).StringConcatenate()).FirstOrDefault(),
-                            autoCount = bAutocount,
-                            //before = element
-                            //    .NodesBeforeSelf().OfType<XElement>()
-                            //    .Where(p=>p.Attributes("class").FirstOrDefault()
-                            //    .GetGenObjectName(names)==name)
-                            //    .Select(p=>(string)p.Attributes("id").FirstOrDefault())
-                            //    .ToList(),
-                            optional = bOptional,
-                            varId = bOptional ? (string)element.Attributes("data-var-id").FirstOrDefault() : null,
-                            varvalue = bOptional ? bDefault : false,
-                            dataType = (string)element.Attributes("data-type").FirstOrDefault()
+                            name = element.Elements().Where(p => Regex.IsMatch(p.Name.LocalName.Trim().ToLower(), @"^h\d$")).Select(p => p.DescendantNodes().OfType<XText>().Where(s => s.Ancestors("sup").Count() == 0).Select(s => s.Value).StringConcatenate()).FirstOrDefault(),
+                            autoCount = gota.autoCount,
+                            optional = gota.Optional,
+                            varId = gota.Optional ? id : null,
+                            varvalue = gota.Optional ? gota.Default : false,
+                            dataType = (string)element.Attributes("type").FirstOrDefault()
                         };
                         break;
                     case "dib-x-optional":
@@ -240,82 +355,77 @@ namespace DIBAdminAPI.Data.Entities
                         };
                         break;
                     default:
-                        objApi.data = new
-                        {
-                            id,
-                        };
                         break;
 
                 }
-
-                XElement first = element
-                    .Descendants()
-                    .SkipWhile(p => p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 && p.Annotations<GenBuild>().FirstOrDefault() == null)
-                    .Take(1).FirstOrDefault();
-                while (first != null)
+                if (gota.Object)
                 {
-                    if (first.Attributes("data-var-object").FirstOrDefault() != null)
+                    XElement first = element
+                        .Descendants()
+                        .SkipWhile(p => p.IsGenObject().type == "none" && p.Annotations<GenBuild>().FirstOrDefault() == null)
+                        .Take(1).FirstOrDefault();
+                    while (first != null)
                     {
-                        List<XElement> elements = new List<XElement>();
-                        elements.Add(first);
-                        elements.AddRange(
-                            element
-                            .Descendants()
-                            .SkipWhile(p => p != first)
-                            .Skip(1)
-                            .TakeWhile(p => p.Attributes("data-gen-object").FirstOrDefault() == null)
-                            .Where(p => p.Attributes("data-var-object").FirstOrDefault() != null)
-                        );
-                        objects.AddRange(elements
-                            .Select(p => new KeyValuePair<string, ObjectApi>(
-                                (string)p.Attributes("id").FirstOrDefault(),
-                                new ObjectApi
-                                {
-                                    id = (string)p.Attributes("id").FirstOrDefault(),
-                                    type = "pointer-x-var",
-                                    data = new
+                        if (first.IsGenObject().type == "var")
+                        {
+                            List<XElement> elements = new List<XElement>();
+                            elements.Add(first);
+                            elements.AddRange(
+                                element
+                                .Descendants()
+                                .SkipWhile(p => p != first)
+                                .Skip(1)
+                                .TakeWhile(p => p.IsGenObject().type != "gen")
+                                .Where(p => p.IsGenObject().type == "var")
+                            );
+                            objects.AddRange(elements
+                                .Select(p => new KeyValuePair<string, ObjectApi>(
+                                    (string)p.Attributes("id").FirstOrDefault(),
+                                    new ObjectApi
                                     {
-                                        varId = (string)p.Attributes("data-var-id").FirstOrDefault()
+                                        id = (string)p.Attributes("id").FirstOrDefault(),
+                                        type = "pointer-x-var",
+                                        data = new
+                                        {
+                                            varId = (string)p.Attributes("data-var-id").FirstOrDefault()
+                                        }
                                     }
-                                }
+                                    )
                                 )
-                            )
-                            .ToList()
+                                .ToList()
 
-                        );
-                        elements.ForEach(p => new GenBuild(p));
-                        if (objApi.children == null) objApi.children = new List<string>();
-                        objApi.children.AddRange(elements.Select(p => (string)p.Attributes("id").FirstOrDefault()));
-                        
-                        first = element
-                            .Descendants()
-                            .SkipWhile(p => p != elements.LastOrDefault())
-                            .Skip(1)
-                            .SkipWhile(p => 
-                                p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
-                                || p.Annotations<GenBuild>().FirstOrDefault() != null)
-                            .Take(1)
-                            .FirstOrDefault();
-                    }
-                    else if (first.Attributes("data-gen-object").FirstOrDefault() != null)
-                    {
-                        new GenBuild(first);
-                        if (objApi.children==null) objApi.children = new List<string>();
-                        objApi.children.Add((string)first.Attributes("id").FirstOrDefault());
-                        
-                        List<KeyValuePair<string, ObjectApi>> result = first.GetGenObject(names);
-                        
-                        objects.AddRange(result);
-                        
-                        first = element
-                            .Descendants()
-                            .SkipWhile(p => p != first)
-                            .Skip(1)
-                            .SkipWhile(p => 
-                                p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
-                                || p.Annotations<GenBuild>().FirstOrDefault() != null)
-                            .Take(1)
-                            .FirstOrDefault();
+                            );
+                            elements.ForEach(p => new GenBuild(p));
+                            if (objApi.children == null) objApi.children = new List<string>();
+                            objApi.children.AddRange(elements.Select(p => (string)p.Attributes("id").FirstOrDefault()));
+
+                            first = element
+                                .Descendants()
+                                .SkipWhile(p => p != elements.LastOrDefault())
+                                .Skip(1)
+                                .SkipWhile(p => p.IsGenObject().type == "none" || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                                .Take(1)
+                                .FirstOrDefault();
+                        }
+                        else if (first.IsGenObject().type == "gen")
+                        {
+                            new GenBuild(first);
+                            if (objApi.children == null) objApi.children = new List<string>();
+                            if (gota.Object)
+                                objApi.children.Add((string)first.Attributes("id").FirstOrDefault());
+
+                            List<KeyValuePair<string, ObjectApi>> result = first.GetGenObject();
+
+                            objects.AddRange(result);
+
+                            first = element
+                                .Descendants()
+                                .SkipWhile(p => p != first)
+                                .Skip(1)
+                                .SkipWhile(p => p.IsGenObject().type == "none" || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                                .Take(1)
+                                .FirstOrDefault();
+                        }
                     }
                 }
                 objects.Add(new KeyValuePair<string, ObjectApi>(id, objApi));
@@ -825,19 +935,19 @@ namespace DIBAdminAPI.Data.Entities
         {
             try
             {
+                
 
-
-                List<string> names = "-autocount;-optional;dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
+                List<string> names = "dib-x-var;dib-x-optional;dib-x-list;dib-x-letterhead;dib-x-alternatives;dib-x-alternative;dib-x-comment".Split(';').ToList();
+                element.Descendants().ToList().ForEach(p => p.SetGenObjectAttributes(names));
 
                 XElement first = element
                         .Descendants()
-                        .SkipWhile(p => 
-                            p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
-                            || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                        .SkipWhile(p => p.IsGenObject().type=="none" || p.Annotations<GenBuild>().FirstOrDefault() != null
+                        )
                         .Take(1).FirstOrDefault();
                 while (first != null)
                 {
-                    if (first.Attributes("data-var-object").FirstOrDefault() != null)
+                    if (first.IsGenObject().type=="var")
                     {
                         List<XElement> elements = new List<XElement>();
                         elements.Add(first);
@@ -845,10 +955,9 @@ namespace DIBAdminAPI.Data.Entities
                             element
                             .Descendants()
                             .SkipWhile(p => p != first).Skip(1)
-                            .TakeWhile(p => 
-                                p.Attributes("data-gen-object").FirstOrDefault() == null
+                            .TakeWhile(p => p.IsGenObject().type!="gen"
                             )
-                            .Where(p => p.Attributes("data-var-object").FirstOrDefault() != null)
+                            .Where(p => p.IsGenObject().type=="var")
                         );
                         objects.AddRange(elements
                             .ToDictionary(
@@ -871,23 +980,25 @@ namespace DIBAdminAPI.Data.Entities
                         first = element
                             .Descendants()
                             .SkipWhile(p => p != elements.LastOrDefault())
-                            .SkipWhile(p => p.Attributes("data-gen-object").FirstOrDefault() == null)
+                            .SkipWhile(p => p.IsGenObject().type!="gen")
                             .Take(1)
                             .FirstOrDefault();
                     }
-                    else if (first.Attributes("data-gen-object").FirstOrDefault() != null)
+                    else if (first.IsGenObject().type=="gen")
                     {
                         new GenBuild(first);
-                        root.Add((string)first.Attributes("id").FirstOrDefault());
-                        List<KeyValuePair<string, ObjectApi>> result = first.GetGenObject(names);
+
+                        if (first.IsGenObject().Object)
+                        {
+                            root.Add((string)first.Attributes("id").FirstOrDefault());
+                        }
+                        List<KeyValuePair<string, ObjectApi>> result = first.GetGenObject();
                         objects.AddRange(result.ToDictionary(p => p.Key, p => p.Value));
                         first = element
                             .Descendants()
                             .SkipWhile(p => p != first)
                             .Skip(1)
-                            .SkipWhile(p => 
-                                p.Attributes().Where(a => "data-var-object;data-gen-object".Split(';').Contains(a.Name.LocalName)).Count() == 0 
-                                || p.Annotations<GenBuild>().FirstOrDefault() != null)
+                            .SkipWhile(p => p.IsGenObject().type=="none" || p.Annotations<GenBuild>().FirstOrDefault() != null)
                             .Take(1)
                             .FirstOrDefault();
                     }
@@ -1293,11 +1404,13 @@ namespace DIBAdminAPI.Data.Entities
                 tocroot = tocJson.tocroot;
                 toc = tocJson.toc;
 
-                GenObjects go = new GenObjects(docparthtml);
-
-                objects.AddRange(go.objects);
-                genobjectroot = go.root;
                 
+                if (resourceTypeId == "24")
+                { 
+                    GenObjects go = new GenObjects(docparthtml);
+                    objects.AddRange(go.objects);
+                    genobjectroot = go.root;
+                }
 
 
                 string document_id = "document;" + r.id + ";" + r.segmentId;
@@ -1313,7 +1426,7 @@ namespace DIBAdminAPI.Data.Entities
                         {
                             
                             name = "div",
-                            attributes = new Dictionary<string, string>() { 
+                            attributes = new Dictionary<string, dynamic>() { 
                                 { "class", "doccontainer" },
                                 { "id", document_id },
                             },

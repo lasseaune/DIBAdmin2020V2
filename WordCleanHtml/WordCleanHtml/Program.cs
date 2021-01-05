@@ -29,6 +29,120 @@ namespace WordCleanHtml
         {
             //string path = @"D:\_books\KOSTRA\2020\html\";
             //string filename = @"KOSTRA hovedveileder 2020.xml";
+            string path = @"D:\_data\_lover_en\The Bookkeeping Act\";
+            string filename = @"total.htm";
+            XElement e = XElement.Load(path + filename);
+
+            e.DescendantNodes().OfType<XText>().ToList().ForEach(p => p.ReplaceWith(new XText(Regex.Replace(p.Value, @"&nbsp\;", " "))));
+            e.DescendantNodes().OfType<XText>().ToList().ForEach(p => p.ReplaceWith(new XText(Regex.Replace(p.Value, @"&#8209\;", "-"))));
+            e.DescendantNodes().OfType<XText>().ToList().ForEach(p => p.ReplaceWith(new XText(Regex.Replace(p.Value, @"\s+", " "))));
+            e.DescendantNodes().OfType<XText>().ToList().ForEach(p => p.ReplaceWith(new XText(Regex.Replace(p.Value, @"\r\n", " "))));
+            e.Descendants().OfType<XText>().ToList().ForEach(p => p.ReplaceWith(new XText(Regex.Replace(p.Value, @"\s+", " "))));
+
+            e.Descendants("a").Where(p => ((string)p.Attributes("name").FirstOrDefault() ?? "")!="" && p.Nodes().OfType<XText>().Select(s=>s.Value).StringConcatenate().Trim()=="").ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+            e.Descendants("p").Where(p => p.GetDescendantText().Trim() == "").ToList().ForEach(p => p.Remove());
+            e.Descendants("span").Where(p => "td;th;li;p;b;h1".Split(';').Contains(p.Parent.Name.LocalName) && p.Parent.Nodes().Count() == 1).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+            e.Descendants("td").Where(p => p.GetDescendantText().Trim() == "").ToList().ForEach(p => p.ReplaceWith(new XElement("td")));
+            
+            
+
+            e.Descendants("span").Attributes("style").ToList().ForEach(p => p.SetValue(Regex.Replace(p.Value, @"\s+", "")));
+            e.Descendants().Attributes("style").Where(p => p.Value.Trim().ToLower().StartsWith("mso-list:l19")).ToList().ForEach(p => p.Remove());
+            e.Descendants("tr").Attributes("style").ToList().ForEach(p => p.Remove());
+            
+            
+            
+            e.Descendants("p").Attributes("class").Where(s => s.Value== "MsoNormal").ToList().ForEach(p => p.Remove());
+
+            
+
+            e.Descendants("span").Where(p => p.DescendantNodes().OfType<XText>().Select(t => t.Value).StringConcatenate() == "").ToList().ForEach(p => p.Remove());
+
+
+            
+
+            e.Save(path + "temp.xml");
+            
+            XElement temp = e.Elements("div").Where(p => (string)p.Attributes("id").FirstOrDefault() == "WordSection1").FirstOrDefault();
+
+            List<Header> header = temp.Elements().Where(p => Regex.IsMatch(p.Name.LocalName, @"^h\d$")).Select(p => new Header(p)).ToList();
+            XElement document = new XElement("document",
+                temp.GetChildren(header, header, 1)
+            );
+
+            Regex numb = new Regex(@"^(\s+)?(?<numb>(\d+((\.\d+)+)?))(?<rest>([A-ZÆØÅ].+))");
+            document = XElement.Parse(document.ToString());
+
+            document.Descendants("span").Where(p => p.Nodes().OfType<XElement>().Count() == 0 && p.DescendantNodesAndSelf().OfType<XText>().Select(s => s.Value).StringConcatenate() == "").ToList().ForEach(p => p.Remove());
+
+            document.Descendants()
+                .Where(p =>
+                    Regex.IsMatch(p.Name.LocalName, @"^h\d$")
+                    && numb.IsMatch(p.DescendantNodesAndSelf().OfType<XText>().Select(s => s.Value).FirstOrDefault() ?? "")
+                )
+                .Select(p => p.DescendantNodesAndSelf().OfType<XText>().FirstOrDefault())
+                .ToList()
+                .ForEach(p => p.ReplaceWith(new XText(numb.Match(p.Value.TrimStart()).Groups["numb"].Value + " " + numb.Match(p.Value.TrimStart()).Groups["rest"].Value)));
+
+
+
+            List<string> listName = new List<string>(){
+                { "MsoListParagraphCxSpFirst" },
+                { "MsoListParagraphCxSpMiddel" },
+                { "MsoListParagraphCxSpLast" }
+            };
+
+
+            XElement first = document
+                .Descendants("p")
+                .Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower().Contains("list"))
+                .FirstOrDefault();
+            while (first != null)
+            {
+                List<XElement> n = new List<XElement>();
+                n.Add(first);
+
+                n.AddRange(first.NodesAfterSelf().OfType<XElement>().TakeWhile(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower().Contains("list")));
+
+                n.Skip(1).ToList().ForEach(p => p.Attributes("class").FirstOrDefault().SetValue((string)first.Attributes("class").FirstOrDefault()));
+                n.ForEach(p => Debug.Print(p.ToString()));
+                XElement container = n.MakeListFromP();
+                if (container == null)
+                {
+                    n.ForEach(p => p.ReplaceWith(new XElement("p", n.Nodes())));
+                }
+                else
+                {
+                    container.Descendants("container").ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+                    container.Descendants("p").ToList().ForEach(p => p.ReplaceWith(new XElement("p", p.Nodes())));
+                    n.Skip(1).ToList().ForEach(p => p.Remove());
+                    first.ReplaceWith(container.Nodes());
+                }
+
+
+                first = document
+                .Descendants("p")
+                .Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Trim().ToLower().Contains("list"))
+                .FirstOrDefault();
+            }
+            document.Descendants().Attributes("style").Where(p => p.Value == "margin-bottom:0cm;margin-bottom:0cm;margin-top:      0cm").ToList().ForEach(p => p.Remove());
+            document.Descendants().Attributes("class").Where(p => p.Value == "MsoNormal").ToList().ForEach(p => p.Remove());
+            document.Descendants("span").Where(p => "td;th;li;p;b;h1".Split(';').Contains(p.Parent.Name.LocalName) && p.Parent.Nodes().Count() == 1).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+            document.Descendants("span").Where(p => "td;th;li;p;b;h1".Split(';').Contains(p.Parent.Name.LocalName) && p.Parent.Nodes().Count() == 1).ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+            document.Descendants().Attributes("style").ToList().ForEach(p => p.Remove());
+            document.Descendants("a").Where(p => (string)p.Attributes("class").FirstOrDefault() == "msocomanchor").ToList().ForEach(p => p.Remove());
+            document.Descendants("span").Reverse().ToList().ForEach(p => p.ReplaceWith(p.Nodes()));
+            document.Save(path + "bookkeepingavt.xml");
+
+            
+
+
+
+        }
+        static void MainKostra(string[] args)
+        {
+            //string path = @"D:\_books\KOSTRA\2020\html\";
+            //string filename = @"KOSTRA hovedveileder 2020.xml";
             string path = @"D:\_books\KOSTRA\2021\last\";
             string filename = @"kostra2021_all.xml";
             XElement e = XElement.Load(path + filename);

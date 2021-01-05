@@ -45,7 +45,7 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class JsonElementHierarcy
     {
-        public Dictionary<string, string> attributes = new Dictionary<string, string>();
+        public Dictionary<string, dynamic> attributes = new Dictionary<string, dynamic>();
         public List<JsonChild> children { get; set; } = new List<JsonChild>();
         public string name { get; set; }
 
@@ -1386,6 +1386,20 @@ namespace DIBAdminAPI.Data.Entities
     
     public class ElementConstructor
     {
+        public XElement CreateXAlternatives()
+        {
+            string id = Guid.NewGuid().ToString();
+            XElement alternatives = new XElement("section",
+                                new XAttribute("id", id),
+                                new XAttribute("class", "dib-x-alternatives"),
+                                new XAttribute("data-var-id", id),
+                                Extentions.CreateXAlternative(1),
+                                Extentions.CreateXAlternative(2)
+                            );
+            return alternatives;
+        }
+
+        
         public XElement CreateCheckItem()
         {
             XElement checklistitem = new XElement("section",
@@ -1421,6 +1435,23 @@ namespace DIBAdminAPI.Data.Entities
     }
     public static class Extentions
     {
+        public static XElement CreateXAlternative(int n)
+        {
+            string id = Guid.NewGuid().ToString();
+            XElement result = 
+                new XElement("section",
+                    new XAttribute("id", Guid.NewGuid().ToString()),
+                    new XAttribute("class", "dib-x-alternative"),
+                    new XAttribute("data-var-value",id),
+                    n==0 ? new XAttribute("data-var-name", "Nytt Alternativ") : new XAttribute("data-var-name", "Alternativ " + n.ToString()),
+                    new XElement("p",
+                        new XAttribute("id", Guid.NewGuid().ToString()),
+                        n == 0 ? new XText("Nytt Alternativ") : new XText("Alternativ " + n.ToString())
+                    )
+                                
+                );
+            return result;
+        }
         public static void SetHrefValue(this IEnumerable<XAttribute> xAttributes)
         {
             foreach (XAttribute a in xAttributes)
@@ -1826,30 +1857,14 @@ namespace DIBAdminAPI.Data.Entities
             }
             return true;
         }
-        //public static bool DeleteJsonElement(this Dictionary<string, JsonElement> elements, JsonDelete jsonDelete)
-        //{
-        //    if (elements == null) return false;
-        //    if (jsonDelete.action != "delete") return false;
-        //    foreach (string id in jsonDelete.id)
-        //    {
-        //        if (elements.ContainsKey(id))
-        //        {
-        //            JsonElement e = elements.Values.Where(p => p.children.Where(c => c.id == id).Count() > 0).FirstOrDefault();
-        //            if (e != null)
-        //            {
-        //                e.RemoveChild(id);
-        //            }
-        //        }
-        //    }
-
-        //    return true;
-        //}
+        
         public static EditDocumentContainerResult DeleteJsonElement(this DocumentContainer documentContainer, JsonDelete jsonDelete, string resourceId, string segmentId)
         {
             string document_id = "document;" + resourceId + ";" + segmentId;
             if (documentContainer == null) return null;
             if (jsonDelete.action != "delete") return null;
             string CurrId = "";
+            AutoCountProps autoCountProps = new AutoCountProps();
             foreach (string id in jsonDelete.id)
             {
                 CurrId = id;
@@ -1864,6 +1879,7 @@ namespace DIBAdminAPI.Data.Entities
                             CurrId = je.Key;
                         }
                     }
+                    
                     JsonElement e = documentContainer.elements.Values.Where(p => p.children.Where(c => c.id == CurrId).Count() > 0).FirstOrDefault();
                     if (e != null)
                     {
@@ -1878,28 +1894,8 @@ namespace DIBAdminAPI.Data.Entities
             if (CurrId == "")
                 return null;
 
-            SectionUpdateObjects updatedObjects = documentContainer.UpdateJsonObjects(resourceId, segmentId);
+            SectionUpdateObjects updatedObjects = documentContainer.UpdateJsonObjects(resourceId, segmentId, autoCountProps);
 
-            //XElement document = documentContainer.GetDocumentContainerXML();
-            //TocJson tocJson = new TocJson(document,resourceId,segmentId);
-
-            //List<TocUpdate> tocUpdates = null;
-            //tocUpdates = (
-            //    from t in documentContainer.toc
-            //    join t1 in tocJson.toc
-            //    on t.Key equals t1.Key
-            //    where !t.Value.Equals(t1.Value)
-            //    select new TocUpdate { oldToc = t, newToc = t1 }
-            //).ToList();
-
-            //foreach (TocUpdate tu in tocUpdates)
-            //{
-            //    if (documentContainer.toc.ContainsKey(tu.newToc.Key))
-            //    {
-            //        documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
-            //    }
-                    
-            //}
             
 
             return new EditDocumentContainerResult
@@ -1919,36 +1915,18 @@ namespace DIBAdminAPI.Data.Entities
         {
             //string document_id = "document;" + resourceId + ";" + segmentId;
             if (jsonUpdate.action != "update") return null;
-            bool updateToc = false;
-            bool autocount = false;
             List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
-            
+            AutoCountProps autoCountProps = new AutoCountProps();
             foreach (KeyValuePair<string, JsonElement> pair in jsonUpdate.elements)
             {
                 if (documentContainer.elements.ContainsKey(pair.Key))
                 {
                     if (!documentContainer.elements[pair.Key].Equals(pair.Value))
                     {
-                        if (Regex.IsMatch(pair.Value.name, @"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;"))
+
+                        if (documentContainer.resourceTypeId == "24" && pair.Value.name == "section")
                         {
-                            updateToc = true;
-                            if (pair.Value.name == "section")
-                            {
-
-                            }
-                            if (pair.Value.attributes.ContainsKey("data-class"))
-                            {
-                                autocount = (pair.Value.attributes.GetValueOrDefault("data-class") ?? "").Split(' ').Contains("-autocount");
-                            }
-                            else
-                            {
-                                if ((documentContainer.elements[pair.Key].attributes.GetValueOrDefault("data-class") ?? "").Split(' ').Contains("-autocount"))
-                                {
-                                    string removeO
-                                }
-
-                            }
-
+                            autoCountProps = new AutoCountProps(pair, documentContainer.elements[pair.Key]);
                         }
 
                         documentContainer.elements[pair.Key] = pair.Value;
@@ -1961,13 +1939,15 @@ namespace DIBAdminAPI.Data.Entities
                     updated.Add(pair);
                 }
             }
-            SectionUpdateObjects updatedObjects = documentContainer.UpdateJsonObjects(resourceId, segmentId);
-            //List<TocUpdate> tocUpdates = null;
-            //if (updateToc)
-            //{
-            //    tocUpdates = documentContainer.UpdateToc(resourceId, segmentId);
-                
-            //}
+
+            SectionUpdateObjects updatedObjects = documentContainer.UpdateJsonObjects(resourceId, segmentId, autoCountProps);
+            if (updatedObjects.updated.Count>0)
+            {
+                updated = updated.Where(p => !updatedObjects.updated.Select(s=>s.Key).Contains(p.Key)).ToList();
+                updated.AddRange(updatedObjects.updated);
+            }
+
+
             return new EditDocumentContainerResult
             {
                 json = new JsonObject {
@@ -1985,6 +1965,7 @@ namespace DIBAdminAPI.Data.Entities
             public List<TocUpdate> TocUpdates = new List<TocUpdate>();
             public List<string> genRoot = new List<string>();
             public Dictionary<string, ObjectApi> objects = new Dictionary<string, ObjectApi>();
+            public List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
 
         }
         public class ObjectAPIUpdated
@@ -1993,7 +1974,48 @@ namespace DIBAdminAPI.Data.Entities
             public KeyValuePair<string, ObjectApi> currObj { get; set; }
         }
 
-        public static SectionUpdateObjects UpdateJsonObjects(this DocumentContainer documentContainer, string resourceId, string segmentId)
+        public static void SetAutoCountAttribute(this XAttribute attribute)
+        {
+            if (attribute == null) return;
+            if (!attribute.Value.Split(' ').Contains("-autocount"))
+            {
+                attribute.SetValue(attribute.Value + " " + "-autocount");
+            }
+        }
+        public static void RemoveAttributeClassValue(this XAttribute attribute, string value)
+        {
+            if (attribute == null || (value == null ? "" : value.Trim()) == "") return;
+            if (attribute.Value != "")
+            {
+                attribute.SetValue(attribute.Value.Split(' ').Where(p => p != value).Select(p => p).StringConcatenate(" "));
+            }
+        }
+        
+        public static void SetAutoCount(this XElement element, AutoCountProps autoCountProps)
+        {;
+            if (element == null || autoCountProps == null) return;
+            if (autoCountProps.autocount && element.Elements().Where(p => p.IsHeaderName()).Count() != 0)
+            {
+                element.SetAttributeValueEx("autocount", true);
+                element.SetAttributeValueEx("type", autoCountProps.type);    
+                //element.SetAttributeValueEx("data-gen-object", true);
+            }
+            else
+            {
+                element.Attributes("autocount").ToList().ForEach(p=>p.Remove());
+                element.Attributes("type").ToList().ForEach(p => p.Remove());
+                    
+                //if ((bool)element.Attributes("optional").FirstOrDefault())
+                //{
+                //    element.SetAttributeValueEx("data-gen-object", true);
+                //}
+                //else
+                //{
+                //    element.Attributes("data-gen-object").ToList().ForEach(p => p.Remove());
+                //}
+            }
+        }
+        public static SectionUpdateObjects UpdateJsonObjects(this DocumentContainer documentContainer, string resourceId, string segmentId, AutoCountProps autoCountProps = null)
         {
             SectionUpdateObjects result = new SectionUpdateObjects();
             
@@ -2002,7 +2024,38 @@ namespace DIBAdminAPI.Data.Entities
 
             if (documentContainer.resourceTypeId == "24")
             {
+                if (autoCountProps == null ? false : autoCountProps.active)
+                {
+                    XElement element = document.Descendants("section").Where(p => (string)p.Attributes("id").FirstOrDefault() == autoCountProps.id).FirstOrDefault();
+                    element.SetAutoCount(autoCountProps);
+                    element.NodesBeforeSelf().OfType<XElement>().Where(p => p.Name.LocalName == "section").ToList().ForEach(p => p.SetAutoCount(autoCountProps));
+                    element.NodesAfterSelf().OfType<XElement>().Where(p => p.Name.LocalName == "section").ToList().ForEach(p => p.SetAutoCount(autoCountProps));
+
+                    Dictionary<string, JsonElement> elements = document
+                    .Descendants()
+                    .Select(p => p)
+                    .ToDictionary(p => (string)p.Attributes("id").FirstOrDefault(), p => new JsonElement(p));
+
+                    foreach (KeyValuePair<string, JsonElement> pair in elements)
+                    {
+                        if (documentContainer.elements.ContainsKey(pair.Key))
+                        {
+                            if (!documentContainer.elements[pair.Key].Equals(pair.Value))
+                            {
+                                documentContainer.elements[pair.Key] = pair.Value;
+                                result.updated.Add(pair);
+                            }
+                        }
+                        else
+                        {
+                            documentContainer.elements.Add(pair.Key, pair.Value);
+                            result.updated.Add(pair);
+                        }
+                    }
+                
+                }
                 GenObjects genObjects = new GenObjects(document);
+                
                 List<ObjectAPIUpdated> objectAPIUpdateds =
                 (
                     from o in documentContainer.objects.Where(p => p.Value.type.StartsWith("pointer-x-var") || p.Value.type.StartsWith("dib-x"))
@@ -2017,17 +2070,18 @@ namespace DIBAdminAPI.Data.Entities
                     if (documentContainer.objects.ContainsKey(o.currObj.Key))
                     {
                         documentContainer.objects[o.currObj.Key] = o.currObj.Value;
+                        result.objects.Add(o.currObj.Key, o.currObj.Value);
                     }
                 }
 
-                result.objects.AddRange(objectAPIUpdateds.ToDictionary(p => p.currObj.Key, p => p.currObj.Value));
+                //result.objects.AddRange(objectAPIUpdateds.ToDictionary(p => p.currObj.Key, p => p.currObj.Value));
 
                 Dictionary<string, ObjectApi> newObjects =
                     genObjects
                     .objects
                     .Where(p => !documentContainer.objects.ContainsKey(p.Key))
                     .ToDictionary(p => p.Key, p => p.Value);
-
+                
 
                 if (newObjects.Count() > 0)
                 {
@@ -2075,42 +2129,42 @@ namespace DIBAdminAPI.Data.Entities
 
             return result;
         }
-        public static List<TocUpdate> UpdateToc(this DocumentContainer documentContainer, string resourceId, string segmentId)
-        {
-            List<TocUpdate> tocUpdates = null;
-            XElement document = documentContainer.GetDocumentContainerXML();
-            TocJson tocJson = new TocJson(document, resourceId, segmentId);
+        //public static List<TocUpdate> UpdateToc(this DocumentContainer documentContainer, string resourceId, string segmentId)
+        //{
+        //    List<TocUpdate> tocUpdates = null;
+        //    XElement document = documentContainer.GetDocumentContainerXML();
+        //    TocJson tocJson = new TocJson(document, resourceId, segmentId);
 
             
-            tocUpdates = (
-                from t in documentContainer.toc
-                join t1 in tocJson.toc
-                on t.Key equals t1.Key
-                where !t.Value.Equals(t1.Value)
-                select new TocUpdate { oldToc = t, newToc = t1 }
-            ).ToList();
+        //    tocUpdates = (
+        //        from t in documentContainer.toc
+        //        join t1 in tocJson.toc
+        //        on t.Key equals t1.Key
+        //        where !t.Value.Equals(t1.Value)
+        //        select new TocUpdate { oldToc = t, newToc = t1 }
+        //    ).ToList();
 
 
-            foreach (TocUpdate tu in tocUpdates)
-            {
-                if (documentContainer.toc.ContainsKey(tu.newToc.Key))
-                {
-                    documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
-                }
-            }
-            List<TocUpdate> newToc =
-                tocJson
-                    .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
-                    .Select(p => new TocUpdate { newToc = p })
-                    .ToList();
+        //    foreach (TocUpdate tu in tocUpdates)
+        //    {
+        //        if (documentContainer.toc.ContainsKey(tu.newToc.Key))
+        //        {
+        //            documentContainer.toc[tu.newToc.Key] = tu.newToc.Value;
+        //        }
+        //    }
+        //    List<TocUpdate> newToc =
+        //        tocJson
+        //            .toc.Where(p => !documentContainer.toc.ContainsKey(p.Key))
+        //            .Select(p => new TocUpdate { newToc = p })
+        //            .ToList();
 
-            if (newToc.Count() > 0)
-            {
-                documentContainer.toc.AddRange(newToc.ToDictionary(p => p.newToc.Key, p => p.newToc.Value));
-                tocUpdates.AddRange(newToc);
-            }
-            return tocUpdates;
-        }
+        //    if (newToc.Count() > 0)
+        //    {
+        //        documentContainer.toc.AddRange(newToc.ToDictionary(p => p.newToc.Key, p => p.newToc.Value));
+        //        tocUpdates.AddRange(newToc);
+        //    }
+        //    return tocUpdates;
+        //}
         //public static bool UpdateJsonElements(this Dictionary<string, JsonElement> elements, JsonUpdate jsonUpdate)
         //{
         //    if (jsonUpdate.root.action != "update") return false;
@@ -2232,7 +2286,44 @@ namespace DIBAdminAPI.Data.Entities
             }
             return result;
         }
-       
+
+        //public static JsonPaste CreateXSection(this JsonCreateElement jsonCreate)
+        //{
+        //    JsonPaste result = null;
+        //    XElement checklistitem = new ElementConstructor().CreateCheckItem();
+        //    checklistitem
+        //        .DescendantsAndSelf()
+        //        .Where(p => (string)p.Attributes("class").FirstOrDefault() != null)
+        //        .ToList()
+        //        .ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+        //    result = checklistitem.NewElementToJson();
+        //    return result;
+        //}
+        public static JsonPaste CreateAlternative(this JsonCreateElement jsonCreate)
+        {
+            JsonPaste result = null;
+
+            XElement alternative = CreateXAlternative(0);
+            alternative
+                .DescendantsAndSelf()
+                .Where(p => (string)p.Attributes("class").FirstOrDefault() != null)
+                .ToList()
+                .ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+            result = alternative.NewElementToJson();
+            return result;
+        }
+        public static JsonPaste CreateAlternatives(this JsonCreateElement jsonCreate)
+        {
+            JsonPaste result = null;
+            XElement alternatives = new ElementConstructor().CreateXAlternatives();
+            alternatives
+                .DescendantsAndSelf()
+                .Where(p => (string)p.Attributes("class").FirstOrDefault() != null)
+                .ToList()
+                .ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+            result = alternatives.NewElementToJson();
+            return result;
+        }
         public static JsonPaste CreateChecklistItem(this JsonCreateElement jsonCreate)
         {
             JsonPaste result = null;
@@ -2562,7 +2653,6 @@ namespace DIBAdminAPI.Data.Entities
 
                 container.Descendants().Attributes().Where(p => p.Name.LocalName == "class").ToList().ForEach(p => p.Remove());
                 container.Descendants().Attributes().Where(p => p.Name.LocalName == "data-class").ToList().ForEach(p => p.Parent.SetAttributeValueEx("class",p.Value));
-                
                 return container;
             }
             catch
@@ -2868,6 +2958,8 @@ namespace DIBAdminAPI.Data.Entities
             }
             return result;
         }
+       
+        
         public static EditResult CreateJsonElement(this DocumentContainer documentContainer , JsonCreateElements jsonCreate)
         {
             string newId = "";
@@ -2876,11 +2968,13 @@ namespace DIBAdminAPI.Data.Entities
             
             if (jsonCreate.action == "create" && jsonCreate.html != null)
             {
+                AutoCountProps autoCountProps = new AutoCountProps();
                 XElement container = GetAgilityXMLAll(jsonCreate.html);
                 JsonObject json = new JsonObject(container.Elements());
                 bool updateToc = false;
                 List<KeyValuePair<string, JsonElement>> updated = new List<KeyValuePair<string, JsonElement>>();
                 bool variableAdded = false;
+                
                 foreach (KeyValuePair<string, JsonElement> pair in json.elements)
                 {
                     if (documentContainer.elements.ContainsKey(pair.Key))
@@ -2888,6 +2982,13 @@ namespace DIBAdminAPI.Data.Entities
                         if (!documentContainer.elements[pair.Key].Equals(pair.Value))
                         { 
                             if (Regex.IsMatch(pair.Value.name, @"^h\d$") || "section;document".Split(';').Contains(pair.Value.name) || pair.Key.StartsWith("document;")) updateToc = true;
+                            
+                            if (documentContainer.resourceTypeId=="24" && pair.Value.name == "section")
+                            {
+                                autoCountProps = new AutoCountProps(pair, documentContainer.elements[pair.Key]);
+                            }
+
+                            
                             documentContainer.elements[pair.Key] = pair.Value;
                             updated.Add(pair);
                         }
@@ -2897,6 +2998,7 @@ namespace DIBAdminAPI.Data.Entities
                         documentContainer.elements.Add(pair.Key, pair.Value); 
                         updated.Add(pair);
                     }
+                    
                     if (pair.Value.name == "span" && pair.Value.attributes.ContainsKey("data-var-id") && pair.Value.attributes.ContainsKey("class") ? pair.Value.attributes["class"].Split(' ').Contains("dib-x-var") : false)
                     {
                         string varId = pair.Value.attributes["data-var-id"];
@@ -2909,29 +3011,16 @@ namespace DIBAdminAPI.Data.Entities
                     }
                 }
                 SectionUpdateObjects updatedObjects = new SectionUpdateObjects();
-                if (updateToc)
+                if (updateToc || autoCountProps.active)
                 {
-                    updatedObjects = documentContainer.UpdateJsonObjects(documentContainer.id, documentContainer.segmentId);
-
-                }
-                /*
-                return new EditDocumentContainerResult
-                {
-                    json = new JsonObject
+                    updatedObjects = documentContainer.UpdateJsonObjects(documentContainer.id, documentContainer.segmentId, autoCountProps);
+                    if (updatedObjects.updated.Count > 0)
                     {
-                        toc = updatedObjects.TocUpdates == null ? null : (updatedObjects.TocUpdates.Count() == 0 ? null : updatedObjects.TocUpdates.Select(p => p).ToDictionary(p => p.newToc.Key, p => p.newToc.Value)),
-                        elements = updated.Count() == 0 ? null : updated.ToDictionary(p => p.Key, p => p.Value),
-                        objects = updatedObjects.objects.Count() == 0 ? null : updatedObjects.objects,
-                        genobjectroot = updatedObjects.genRoot.Count() == 0 ? null : updatedObjects.genRoot
-
-                    },
-                    documentContainer = documentContainer
-                };
-                if (updateToc)
-                {
-                    tocUpdates = documentContainer.UpdateToc(documentContainer.id, documentContainer.segmentId);
+                        updated = updated.Where(p => !updatedObjects.updated.Contains(p)).ToList();
+                        updated.AddRange(updatedObjects.updated);
+                    }
                 }
-                */
+               
                 return new EditResult
                 {
                     json = new JsonObject
@@ -2960,7 +3049,9 @@ namespace DIBAdminAPI.Data.Entities
                     root = new List<JsonChild>(),
                     elements = new Dictionary<string, JsonElement>()
                 };
-                Dictionary<string, string> newAttributes = null;
+                bool autocount;
+                bool optional;
+                Dictionary<string, dynamic> newAttributes = null;
                 foreach (JsonCreateElement jce in jsonCreate.element)
                 {
 
@@ -3002,7 +3093,7 @@ namespace DIBAdminAPI.Data.Entities
                             }
                         case "p":
                             newId = Guid.NewGuid().ToString();
-                            newAttributes = new Dictionary<string, string>();
+                            newAttributes = new Dictionary<string, dynamic>();
                             newAttributes.Add("id", newId);
                             newAttributes.AddRange(jce.attributes.Where(p => p.Key != "id").ToDictionary(p => p.Key, p => p.Value));
                             result.root.Add(new JsonChild { id = newId });
@@ -3020,10 +3111,50 @@ namespace DIBAdminAPI.Data.Entities
                             }
                             );
                             break;
+                        case "section":
 
-                        default:
+                            if (jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "dib-x-alternative").Count() > 0)
+                            {
+                                JsonPaste json = jce.CreateAlternative();
+                                result.root.AddRange(json.children);
+                                result.elements.AddRange(json.elements);
+                                result.toc.AddRange(json.toc);
+                                documentContainer.elements.AddRange(json.elements);
+                                documentContainer.toc.AddRange(json.toc);
+                                return new EditResult
+                                {
+                                    json = new JsonObject
+                                    {
+                                        resourceid = jsonCreate.resourceId,
+                                        root = json.children,
+                                        elements = json.elements,
+                                        toc = json.toc
+                                    },
+                                    documentContainer = documentContainer
+                                };
 
-                            if (jce.name=="section" && jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "check-item").Count() > 0)
+                            }
+                            else if (jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "dib-x-alternatives").Count() > 0)
+                            {
+                                JsonPaste json = jce.CreateAlternatives();
+                                result.root.AddRange(json.children);
+                                result.elements.AddRange(json.elements);
+                                result.toc.AddRange(json.toc);
+                                documentContainer.elements.AddRange(json.elements);
+                                documentContainer.toc.AddRange(json.toc);
+                                return new EditResult
+                                {
+                                    json = new JsonObject
+                                    {
+                                        resourceid = jsonCreate.resourceId,
+                                        root = json.children,
+                                        elements = json.elements,
+                                        toc = json.toc
+                                    },
+                                    documentContainer = documentContainer
+                                };
+                            }
+                            else if (jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "check-item").Count() > 0)
                             {
                                 JsonPaste json = jce.CreateChecklistItem();
                                 result.root.AddRange(json.children);
@@ -3046,9 +3177,39 @@ namespace DIBAdminAPI.Data.Entities
                             else
                             {
                                 newId = Guid.NewGuid().ToString();
-                                newAttributes = new Dictionary<string, string>();
+                                newAttributes = new Dictionary<string, dynamic>();
+                                newAttributes.Add("id", newId);
+                                autocount = (jce.attributes.GetValueOrDefault("autocount") ?? "false") == "true";
+                                optional = (jce.attributes.GetValueOrDefault("optional") ?? "false") == "true";
+                                if (autocount || optional)
+                                {
+                                    string classValue = (autocount ? "-autocount" : (optional ? " " : "")) + (optional ? "-optional" : "");
+                                    newAttributes.Add("class", classValue);
+                                    newAttributes.Add("data-class", classValue);
+                                    newAttributes.Add("data-gen-object", true);
+                                }
+                                else
+                                {
+                                    newAttributes.AddRange(jce.attributes.Where(p => p.Key != "id").ToDictionary(p => p.Key, p => p.Value));
+                                }
+
+                                result.root.Add(new JsonChild { id = newId });
+                                result.elements.Add(newId, new JsonElement
+                                {
+                                    name = jce.name,
+                                    attributes = newAttributes,
+                                    children = jce.children == null ? new List<JsonChild>() : jce.children
+                                }
+                                );
+                            }
+                            break;
+                        default:
+                            
+                                newId = Guid.NewGuid().ToString();
+                                newAttributes = new Dictionary<string, dynamic>();
                                 newAttributes.Add("id", newId);
                                 newAttributes.AddRange(jce.attributes.Where(p => p.Key != "id").ToDictionary(p => p.Key, p => p.Value));
+                                
                                 result.root.Add(new JsonChild { id = newId });
                                 result.elements.Add(newId, new JsonElement
                                 {
@@ -3058,7 +3219,7 @@ namespace DIBAdminAPI.Data.Entities
                                 }
                                 );
 
-                            }
+                            
                             
                             break;
                     }
@@ -3372,7 +3533,7 @@ namespace DIBAdminAPI.Data.Entities
     }
     public class JsonCreateElement
     {
-        public Dictionary<string, string> attributes { get; set; }
+        public Dictionary<string, dynamic> attributes { get; set; }
         public List<JsonChild> children { get; set; }
         public string name { get; set; }
     }
@@ -3390,7 +3551,7 @@ namespace DIBAdminAPI.Data.Entities
         {
             element = new JsonElement
             {
-                attributes = new Dictionary<string, string>()
+                attributes = new Dictionary<string, dynamic>()
             };
 
             element.children = new List<JsonChild>();
@@ -3492,7 +3653,7 @@ namespace DIBAdminAPI.Data.Entities
     {
 
         public Dictionary<string, dynamic> otherprops { get; set; }
-        public Dictionary<string, string> attributes { get; set; }
+        public Dictionary<string, dynamic> attributes { get; set; }
         public List<JsonChild> children { get; set; } = new List<JsonChild>();
         public string  name { get; set; }
         public string type { get; set; }
@@ -3503,7 +3664,7 @@ namespace DIBAdminAPI.Data.Entities
         {
             name = element.Name.LocalName;
             children = element.GetElementChildren();
-            attributes = element.Attributes().Where(p=>(p.Value==null ? "" : p.Value)!="").OrderBy(p=>p.Name.LocalName).Select(p => p).ToDictionary(p => p.Name.LocalName, p => p.Value);
+            attributes = element.Attributes().Where(p => p.Value != null).OrderBy(p => p.Name.LocalName).Select(p => p).ToDictionary(p => p.Name.LocalName, p => (dynamic)p.Value);
         }
         public void RemoveChild(string id)
         {
@@ -3521,8 +3682,31 @@ namespace DIBAdminAPI.Data.Entities
             if ((other.name ?? "null") != (name ?? "null")) return false;
             if ((other.type ?? "null") != (type ?? "null")) return false;
 
-            if ((other.attributes == null ? "" : other.attributes.OrderBy(p=>p.Key).Select(p => p.Key + ":" + p.Value).StringConcatenate(";")) != (attributes == null ? "" : attributes.OrderBy(p => p.Key).Select(p => p.Key + ":" + p.Value).StringConcatenate(";"))) return false;
-            if ((other.children == null ? "" : other.children.Select(p => (p.id == null ? p.text : p.id)).StringConcatenate(";")) != (children == null ? "" : children.Select(p => (p.id == null ? p.text : p.id)).StringConcatenate())) return false;
+            string oAtt = "";
+            if (other.attributes != null)
+            {
+                foreach (KeyValuePair<string, dynamic> a in other.attributes.OrderBy(p => p.Key))
+                {
+                    oAtt = oAtt + a.Key + ";" + Convert.ToString(a.Value) + "/";
+                }
+            }
+            
+            string Att = "";
+            if (attributes != null)
+            {
+                foreach (KeyValuePair<string, dynamic> a in attributes.OrderBy(p => p.Key))
+                {
+                    Att = Att + a.Key + ";" + Convert.ToString(a.Value) + "/";
+                }
+            }
+
+            if (oAtt.ToLower() != Att.ToLower()) return false;
+            //if ((other.attributes == null ? "" : other.attributes.OrderBy(p => p.Key).Select(p => p.Key + ":" + Convert.ToString(p.Value)).Select(p=>p).StringConcatenate(";")) != (attributes == null ? "" : attributes.OrderBy(p => p.Key).Select(p => p.Key + ":" + Convert.ToString(p.Value)).StringConcatenate(";"))) return false;
+
+            string leftChild = other.children == null ? "" : other.children.Select(p => (p.id == null ? (p.text==null?"": p.text) : p.id)).StringConcatenate(";");
+            string rightChild = children == null ? "" : children.Select(p => (p.id == null ? (p.text == null ? "" : p.text) : p.id)).StringConcatenate(";");
+            if (leftChild != rightChild) return false;
+            //if ((other.children == null ? "" : other.children.Select(p => (p.id == null ? p.text : p.id)).StringConcatenate(";")) != (children == null ? "" : children.Select(p => (p.id == null ? p.text : p.id)).StringConcatenate())) return false;
             return true;
         }
 

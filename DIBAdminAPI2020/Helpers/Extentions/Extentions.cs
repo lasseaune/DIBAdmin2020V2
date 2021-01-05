@@ -15,6 +15,40 @@ using DIBAdminAPI.Data.Entities;
 
 namespace DIBAdminAPI.Helpers.Extentions
 {
+    public class AutoCountProps
+    {
+        public bool active = false;
+        public bool autocount = false;
+        public bool optional = false;
+        public string id { get; set; }
+        public string type { get; set; }
+        public AutoCountProps() { }
+        public AutoCountProps(KeyValuePair<string, JsonElement> newElement, JsonElement currElement)
+        {
+            if (newElement.Value.name == "section")
+            {
+                bool setAutocount = ((string)((newElement.Value.attributes.GetValueOrDefault("autocount")??"").ToString())).EvalBooleanString();
+                bool hadAutocount = ((string)((currElement.attributes.GetValueOrDefault("autocount")??"").ToString())).EvalBooleanString();
+                optional = ((string)((currElement.attributes.GetValueOrDefault("optional")??"").ToString())).EvalBooleanString();
+                if (setAutocount && !hadAutocount)
+                {
+                    active = true;
+                    autocount = true;
+                    id = newElement.Key;
+                    type = newElement.Value.attributes.GetValueOrDefault("type")??"1";
+                }
+                else if (!setAutocount && hadAutocount)
+                {
+                    active = true;
+                    autocount = false;
+                    id = newElement.Key;
+                }
+                
+
+
+            }
+        }
+    }
     public class ElementEnumerator
     {
         public int idx { get; set; }
@@ -276,6 +310,17 @@ namespace DIBAdminAPI.Helpers.Extentions
     }
     public static class Extentions
     {
+        public static bool EvalBooleanString(this string text)
+        {
+            if (text == null) return false;
+            if ("true;1".Split(';').Contains(text.Trim().ToLower()))
+            {
+                return true;
+            }
+            return false;
+
+
+        }
         public static int StringIsMatchValue(this string text, string search)
         {
             int rank = 0;
@@ -476,6 +521,18 @@ namespace DIBAdminAPI.Helpers.Extentions
             }
             return false;
        }
+        public static void SetAttributeValueEx(this XElement e, string name, bool value)
+        {
+            XAttribute att = e.Attributes(name).FirstOrDefault();
+            if (att != null)
+            {
+                att.SetValue(value);
+            }
+            else
+            {
+                e.Add(new XAttribute(name, value));
+            }
+        }
         public static void SetAttributeValueEx(this XElement e, string name, string value)
         {
             XAttribute att = e.Attributes(name).FirstOrDefault();

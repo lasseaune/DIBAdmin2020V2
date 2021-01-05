@@ -170,7 +170,7 @@ namespace DIBAdminAPI.Controllers
                         new JsonElement
                         {
                             name = "div",
-                            attributes = new Dictionary<string, string>() {
+                            attributes = new Dictionary<string, dynamic>() {
                                 { "class", "doccontainer" },
                                 { "id", document_id },
                             },

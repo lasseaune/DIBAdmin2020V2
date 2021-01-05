@@ -144,6 +144,31 @@ namespace DIBAdminAPI.Helpers.Extentions
 
                 XElement xElement = new XElement("document", document.Transform());
                 xElement.Descendants().Where(p => (string)p.Attributes("class").FirstOrDefault() != null).ToList().ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+
+                //XElement first = xElement.Descendants("section").Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Split(" ").Contains("-autocount")).FirstOrDefault();
+                //if (first!=null)
+                //{
+                //    int n = first.Ancestors().Count();
+                //    while (first != null)
+                //    {
+                //        AutoCountProps autoCountProps = new AutoCountProps();
+                //        autoCountProps.active = true;
+                //        autoCountProps.autocount = true;
+                //        autoCountProps.id = (string)first.Attributes("id").FirstOrDefault();
+                //        autoCountProps.type = (string)first.Attributes("data-type").FirstOrDefault() ?? "decimal";
+                //        first.SetAutoCount(autoCountProps);
+                //        first.NodesBeforeSelf().OfType<XElement>().Where(p => p.Name.LocalName == "section").ToList().ForEach(p => p.SetAutoCount(autoCountProps));
+                //        first.NodesAfterSelf().OfType<XElement>().Where(p => p.Name.LocalName == "section").ToList().ForEach(p => p.SetAutoCount(autoCountProps));
+
+                //        first = xElement.Descendants("section").Where(p => p.Ancestors().Count() > n && ((string)p.Attributes("class").FirstOrDefault() ?? "").Split(" ").Contains("-autocount")).FirstOrDefault();
+                //        if (first != null)
+                //        {
+                //            n = first.Ancestors().Count();
+                //        }
+
+                //    }
+                //}
+                
                 return xElement;
             }
             catch (SystemException e)
@@ -273,7 +298,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                                     result.Add(new XElement("aside",
                                         new XAttribute("id", Guid.NewGuid().ToString()),
                                         new XAttribute("class", "dib-x-comment"),
-                                        new XAttribute("data-gen-object", true),
+                                        //new XAttribute("data-gen-object", true),
                                         ((string)e.Attributes("title").FirstOrDefault() ?? "").Trim() != "" ? new XElement("em", new XAttribute("class","dib-x-comment-tag"), new XText(((string)e.Attributes("title").FirstOrDefault() ?? "").Trim())) : null,
                                         new XElement("p",
                                             new XAttribute("id", Guid.NewGuid().ToString()),
@@ -290,9 +315,8 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-alternative"),
-                                new XAttribute("data-gen-object", true),
+                                //new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-value", (string)e.Attributes("n").FirstOrDefault()),
-                                new XAttribute("data-var-id", (string)e.Parent.Attributes("id").FirstOrDefault()),
                                 new XAttribute("data-var-name", (string)e.Attributes("title").FirstOrDefault()),
                                 e.Nodes().SelectMany(p => p.Transform())
                                 )
@@ -303,7 +327,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-alternatives"),
-                                new XAttribute("data-gen-object", true),
+                                //new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
                                 e.Nodes().SelectMany(p => p.Transform())
                                 )
@@ -313,7 +337,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-letterhead"),
-                                new XAttribute("data-gen-object", true),
+                                //new XAttribute("data-gen-object", true),
                                 e.Nodes().SelectMany(p => p.Transform())
                                 )
                             );
@@ -323,7 +347,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("section",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-list"),
-                                new XAttribute("data-gen-object", true),
+                                //new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-oftype", (string)e.Attributes("oftype").FirstOrDefault()),
                                 new XAttribute("data-var-id", (string)e.Attributes("varname").FirstOrDefault()),
                                 new XAttribute("data-var-header", (string)e.Attributes("header").FirstOrDefault()),
@@ -337,7 +361,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                             result.Add(new XElement("span",
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-optional"),
-                                new XAttribute("data-gen-object", true),
+                                //new XAttribute("data-gen-object", true),
                                 new XAttribute("data-var-id", (string)e.Attributes("id").FirstOrDefault()),
                                 new XAttribute("data-var-keyword", (string)e.Attributes("keyword").FirstOrDefault()),
                                 e.Nodes().SelectMany(p => p.Transform())
@@ -356,7 +380,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                                                         ),
                                     (vi.t == null ? false : vi.t.trigName.Trim().ToLower() != vi.v.name.Trim().ToLower() && vi.t.name.Trim().ToLower() == vi.v.name.Trim().ToLower()) ? new XAttribute("data-trigby", vi.t.trigName) : null,
                                     new XAttribute("data-var-id", vi.v.id.ToString().ToLower()),
-                                    new XAttribute("data-var-object", true),
+                                    //new XAttribute("data-var-object", true),
                                     //(string)e.Attributes("class").FirstOrDefault() == null ? null : new XAttribute("data-var-area", (string)e.Attributes("class").FirstOrDefault()),
                                     new XAttribute("data-var-text", vi.v.name),
                                     new XText(vi.v.name)
@@ -841,24 +865,23 @@ namespace DIBAdminAPI.Helpers.Extentions
         private static IEnumerable<XAttribute> GetSectionAttributes(this XElement e)
         {
             List<XAttribute> result = new List<XAttribute>();
+            string dataType = (string)e.Attributes("data-type").FirstOrDefault() ?? "decimal";
             bool dataOptional = ((string)e.Attributes("data-optional").FirstOrDefault() ?? "").Trim().ToLower() == "true";
             bool dataAutocount = ((string)e.Attributes("data-autocount").FirstOrDefault() ?? "").Trim().ToLower() == "true";
             bool bDataAutocount = e.NodesAfterSelf().OfType<XElement>().Where(p => p.IsHeaderName() && p.Name.LocalName == "section" && ((string)e.Attributes("data-autocount").FirstOrDefault() ?? "").Trim().ToLower() == "true").FirstOrDefault() != null;
             bool aDataAutocount = e.NodesBeforeSelf().OfType<XElement>().Where(p => p.IsHeaderName() && p.Name.LocalName == "section" && ((string)e.Attributes("data-autocount").FirstOrDefault() ?? "").Trim().ToLower() == "true").FirstOrDefault() != null;
-
+            
             if (dataOptional || dataAutocount || bDataAutocount || aDataAutocount)
             {
-                List<string> classValue = ((string)e.Attributes("class").FirstOrDefault() ?? "").Split(' ').Where(p => p.Trim() != "" && p != "x-section-optional").ToList();
-                
-                if (dataOptional)  classValue.Add("-optional");
-                if (dataAutocount || bDataAutocount || aDataAutocount) classValue.Add("-autocount");
-                result.Add(new XAttribute("class", classValue.Select(p => p).StringConcatenate(" ")));
-                result.Add(new XAttribute("data-gen-object", true));
+                List<string> classValue = ((string)e.Attributes("class").FirstOrDefault() ?? "").Split(' ').Where(p => p.Trim() != "" && p != "").ToList();
+                if (dataType == "decimal") result.Add(new XAttribute("type", "1"));
+                if (dataOptional) result.Add(new XAttribute("optional", true));
+                if (dataAutocount || bDataAutocount || aDataAutocount) result.Add(new XAttribute("autocount", true));
+
+                //result.Add(new XAttribute("class", "x-section-optional"));
+                //result.Add(new XAttribute("data-gen-object", true));
             }
-            else 
-            {
-                result.Add(e.Attributes("class").FirstOrDefault());
-            }
+            
             return result;
         }
         private static IEnumerable<XNode> Section(this XElement e)
@@ -869,10 +892,6 @@ namespace DIBAdminAPI.Helpers.Extentions
             result.Add(new XElement("section",
                 e.Attributes("id"),
                 e.GetSectionAttributes(),
-                
-                e.Attributes().Where(a => a.Name.LocalName.StartsWith("data")),
-                cmi != null && e.Elements().Where(p => Regex.IsMatch(p.Name.LocalName, @"h\d")).FirstOrDefault() == null ? cmi.comments : null,
-                moreinfo == null ? null : new XAttribute("data-hasrelations", moreinfo.hasRelations),
                 e.Nodes().SelectMany(p => p.Transform())
                 )
             );

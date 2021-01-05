@@ -266,54 +266,65 @@ namespace DIBAdminAPI.Data.Entities
             if ((other.selected ?? false) != (selected ?? false)) return false;
             switch (type)
             {
+                case "dib-x-section":
+                    {
+                        if ((other.data.name ?? "") != (data.name ?? "")) return false;
+                        if ((other.data.autoCount ?? "") != (data.autoCount ?? "")) return false;
+                        if ((other.data.optional ?? "") != (data.optional ?? "")) return false;
+                        if ((other.data.varId ?? "") != (data.varId ?? "")) return false;
+                        if ((other.data.varvalue ?? "") != (data.varvalue ?? "")) return false;
+                        if ((other.data.dataType ?? "") != (data.dataType ?? "")) return false;
+                    }
+                    break;
                 case "pointer-x-var":
                     {
-                        if (other.data.varId ?? "" != data.varId ?? "") return false;
+                        if ((other.data.varId ?? "") != (data.varId ?? "")) return false;
                     }
                     break;
                 case "dib-x-optional":
                     {
-                        if (other.data.varId ?? "" != data.varId ?? "") return false;
-                        if (((bool)other.data.varvalue) != ((bool)data.varvalue)) return false;
-                        if (other.data.dataType ?? "" != data.dataType ?? "") return false;
+                        if ((other.data.varId ?? "") != (data.varId ?? "")) return false;
+                        if ((other.data.varvalue ??"") != (data.varvalue ?? "")) return false;
+                        if ((other.data.optionKey ?? "") != (data.optionKey ?? "")) return false;
                     }
                     break;
                 case "dib-x-list":
                     {
-                        if (other.data.ofType ?? "" != data.ofType ?? "") return false;
-                        if (other.data.heading ?? "" != data.heading ?? "") return false;
-                        if (other.data.varId ?? "" != data.varId ?? "") return false;
-                        if (other.data.defaultCounter ?? "" != data.defaultCounter ?? "") return false;
+                        if ((other.data.ofType ?? "") != (data.ofType ?? "")) return false;
+                        if ((other.data.heading ?? "") != (data.heading ?? "")) return false;
+                        if ((other.data.varId ?? "") != (data.varId ?? "")) return false;
+                        if ((other.data.defaultCounter ?? "") != (data.defaultCounter ?? "")) return false;
                     }
                     break;
                 case "dib-x-letterhead":
                     {
-                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                        if ((other.data.heading ?? "") != (data.heading ?? "")) return false;
                     }
                     break;
                 case "dib-x-alternatives":
                     {
-                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                        if ((other.data.heading ?? "") != (data.heading ?? "")) return false;
                     }
                     break;
                 case "dib-x-alternative":
                     {
-                        if (other.data.heading ?? "" != data.heading ?? "") return false;
-                        if (other.data.varId ?? "" != data.varId ?? "") return false;
-                        if (other.data.varValue ?? "" != data.varValue ?? "") return false;
+                        if ((other.data.heading ?? "") != (data.heading ?? "")) return false;
+                        //if ((other.data.varId ?? "") != (data.varId ?? "")) return false;
+                        if ((other.data.varValue ?? "") != (data.varValue ?? "")) return false;
                     }
                     break;
                 case "dib-x-comment":
                     {
-                        if (other.data.heading ?? "" != data.heading ?? "") return false;
+                        if ((other.data.heading ?? "") != (data.heading ?? "")) return false;
                     }
                     break;
                 default:
                     return false; ;
 
             }
-
-            if ((other.children == null ? "" : other.children.Select(p=>p).StringConcatenate()) == (children == null ? "" : children.Select(p => p).StringConcatenate())) return false;
+            string leftChild = other.children == null ? "" : other.children.Select(p => p).StringConcatenate(";");
+            string rightChild = children == null ? "" : children.Select(p => p).StringConcatenate(";");
+            if (leftChild != rightChild) return false;
             return true;
         }
 
