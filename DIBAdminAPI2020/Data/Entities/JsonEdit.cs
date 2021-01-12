@@ -2299,6 +2299,62 @@ namespace DIBAdminAPI.Data.Entities
         //    result = checklistitem.NewElementToJson();
         //    return result;
         //}
+        public static JsonPaste CreateXListUl(this JsonCreateElement jsonCreate)
+        {
+            JsonPaste result = null;
+            string id = Guid.NewGuid().ToString();
+            XElement list = new XElement("section",
+                new XAttribute("id", id),
+                new XAttribute("class", "dib-x-list"),
+                new XAttribute("ofType", "ul"),
+                new XAttribute("data-var-header", "Ny liste"),
+                new XAttribute("data-var-id", id),
+                new XAttribute("data-var-value", 1),
+                new XAttribute("data-default-counter", 1),
+                new XElement("ul",
+                        new XAttribute("id", Guid.NewGuid().ToString()),
+                        new XElement("li",
+                        new XAttribute("id", Guid.NewGuid().ToString()),
+                        new XAttribute("class", "n-p"),
+                        new XText("")
+                    )
+                )
+                
+            );
+            list
+                .DescendantsAndSelf()
+                .Where(p => (string)p.Attributes("class").FirstOrDefault() != null)
+                .ToList()
+                .ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+            result = list.NewElementToJson();
+            return result;
+        }
+        public static JsonPaste CreateXListP(this JsonCreateElement jsonCreate)
+        {
+            JsonPaste result = null;
+            string id = Guid.NewGuid().ToString();
+            XElement list = new XElement("section",
+                new XAttribute("id", id),
+                new XAttribute("class", "dib-x-list"),
+                new XAttribute("ofType", "p"),
+                new XAttribute("data-var-header", "Ny liste"),
+                new XAttribute("data-var-id", id),
+                new XAttribute("data-var-value", 1),
+                new XAttribute("data-default-counter", 1),
+                new XElement("p",
+                    new XAttribute("id", Guid.NewGuid().ToString()),
+                    new XAttribute("class", "n-p"),
+                    new XText("")
+                )
+            );
+            list
+                .DescendantsAndSelf()
+                .Where(p => (string)p.Attributes("class").FirstOrDefault() != null)
+                .ToList()
+                .ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
+            result = list.NewElementToJson();
+            return result;
+        }
         public static JsonPaste CreateAlternative(this JsonCreateElement jsonCreate)
         {
             JsonPaste result = null;
@@ -3054,7 +3110,6 @@ namespace DIBAdminAPI.Data.Entities
                 Dictionary<string, dynamic> newAttributes = null;
                 foreach (JsonCreateElement jce in jsonCreate.element)
                 {
-
                     switch (jce.name)
                     {
 
@@ -3113,7 +3168,41 @@ namespace DIBAdminAPI.Data.Entities
                             break;
                         case "section":
 
-                            if (jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "dib-x-alternative").Count() > 0)
+                            if (jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "dib-x-list").Count() > 0)
+                            {
+                                string oftype = jce.attributes.Where(p => p.Key == "ofType").Select(p => p.Value).FirstOrDefault() ?? "";
+                                if (oftype == "") return null;
+                                JsonPaste json = null;
+                                switch (oftype)
+                                {
+                                    case "p":
+                                        json = jce.CreateXListP();
+                                        break;
+                                    case "ul":
+                                        json = jce.CreateXListUl();
+                                        break;
+                                    default:
+                                        return null;
+                                }
+                                result.root.AddRange(json.children);
+                                result.elements.AddRange(json.elements);
+                                result.toc.AddRange(json.toc);
+                                documentContainer.elements.AddRange(json.elements);
+                                documentContainer.toc.AddRange(json.toc);
+                                return new EditResult
+                                {
+                                    json = new JsonObject
+                                    {
+                                        resourceid = jsonCreate.resourceId,
+                                        root = json.children,
+                                        elements = json.elements,
+                                        toc = json.toc
+                                    },
+                                    documentContainer = documentContainer
+                                };
+
+                            }
+                            else if (jce.attributes.Where(p => "className;class".Split(';').Contains(p.Key) && p.Value == "dib-x-alternative").Count() > 0)
                             {
                                 JsonPaste json = jce.CreateAlternative();
                                 result.root.AddRange(json.children);

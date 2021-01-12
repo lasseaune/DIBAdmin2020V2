@@ -272,7 +272,7 @@ namespace DIBAdminAPI.Data.Entities
         public string id { get; set; }
         public string codeId { get; set; }
         public string name { get; set; }
-        public bool debetcredit { get; set; }
+        public int debetcredit { get; set; }
         public string accId { get; set; }
         public string typeId { get; set; }
         public string dataResourceId { get; set; }
@@ -286,7 +286,7 @@ namespace DIBAdminAPI.Data.Entities
         public Guid lineId { get; set; }
         public string codeId { get; set; }
         public string name { get; set; }
-        public bool debetcredit { get; set; }
+        public int debetcredit { get; set; }
         public string accId { get; set; }
         public string typeId { get; set; }
         public int guiorder { get; set; }

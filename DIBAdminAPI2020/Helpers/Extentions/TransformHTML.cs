@@ -115,19 +115,6 @@ namespace DIBAdminAPI.Helpers.Extentions
                     ).ToList()
                     .ForEach(p => p.x.AddAnnotation(new VariableInfo(p.v, trigger.Where(t => (t.name == null ? false : t.name.Trim().ToLower() == p.v.name.Trim().ToLower())).Select(t => t).FirstOrDefault())));
 
-                    //.ForEach(p => p.x.ReplaceWith(
-                    //        new XElement("span",
-                    //                new XAttribute("id", Guid.NewGuid().ToString()),
-                    //                new XAttribute("class", "dib-var" + (p.v.n == 1 ? " -nvar" : "") + (trigger.Where(t => (t.name == null ? false : t.name.Trim().ToLower() == p.v.name.Trim().ToLower())).Count() > 0 ? "" : " -trig")),
-                    //                new XAttribute("data-var-id", p.v.varId),
-                    //                (string)p.x.Attributes("class").FirstOrDefault() == null ? null : new XAttribute("data-var-area", (string)p.x.Attributes("class").FirstOrDefault()),
-                    //                new XAttribute("data-var-text", p.v.name),
-                    //                new XText(p.v.name)
-                    //        )
-
-                    //    )
-                    //);
-
                 }
 
 
@@ -145,30 +132,6 @@ namespace DIBAdminAPI.Helpers.Extentions
                 XElement xElement = new XElement("document", document.Transform());
                 xElement.Descendants().Where(p => (string)p.Attributes("class").FirstOrDefault() != null).ToList().ForEach(p => p.SetAttributeValueEx("data-class", (string)p.Attributes("class").FirstOrDefault()));
 
-                //XElement first = xElement.Descendants("section").Where(p => ((string)p.Attributes("class").FirstOrDefault() ?? "").Split(" ").Contains("-autocount")).FirstOrDefault();
-                //if (first!=null)
-                //{
-                //    int n = first.Ancestors().Count();
-                //    while (first != null)
-                //    {
-                //        AutoCountProps autoCountProps = new AutoCountProps();
-                //        autoCountProps.active = true;
-                //        autoCountProps.autocount = true;
-                //        autoCountProps.id = (string)first.Attributes("id").FirstOrDefault();
-                //        autoCountProps.type = (string)first.Attributes("data-type").FirstOrDefault() ?? "decimal";
-                //        first.SetAutoCount(autoCountProps);
-                //        first.NodesBeforeSelf().OfType<XElement>().Where(p => p.Name.LocalName == "section").ToList().ForEach(p => p.SetAutoCount(autoCountProps));
-                //        first.NodesAfterSelf().OfType<XElement>().Where(p => p.Name.LocalName == "section").ToList().ForEach(p => p.SetAutoCount(autoCountProps));
-
-                //        first = xElement.Descendants("section").Where(p => p.Ancestors().Count() > n && ((string)p.Attributes("class").FirstOrDefault() ?? "").Split(" ").Contains("-autocount")).FirstOrDefault();
-                //        if (first != null)
-                //        {
-                //            n = first.Ancestors().Count();
-                //        }
-
-                //    }
-                //}
-                
                 return xElement;
             }
             catch (SystemException e)
@@ -299,7 +262,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                                         new XAttribute("id", Guid.NewGuid().ToString()),
                                         new XAttribute("class", "dib-x-comment"),
                                         //new XAttribute("data-gen-object", true),
-                                        ((string)e.Attributes("title").FirstOrDefault() ?? "").Trim() != "" ? new XElement("em", new XAttribute("class","dib-x-comment-tag"), new XText(((string)e.Attributes("title").FirstOrDefault() ?? "").Trim())) : null,
+                                        ((string)e.Attributes("title").FirstOrDefault() ?? "").Trim() != "" ? new XElement("em", new XAttribute("id", Guid.NewGuid().ToString()), new XAttribute("class","dib-x-comment-tag"), new XText(((string)e.Attributes("title").FirstOrDefault() ?? "").Trim())) : null,
                                         new XElement("p",
                                             new XAttribute("id", Guid.NewGuid().ToString()),
                                             e.Nodes().SelectMany(p => p.Transform())
@@ -348,7 +311,7 @@ namespace DIBAdminAPI.Helpers.Extentions
                                 new XAttribute("id", Guid.NewGuid().ToString()),
                                 new XAttribute("class", "dib-x-list"),
                                 //new XAttribute("data-gen-object", true),
-                                new XAttribute("data-var-oftype", (string)e.Attributes("oftype").FirstOrDefault()),
+                                new XAttribute("ofType", (string)e.Attributes("oftype").FirstOrDefault()),
                                 new XAttribute("data-var-id", (string)e.Attributes("varname").FirstOrDefault()),
                                 new XAttribute("data-var-header", (string)e.Attributes("header").FirstOrDefault()),
                                 new XAttribute("data-default-counter", (string)e.Attributes("defaultcounter").FirstOrDefault()),
@@ -851,6 +814,44 @@ namespace DIBAdminAPI.Helpers.Extentions
                 );
                 return result;
             }
+
+            if (e.Name.LocalName == "p")
+            {
+                if (e.Elements("x-comment").Count() != 0)
+                {
+                    XElement newP = new XElement("p", e.Attributes());
+                    foreach (XNode x in e.Nodes())
+                    { 
+                        if (x.NodeType == XmlNodeType.Element)
+                        {
+                            XElement test = (XElement)x;
+                            if (test.Name.LocalName == "x-comment")
+                            {
+                                if (newP.Nodes().Count()>0)
+                                {
+                                    result.Add(newP);
+                                    newP = new XElement("p", new XAttribute("id", Guid.NewGuid().ToString()));
+                                }
+                                result.AddRange(Transform(x));
+                            }
+                            else
+                            {
+                                newP.Add(Transform(x));
+                            }
+                        }
+                        else
+                        {
+                            newP.Add(Transform(x));
+                        }
+                    }
+                    if (result.Where(p=>p.NodeType==XmlNodeType.Element ? (string)((XElement)p).Attributes("id").FirstOrDefault() == (string)newP.Attributes("id").FirstOrDefault():false).Count()==0 && newP.Nodes().Count()>0)
+                    {
+                        result.Add(newP);
+                    }
+                    return result;
+                }
+            }
+
             if (e == null) return result;
             CommentsItem cmi = e.Annotations<CommentsItem>().FirstOrDefault();
             result.Add(new XElement(e.Name.LocalName.ToString(),
